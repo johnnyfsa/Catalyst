@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d493f200cbe2824f948a04848746184, type: 3}
+  m_Name: Def_Cl2
+  m_EditorClassIdentifier: 
+  id: cl2
+  displayName: Chlorine
+  cardType: 0
+  formula: Cl<sub>2</sub>
+  artwork: {fileID: 21300000, guid: 0e7c4b2f625339e4497608772219ffd3, type: 3}
+  tags: []

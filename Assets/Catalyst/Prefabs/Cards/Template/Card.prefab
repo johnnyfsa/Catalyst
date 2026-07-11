@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3517049868115164246}
+  - component: {fileID: 2152685100506196748}
   m_Layer: 0
   m_Name: VisualRoot
   m_TagString: Untagged
@@ -35,6 +36,28 @@ Transform:
   - {fileID: 6282561998585019553}
   m_Father: {fileID: 7424581878103038576}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2152685100506196748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846308799652178806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7703eaafc4d114dba5bbadde23e0d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  styleMap: {fileID: 11400000, guid: a2329292fb8406048a77296fdc0bd71e, type: 2}
+  previewDefinition: {fileID: 0}
+  frameImage: {fileID: 8353342788418490582}
+  backgroundImage: {fileID: 4027368315028888576}
+  artworkImage: {fileID: 7787265414344114701}
+  titleText: {fileID: 6096483378930687182}
+  titleBackgroundImage: {fileID: 2687955469338547033}
+  formulaText: {fileID: 6794831790849264533}
+  formulaBackgroundImage: {fileID: 7392369525281279719}
+  tagsText: {fileID: 3185126380917467495}
 --- !u!1 &991766732812512662
 GameObject:
   m_ObjectHideFlags: 0
@@ -487,8 +510,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.9212, y: 38.4936}
-  m_SizeDelta: {x: 140.5, y: 130.6}
+  m_AnchoredPosition: {x: 0.632, y: 39.807}
+  m_SizeDelta: {x: 277.326, y: 214.636}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7818931664942346866
 CanvasRenderer:
@@ -511,7 +534,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.13333334, g: 0.19607845, b: 0.23137257, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.65882355}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1009,7 +1032,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6179177813202575822
 Transform:
   m_ObjectHideFlags: 0
@@ -1268,9 +1291,9 @@ Transform:
   - {fileID: 3532081794546619959}
   - {fileID: 974797365730248995}
   - {fileID: 110407754175582455}
-  - {fileID: 8836918387708311079}
   - {fileID: 6712627098143611442}
   - {fileID: 8666595017881755056}
+  - {fileID: 8836918387708311079}
   - {fileID: 6913918613625859798}
   - {fileID: 4389897758626321464}
   - {fileID: 3464725922639478066}
