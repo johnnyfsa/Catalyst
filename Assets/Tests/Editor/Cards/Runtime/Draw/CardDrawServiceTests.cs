@@ -1,13 +1,13 @@
 using System;
 using Catalyst.Cards.Definitions;
 using Catalyst.Cards.Runtime;
-using Catalyst.Cards.Runtime.Drawing;
+using Catalyst.Cards.Runtime.Draw;
 using Catalyst.Cards.Runtime.Movement;
 using Catalyst.Cards.Runtime.Zones;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace Catalyst.Tests.EditMode.Cards.Runtime.Drawing
+namespace Catalyst.Tests.EditMode.Cards.Runtime.Draw
 {
     public sealed class CardDrawServiceTests
     {

@@ -1,6 +1,6 @@
 using Catalyst.Cards.Runtime.Movement;
 
-namespace Catalyst.Cards.Runtime.Drawing
+namespace Catalyst.Cards.Runtime.Draw
 {
     public readonly struct CardDrawResult
     {

@@ -2,7 +2,7 @@ using System;
 using Catalyst.Cards.Runtime.Movement;
 using Catalyst.Cards.Runtime.Zones;
 
-namespace Catalyst.Cards.Runtime.Drawing
+namespace Catalyst.Cards.Runtime.Draw
 {
     public sealed class CardDrawService
     {

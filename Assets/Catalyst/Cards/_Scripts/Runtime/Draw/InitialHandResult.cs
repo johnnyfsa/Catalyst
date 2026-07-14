@@ -1,4 +1,4 @@
-namespace Catalyst.Cards.Runtime.Drawing
+namespace Catalyst.Cards.Runtime.Draw
 {
     public readonly struct InitialHandResult
     {
