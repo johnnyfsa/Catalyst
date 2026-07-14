@@ -135,5 +135,33 @@ namespace Catalyst.Cards.Runtime.Zones
 
             return -1;
         }
+        protected void SwapCards(
+    int firstIndex,
+    int secondIndex
+)
+        {
+            if (firstIndex < 0 || firstIndex >= cards.Count)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(firstIndex)
+                );
+            }
+
+            if (secondIndex < 0 || secondIndex >= cards.Count)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(secondIndex)
+                );
+            }
+
+            if (firstIndex == secondIndex)
+            {
+                return;
+            }
+
+            CardInstance temporary = cards[firstIndex];
+            cards[firstIndex] = cards[secondIndex];
+            cards[secondIndex] = temporary;
+        }
     }
 }
