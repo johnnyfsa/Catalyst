@@ -1,0 +1,16 @@
+{
+    "name": "Catalyst.Game",
+    "rootNamespace": "",
+    "references": [
+        "GUID:40406e8178f88e24d87e5705b0313e4c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
