@@ -362,6 +362,44 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Movement
             Assert.That(hand.Contains(card), Is.True);
         }
 
+        [Test]
+        public void TryMove_ToFullHand_DoesNotRemoveCardFromSource()
+        {
+            DeckRuntime deck = new DeckRuntime();
+            HandRuntime hand = new HandRuntime(1);
+
+            CardInstance cardAlreadyInHand = CreateCard();
+            CardInstance cardInDeck = CreateCard();
+
+            hand.TryAdd(cardAlreadyInHand);
+            deck.TryAdd(cardInDeck);
+
+            CardMovementResult result =
+                movementService.TryMove(
+                    cardInDeck,
+                    deck,
+                    hand
+                );
+
+            Assert.That(result.Succeeded, Is.False);
+
+            Assert.That(
+                result.Failure,
+                Is.EqualTo(
+                    CardMovementFailure.DestinationCannotReceiveCard
+                )
+            );
+
+            Assert.That(deck.Count, Is.EqualTo(1));
+            Assert.That(deck.Contains(cardInDeck), Is.True);
+
+            Assert.That(hand.Count, Is.EqualTo(1));
+            Assert.That(
+                hand.Cards[0],
+                Is.SameAs(cardAlreadyInHand)
+            );
+        }
+
         private CardInstance CreateCard()
         {
             return new CardInstance(

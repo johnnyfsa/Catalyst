@@ -10,6 +10,7 @@ namespace Catalyst.Cards.Runtime.Movement
         CardNotInSource = 5,
         SourceDoesNotAllowRemoval = 6,
         DestinationAlreadyContainsCard = 7,
-        DestinationRejectedCard = 8
+        DestinationCannotReceiveCard = 8,
+        DestinationRejectedCard = 9
     }
 }

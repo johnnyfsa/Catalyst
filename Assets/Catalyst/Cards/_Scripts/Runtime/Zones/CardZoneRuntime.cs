@@ -29,7 +29,7 @@ namespace Catalyst.Cards.Runtime.Zones
             return FindIndex(card.InstanceId) >= 0;
         }
 
-        internal bool CanAdd(CardInstance card)
+        internal virtual bool CanAdd(CardInstance card)
         {
             return card != null && !Contains(card);
         }

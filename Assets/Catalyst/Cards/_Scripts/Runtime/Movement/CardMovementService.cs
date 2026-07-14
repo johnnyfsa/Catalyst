@@ -110,6 +110,12 @@ namespace Catalyst.Cards.Runtime.Movement
                         .DestinationAlreadyContainsCard
                 );
             }
+            if (!destination.CanAdd(card))
+            {
+                return CardMovementResult.Fail(
+                    CardMovementFailure.DestinationCannotReceiveCard
+                );
+            }
 
             return CardMovementResult.Success();
         }
