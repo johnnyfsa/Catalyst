@@ -10,6 +10,7 @@ using Catalyst.Cards.Runtime.Randomness;
 using Catalyst.Cards.Runtime.Session;
 using NUnit.Framework;
 using UnityEngine;
+using Catalyst.Cards.Runtime.Turn;
 
 namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
 {
@@ -54,6 +55,24 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
             Assert.That(session.Hand, Is.Not.Null);
             Assert.That(session.ReactionTable, Is.Not.Null);
             Assert.That(session.DiscardPile, Is.Not.Null);
+            Assert.That(session.Turn, Is.Not.Null);
+        }
+
+        [Test]
+        public void Build_CreatesTurnRuntimeNotYetStarted()
+        {
+            GameSession session = BuildSession(
+                cardCount: 12,
+                seed: 12345
+            );
+
+            Assert.That(session.Turn.HasStarted, Is.False);
+            Assert.That(session.Turn.TurnNumber, Is.Zero);
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.NotStarted)
+            );
         }
 
         [Test]

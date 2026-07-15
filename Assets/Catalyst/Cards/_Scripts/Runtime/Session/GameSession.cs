@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Catalyst.Cards.Runtime.Zones;
+using Catalyst.Cards.Runtime.Turn;
 
 namespace Catalyst.Cards.Runtime.Session
 {
@@ -19,7 +20,8 @@ namespace Catalyst.Cards.Runtime.Session
             DeckRuntime deck,
             HandRuntime hand,
             ReactionTableRuntime reactionTable,
-            DiscardPileRuntime discardPile
+            DiscardPileRuntime discardPile,
+            TurnRuntime turn
         )
         {
             if (sessionCards == null)
@@ -48,6 +50,7 @@ namespace Catalyst.Cards.Runtime.Session
                 ?? throw new ArgumentNullException(
                     nameof(discardPile)
                 );
+            Turn = turn ?? throw new ArgumentNullException(nameof(turn));
 
             this.sessionCards = new List<CardInstance>();
             cardsById = new Dictionary<Guid, CardInstance>();
@@ -71,6 +74,8 @@ namespace Catalyst.Cards.Runtime.Session
         public ReactionTableRuntime ReactionTable { get; }
 
         public DiscardPileRuntime DiscardPile { get; }
+
+        public TurnRuntime Turn { get; }
 
         public bool ContainsCard(Guid instanceId)
         {

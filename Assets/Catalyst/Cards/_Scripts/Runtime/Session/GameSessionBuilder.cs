@@ -6,6 +6,7 @@ using Catalyst.Cards.Runtime.Creation;
 using Catalyst.Cards.Runtime.Draw;
 using Catalyst.Cards.Runtime.Randomness;
 using Catalyst.Cards.Runtime.Zones;
+using Catalyst.Cards.Runtime.Turn;
 
 namespace Catalyst.Cards.Runtime.Session
 {
@@ -79,13 +80,15 @@ namespace Catalyst.Cards.Runtime.Session
                 hand,
                 config.InitialHandSize
             );
+            TurnRuntime turn = new TurnRuntime();
 
             GameSession session = new GameSession(
                 sessionCards,
                 deck,
                 hand,
                 reactionTable,
-                discardPile
+                discardPile,
+                turn
             );
 
             session.ValidateState();
