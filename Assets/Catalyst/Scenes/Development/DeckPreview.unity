@@ -166,7 +166,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c19ffbd41e5abeb4086f6c747568f8a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deckEntries: []
+  deckEntries:
+  - cardDefinition: {fileID: 11400000, guid: aed76f0eab182b94ebfc5fb1ee8d4bd2, type: 2}
+    quantity: 10
+  - cardDefinition: {fileID: 11400000, guid: 88b2555684464354aa3cd22eee0f0105, type: 2}
+    quantity: 5
+  - cardDefinition: {fileID: 11400000, guid: 2319faeb691ee93448b2e81c3bf73b56, type: 2}
+    quantity: 8
   initialHandSize: 8
   maxHandSize: 8
   randomSeed: 12345
