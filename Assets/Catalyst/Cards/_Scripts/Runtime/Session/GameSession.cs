@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Catalyst.Cards.Runtime.Zones;
 using Catalyst.Cards.Runtime.Turn;
+using Catalyst.Cards.Runtime.Zones;
 
 namespace Catalyst.Cards.Runtime.Session
 {
     public sealed class GameSession
     {
         private readonly List<CardInstance> sessionCards;
+
         private readonly ReadOnlyCollection<CardInstance>
             readOnlySessionCards;
 
@@ -32,14 +33,10 @@ namespace Catalyst.Cards.Runtime.Session
             }
 
             Deck = deck
-                ?? throw new ArgumentNullException(
-                    nameof(deck)
-                );
+                ?? throw new ArgumentNullException(nameof(deck));
 
             Hand = hand
-                ?? throw new ArgumentNullException(
-                    nameof(hand)
-                );
+                ?? throw new ArgumentNullException(nameof(hand));
 
             ReactionTable = reactionTable
                 ?? throw new ArgumentNullException(
@@ -50,7 +47,9 @@ namespace Catalyst.Cards.Runtime.Session
                 ?? throw new ArgumentNullException(
                     nameof(discardPile)
                 );
-            Turn = turn ?? throw new ArgumentNullException(nameof(turn));
+
+            Turn = turn
+                ?? throw new ArgumentNullException(nameof(turn));
 
             this.sessionCards = new List<CardInstance>();
             cardsById = new Dictionary<Guid, CardInstance>();
@@ -77,6 +76,21 @@ namespace Catalyst.Cards.Runtime.Session
 
         public TurnRuntime Turn { get; }
 
+        public GameSessionState State { get; private set; } =
+            GameSessionState.NotStarted;
+
+        public GameSessionEndReason EndReason
+        {
+            get;
+            private set;
+        } = GameSessionEndReason.None;
+
+        public bool IsRunning =>
+            State == GameSessionState.Running;
+
+        public bool HasEnded =>
+            State == GameSessionState.Ended;
+
         public bool ContainsCard(Guid instanceId)
         {
             return cardsById.ContainsKey(instanceId);
@@ -93,6 +107,42 @@ namespace Catalyst.Cards.Runtime.Session
             );
         }
 
+        internal void Start()
+        {
+            if (State != GameSessionState.NotStarted)
+            {
+                throw new InvalidOperationException(
+                    $"Cannot start a session in state '{State}'."
+                );
+            }
+
+            Turn.StartFirstTurn();
+
+            State = GameSessionState.Running;
+            EndReason = GameSessionEndReason.None;
+        }
+
+        internal void End(GameSessionEndReason reason)
+        {
+            if (State != GameSessionState.Running)
+            {
+                throw new InvalidOperationException(
+                    $"Cannot end a session in state '{State}'."
+                );
+            }
+
+            if (reason == GameSessionEndReason.None)
+            {
+                throw new ArgumentException(
+                    "An ended session must have an end reason.",
+                    nameof(reason)
+                );
+            }
+
+            State = GameSessionState.Ended;
+            EndReason = reason;
+        }
+
         internal void ValidateState()
         {
             Dictionary<Guid, int> zoneOccurrences =
@@ -103,21 +153,12 @@ namespace Catalyst.Cards.Runtime.Session
                 zoneOccurrences.Add(card.InstanceId, 0);
             }
 
-            CountZoneCards(
-                Deck,
-                zoneOccurrences
-            );
-
-            CountZoneCards(
-                Hand,
-                zoneOccurrences
-            );
-
+            CountZoneCards(Deck, zoneOccurrences);
+            CountZoneCards(Hand, zoneOccurrences);
             CountZoneCards(
                 ReactionTable,
                 zoneOccurrences
             );
-
             CountZoneCards(
                 DiscardPile,
                 zoneOccurrences
@@ -137,9 +178,7 @@ namespace Catalyst.Cards.Runtime.Session
             }
         }
 
-        private void RegisterInitialCard(
-            CardInstance card
-        )
+        private void RegisterInitialCard(CardInstance card)
         {
             if (card == null)
             {
@@ -177,10 +216,7 @@ namespace Catalyst.Cards.Runtime.Session
                     );
                 }
 
-                if (!ReferenceEquals(
-                    card,
-                    registeredCard
-                ))
+                if (!ReferenceEquals(card, registeredCard))
                 {
                     throw new InvalidOperationException(
                         $"Zone contains a different object using registered instance ID '{card.InstanceId}'."

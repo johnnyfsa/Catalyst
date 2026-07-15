@@ -12,7 +12,7 @@ namespace Catalyst.Cards.Runtime.Turn
         public bool HasStarted =>
             CurrentPhase != GamePhase.NotStarted;
 
-        public void StartFirstTurn()
+        internal void StartFirstTurn()
         {
             if (HasStarted)
             {
@@ -25,7 +25,7 @@ namespace Catalyst.Cards.Runtime.Turn
             CurrentPhase = GamePhase.Draw;
         }
 
-        public void AdvancePhase()
+        internal void AdvancePhase()
         {
             if (!HasStarted)
             {
