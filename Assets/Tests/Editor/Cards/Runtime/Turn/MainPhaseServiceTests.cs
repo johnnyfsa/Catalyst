@@ -3,6 +3,8 @@ using Catalyst.Cards.Definitions;
 using Catalyst.Cards.Runtime;
 using Catalyst.Cards.Runtime.Turn;
 using Catalyst.Cards.Runtime.Zones;
+using Catalyst.Cards.Runtime.Discard;
+using Catalyst.Cards.Runtime.Movement;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -245,6 +247,56 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
             Assert.That(
                 turn.CurrentPhase,
                 Is.EqualTo(GamePhase.Main)
+            );
+        }
+        [Test]
+        public void TryEnd_AfterManualDiscardFromFullHand_AdvancesToEnd()
+        {
+            TurnRuntime turn = CreateMainPhaseTurn();
+            HandRuntime hand = new HandRuntime(2);
+            DiscardPileRuntime discardPile =
+                new DiscardPileRuntime();
+
+            CardInstance first = new CardInstance(
+                Guid.NewGuid(),
+                definition
+            );
+
+            CardInstance second = new CardInstance(
+                Guid.NewGuid(),
+                definition
+            );
+
+            hand.TryAdd(first);
+            hand.TryAdd(second);
+
+            ManualDiscardService discardService =
+                new ManualDiscardService(
+                    new CardMovementService()
+                );
+
+            ManualDiscardResult discardResult =
+                discardService.TryDiscard(
+                    first,
+                    hand,
+                    discardPile
+                );
+
+            MainPhaseEndResult endResult =
+                mainPhaseService.TryEnd(
+                    turn,
+                    hand
+                );
+
+            Assert.That(discardResult.Succeeded, Is.True);
+            Assert.That(endResult.Succeeded, Is.True);
+
+            Assert.That(hand.Count, Is.EqualTo(1));
+            Assert.That(discardPile.Count, Is.EqualTo(1));
+
+            Assert.That(
+                turn.CurrentPhase,
+                Is.EqualTo(GamePhase.End)
             );
         }
 
