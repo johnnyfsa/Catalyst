@@ -33,24 +33,39 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
         }
 
         [TestCase(
-            ReactionResolutionFailure.SessionIsNull
-        )]
+    ReactionResolutionFailure.SessionIsNull
+)]
         [TestCase(
-            ReactionResolutionFailure.ReactionIsNull
-        )]
+    ReactionResolutionFailure.PlanIsNull
+)]
         [TestCase(
-            ReactionResolutionFailure.TableDoesNotMatch
-        )]
+    ReactionResolutionFailure.ReactionIsNull
+)]
         [TestCase(
-            ReactionResolutionFailure.InsufficientHeat
-        )]
+    ReactionResolutionFailure.TableDoesNotMatch
+)]
         [TestCase(
-            ReactionResolutionFailure
-                .InsufficientProductCapacity
-        )]
+    ReactionResolutionFailure
+        .DuplicateReactantInstance
+)]
+        [TestCase(
+    ReactionResolutionFailure
+        .ReactantDoesNotBelongToSession
+)]
+        [TestCase(
+    ReactionResolutionFailure
+        .ReactantIsNotOnReactionTable
+)]
+        [TestCase(
+    ReactionResolutionFailure.InsufficientHeat
+)]
+        [TestCase(
+    ReactionResolutionFailure
+        .InsufficientProductCapacity
+)]
         public void Fail_PreservesExpectedFailure(
-            ReactionResolutionFailure failure
-        )
+    ReactionResolutionFailure failure
+)
         {
             ReactionResolutionResult result =
                 ReactionResolutionResult.Fail(
@@ -74,6 +89,7 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                 )
             );
         }
+
 
         [Test]
         public void InvalidDefinition_PreservesValidationFailure()

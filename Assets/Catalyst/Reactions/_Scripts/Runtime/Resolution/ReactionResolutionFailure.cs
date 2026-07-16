@@ -5,9 +5,16 @@ namespace Catalyst.Reactions.Runtime.Resolution
         None = 0,
 
         SessionIsNull,
+        PlanIsNull,
+
         ReactionIsNull,
         ReactionDefinitionIsInvalid,
         TableDoesNotMatch,
+
+        ReactantDoesNotBelongToSession,
+        ReactantIsNotOnReactionTable,
+        DuplicateReactantInstance,
+
         InsufficientHeat,
         InsufficientProductCapacity
     }
