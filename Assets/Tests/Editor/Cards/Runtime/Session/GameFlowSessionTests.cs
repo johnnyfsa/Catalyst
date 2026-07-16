@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Catalyst.Cards.Definitions;
+using Catalyst.Cards.Runtime;
 using Catalyst.Cards.Runtime.Creation;
+using Catalyst.Cards.Runtime.Discard;
 using Catalyst.Cards.Runtime.Draw;
 using Catalyst.Cards.Runtime.Movement;
 using Catalyst.Cards.Runtime.Randomness;
@@ -198,15 +200,162 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
         public void Constructor_WithNullDrawPhaseService_Throws()
         {
             Assert.That(
-                () => new GameSessionFlowService(null),
+                () => new GameSessionFlowService(null, null, null, null),
                 Throws.TypeOf<ArgumentNullException>()
             );
         }
 
+        [Test]
+        public void RunningSession_CompletesBasicTurnCycle()
+        {
+            GameSession session = CreateSession(
+                handCapacity: 2,
+                initialHandSize: 2,
+                remainingDeckCards: 1
+            );
+
+            GameSessionFlowService flowService =
+                CreateFlowService();
+
+            flowService.Start(session);
+
+            DrawPhaseResult firstDraw =
+                flowService.ResolveDrawPhase(session);
+
+            Assert.That(
+                firstDraw.Outcome,
+                Is.EqualTo(DrawPhaseOutcome.HandFull)
+            );
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Main)
+            );
+
+            MainPhaseEndResult blockedEnd =
+                flowService.TryEndMainPhase(session);
+
+            Assert.That(blockedEnd.Succeeded, Is.False);
+
+            Assert.That(
+                blockedEnd.Failure,
+                Is.EqualTo(MainPhaseEndFailure.HandFull)
+            );
+
+            CardInstance discardedCard =
+                session.Hand.Cards[0];
+
+            ManualDiscardResult discardResult =
+                flowService.TryDiscard(
+                    session,
+                    discardedCard
+                );
+
+            Assert.That(discardResult.Succeeded, Is.True);
+            Assert.That(session.Hand.Count, Is.EqualTo(1));
+            Assert.That(session.DiscardPile.Count, Is.EqualTo(1));
+
+            MainPhaseEndResult mainEnd =
+                flowService.TryEndMainPhase(session);
+
+            Assert.That(mainEnd.Succeeded, Is.True);
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.End)
+            );
+
+            EndPhaseResult endResult =
+                flowService.ResolveEndPhase(session);
+
+            Assert.That(endResult.Succeeded, Is.True);
+            Assert.That(session.Turn.TurnNumber, Is.EqualTo(2));
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Draw)
+            );
+
+            DrawPhaseResult secondDraw =
+                flowService.ResolveDrawPhase(session);
+
+            Assert.That(
+                secondDraw.Outcome,
+                Is.EqualTo(DrawPhaseOutcome.CardDrawn)
+            );
+
+            Assert.That(session.Hand.Count, Is.EqualTo(2));
+            Assert.That(session.Deck.IsEmpty, Is.True);
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Main)
+            );
+        }
+
+        #region Helpers
+
         private GameSession CreateSession(int cardCount)
         {
+            const int initialHandSize = 8;
+            const int handCapacity = 9;
+
+            int actualInitialHandSize =
+                Math.Min(cardCount, initialHandSize);
+
+            int remainingDeckCards =
+                Math.Max(
+                    0,
+                    cardCount - actualInitialHandSize
+                );
+
+            return CreateSession(
+                handCapacity,
+                actualInitialHandSize,
+                remainingDeckCards
+            );
+        }
+
+        private GameSession CreateSession(
+    int handCapacity,
+    int initialHandSize,
+    int remainingDeckCards
+)
+        {
+            if (handCapacity <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(handCapacity)
+                );
+            }
+
+            if (initialHandSize < 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(initialHandSize)
+                );
+            }
+
+            if (initialHandSize > handCapacity)
+            {
+                throw new ArgumentException(
+                    "Initial hand size cannot exceed hand capacity.",
+                    nameof(initialHandSize)
+                );
+            }
+
+            if (remainingDeckCards < 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(remainingDeckCards)
+                );
+            }
+
+            int totalCardCount =
+                initialHandSize + remainingDeckCards;
+
             QueueIdSource idSource =
-                new QueueIdSource(cardCount);
+                new QueueIdSource(totalCardCount);
 
             CardInstanceFactory factory =
                 new CardInstanceFactory(idSource);
@@ -226,26 +375,48 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
                     drawService
                 );
 
-            return builder.Build(
-                new[]
-                {
-                    new DeckEntry(
-                        definition,
-                        cardCount
-                    )
-                },
+            IEnumerable<DeckEntry> entries =
+                totalCardCount > 0
+                    ? new[]
+                    {
+                new DeckEntry(
+                    definition,
+                    totalCardCount
+                )
+                    }
+                    : Array.Empty<DeckEntry>();
+
+            GameSession session = builder.Build(
+                entries,
                 new GameSessionConfig(
-                    initialHandSize: 8,
-                    maxHandSize: 9
+                    initialHandSize,
+                    handCapacity
                 ),
                 new SeededRandomSource(12345)
             );
+
+            Assert.That(
+                session.Hand.Capacity,
+                Is.EqualTo(handCapacity)
+            );
+
+            Assert.That(
+                session.Hand.Count,
+                Is.EqualTo(initialHandSize)
+            );
+
+            Assert.That(
+                session.Deck.Count,
+                Is.EqualTo(remainingDeckCards)
+            );
+
+            return session;
         }
 
         private GameSessionFlowService CreateFlowService()
         {
             CardMovementService movementService =
-                new CardMovementService();
+    new CardMovementService();
 
             CardDrawService drawService =
                 new CardDrawService(movementService);
@@ -253,8 +424,20 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
             DrawPhaseService drawPhaseService =
                 new DrawPhaseService(drawService);
 
+            MainPhaseService mainPhaseService =
+                new MainPhaseService();
+
+            ManualDiscardService manualDiscardService =
+                new ManualDiscardService(movementService);
+
+            EndPhaseService endPhaseService =
+                new EndPhaseService();
+
             return new GameSessionFlowService(
-                drawPhaseService
+                drawPhaseService,
+                mainPhaseService,
+                manualDiscardService,
+                endPhaseService
             );
         }
 
@@ -287,5 +470,6 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
                 return ids.Dequeue();
             }
         }
+        #endregion
     }
 }

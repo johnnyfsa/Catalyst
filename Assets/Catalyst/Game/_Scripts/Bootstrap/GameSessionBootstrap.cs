@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using Catalyst.Cards.Definitions;
 using Catalyst.Cards.Runtime.Creation;
+using Catalyst.Cards.Runtime.Discard;
 using Catalyst.Cards.Runtime.Draw;
 using Catalyst.Cards.Runtime.Movement;
 using Catalyst.Cards.Runtime.Randomness;
 using Catalyst.Cards.Runtime.Session;
+using Catalyst.Cards.Runtime.Turn;
 using UnityEngine;
 
 namespace Catalyst.Game.Bootstrap
@@ -32,8 +34,42 @@ namespace Catalyst.Game.Bootstrap
 
         public GameSession Session { get; private set; }
 
+        public GameSessionFlowService SessionFlow
+        {
+            get;
+            private set;
+        }
+
         private void Awake()
         {
+            CardMovementService movementService =
+        new CardMovementService();
+
+            CardDrawService drawService =
+                new CardDrawService(movementService);
+
+            DrawPhaseService drawPhaseService =
+                new DrawPhaseService(drawService);
+
+            MainPhaseService mainPhaseService =
+                new MainPhaseService();
+
+            ManualDiscardService manualDiscardService =
+                new ManualDiscardService(
+                    movementService
+                );
+
+            EndPhaseService endPhaseService =
+                new EndPhaseService();
+
+            SessionFlow =
+                new GameSessionFlowService(
+                    drawPhaseService,
+                    mainPhaseService,
+                    manualDiscardService,
+                    endPhaseService
+                );
+
             Initialize(
                 deckEntries,
                 initialHandSize,
