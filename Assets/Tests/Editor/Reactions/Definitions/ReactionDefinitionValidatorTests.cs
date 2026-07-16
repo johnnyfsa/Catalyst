@@ -10,8 +10,7 @@ namespace Catalyst.Tests.EditMode.Reactions
 {
     public sealed class ReactionDefinitionValidatorTests
     {
-        private readonly List<ReactionDefinition>
-            createdReactionDefinitions = new();
+        private TestReactionFactory reactionFactory;
 
         private TestCardFactory cardFactory;
 
@@ -23,7 +22,7 @@ namespace Catalyst.Tests.EditMode.Reactions
         public void SetUp()
         {
             cardFactory = new TestCardFactory();
-
+            reactionFactory = new TestReactionFactory();
             hydrogen = cardFactory.CreateDefinition();
             oxygen = cardFactory.CreateDefinition();
             water = cardFactory.CreateDefinition();
@@ -32,20 +31,8 @@ namespace Catalyst.Tests.EditMode.Reactions
         [TearDown]
         public void TearDown()
         {
-            foreach (
-                ReactionDefinition reactionDefinition
-                in createdReactionDefinitions
-            )
-            {
-                if (reactionDefinition != null)
-                {
-                    Object.DestroyImmediate(
-                        reactionDefinition
-                    );
-                }
-            }
-
-            createdReactionDefinitions.Clear();
+            reactionFactory?.Dispose();
+            reactionFactory = null;
 
             cardFactory?.DisposeCreatedDefinitions();
             cardFactory = null;
@@ -623,28 +610,20 @@ namespace Catalyst.Tests.EditMode.Reactions
         }
 
         private ReactionDefinition CreateReaction(
-            string reactionId,
-            IEnumerable<ReactionCardAmount> reactants,
-            IEnumerable<ReactionCardAmount> products,
-            int requiredHeat = 0,
-            int producedHeat = 0
-        )
+     string reactionId,
+     IEnumerable<ReactionCardAmount> reactants,
+     IEnumerable<ReactionCardAmount> products,
+     int requiredHeat = 0,
+     int producedHeat = 0
+ )
         {
-            ReactionDefinition reaction =
-                ScriptableObject
-                    .CreateInstance<ReactionDefinition>();
-
-            reaction.ConfigureForTests(
+            return reactionFactory.Create(
                 reactionId,
                 reactants,
                 products,
                 requiredHeat,
                 producedHeat
             );
-
-            createdReactionDefinitions.Add(reaction);
-
-            return reaction;
         }
 
         private static void AssertInvalid(
