@@ -1,0 +1,17 @@
+{
+    "name": "Catalyst.Reactions",
+    "rootNamespace": "",
+    "references": [
+        "GUID:40406e8178f88e24d87e5705b0313e4c",
+        "GUID:79e4451341ca14b4a90c8dea6e0a1206"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
