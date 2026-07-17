@@ -13,7 +13,9 @@ namespace Catalyst.Reactions.Runtime.Resolution
             IEnumerable<CardInstance> consumedReactants,
             IEnumerable<ReactionProductPlanEntry> products,
             int requiredHeat,
-            int producedHeat
+            int producedHeat,
+            int requiredElectricity,
+            int producedElectricity
         )
         {
             if (consumedReactants == null)
@@ -68,6 +70,8 @@ namespace Catalyst.Reactions.Runtime.Resolution
 
             RequiredHeat = requiredHeat;
             ProducedHeat = producedHeat;
+            RequiredElectricity = requiredElectricity;
+            ProducedElectricity = producedElectricity;
         }
 
         public IReadOnlyList<CardInstance> ConsumedReactants =>
@@ -79,6 +83,9 @@ namespace Catalyst.Reactions.Runtime.Resolution
         public int RequiredHeat { get; }
 
         public int ProducedHeat { get; }
+
+        public int RequiredElectricity { get; }
+        public int ProducedElectricity { get; }
 
         public int TotalProductCount
         {

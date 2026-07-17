@@ -86,11 +86,25 @@ namespace Catalyst.Reactions.Runtime
                         .RequiredHeatIsNegative);
             }
 
+            if (definition.RequiredElectricity < 0)
+            {
+                return Invalid(
+                    ReactionDefinitionValidationFailure
+                        .RequiredElectricityIsNegative);
+            }
+
             if (definition.ProducedHeat < 0)
             {
                 return Invalid(
                     ReactionDefinitionValidationFailure
                         .ProducedHeatIsNegative);
+            }
+
+            if (definition.ProducedElectricity < 0)
+            {
+                return Invalid(
+                    ReactionDefinitionValidationFailure
+                        .ProducedElectricityIsNegative);
             }
 
             return ReactionDefinitionValidationResult.Valid();

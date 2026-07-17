@@ -71,7 +71,9 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                         product
                     },
                     requiredHeat: 0,
-                    producedHeat: 1
+                    producedHeat: 1,
+                    requiredElectricity: 0,
+                    producedElectricity: 0
                 );
 
 
@@ -142,7 +144,9 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                         )
                     },
                     requiredHeat: 0,
-                    producedHeat: 1
+                    producedHeat: 1,
+                    requiredElectricity: 0,
+                    producedElectricity: 0
                 );
 
             Assert.That(
@@ -164,7 +168,9 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                     source,
                     CreateValidProducts(),
                     requiredHeat: 0,
-                    producedHeat: 1
+                    producedHeat: 1,
+                    requiredElectricity: 0,
+                    producedElectricity: 0
                 );
 
             source.Clear();
@@ -193,7 +199,9 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                     CreateValidReactants(),
                     source,
                     requiredHeat: 0,
-                    producedHeat: 1
+                    producedHeat: 1,
+                    requiredElectricity: 0,
+                    producedElectricity: 0
                 );
 
             source.Clear();
@@ -228,7 +236,9 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                     },
                     CreateValidProducts(),
                     requiredHeat: 0,
-                    producedHeat: 1
+                    producedHeat: 1,
+                    requiredElectricity: 0,
+                    producedElectricity: 0
                 );
 
             Assert.That(
@@ -258,7 +268,9 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                     null,
                     CreateValidProducts(),
                     requiredHeat: 0,
-                    producedHeat: 1
+                    producedHeat: 1,
+                    requiredElectricity: 0,
+                    producedElectricity: 0
                 ),
                 Throws.TypeOf<ArgumentNullException>()
             );
@@ -272,7 +284,9 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                     Array.Empty<CardInstance>(),
                     CreateValidProducts(),
                     requiredHeat: 0,
-                    producedHeat: 1
+                    producedHeat: 1,
+                    requiredElectricity: 0,
+                    producedElectricity: 0
                 ),
                 Throws.TypeOf<ArgumentException>()
             );
@@ -292,7 +306,9 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                     },
                     CreateValidProducts(),
                     requiredHeat: 0,
-                    producedHeat: 1
+                    producedHeat: 1,
+                    requiredElectricity: 0,
+                    producedElectricity: 0
                 ),
                 Throws.TypeOf<ArgumentException>()
             );
@@ -306,7 +322,9 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                     CreateValidReactants(),
                     null,
                     requiredHeat: 0,
-                    producedHeat: 1
+                    producedHeat: 1,
+                    requiredElectricity: 0,
+                    producedElectricity: 0
                 ),
                 Throws.TypeOf<ArgumentNullException>()
             );
@@ -322,7 +340,9 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                         ReactionProductPlanEntry
                     >(),
                     requiredHeat: 0,
-                    producedHeat: 1
+                    producedHeat: 1,
+                    requiredElectricity: 0,
+                    producedElectricity: 0
                 ),
                 Throws.TypeOf<ArgumentException>()
             );
@@ -339,7 +359,9 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                         null
                     },
                     requiredHeat: 0,
-                    producedHeat: 1
+                    producedHeat: 1,
+                    requiredElectricity: 0,
+                    producedElectricity: 0
                 ),
                 Throws.TypeOf<ArgumentException>()
             );
@@ -353,7 +375,9 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                     CreateValidReactants(),
                     CreateValidProducts(),
                     requiredHeat: -1,
-                    producedHeat: 0
+                    producedHeat: 0,
+                    requiredElectricity: 0,
+                    producedElectricity: 0
                 ),
                 Throws.TypeOf<ArgumentOutOfRangeException>()
             );
@@ -367,7 +391,9 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                     CreateValidReactants(),
                     CreateValidProducts(),
                     requiredHeat: 0,
-                    producedHeat: -1
+                    producedHeat: -1,
+                    requiredElectricity: 0,
+                    producedElectricity: 0
                 ),
                 Throws.TypeOf<ArgumentOutOfRangeException>()
             );

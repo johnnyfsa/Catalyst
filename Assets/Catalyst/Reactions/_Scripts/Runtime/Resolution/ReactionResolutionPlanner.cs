@@ -78,7 +78,9 @@ namespace Catalyst.Reactions.Runtime.Resolution
                     reactantSnapshot,
                     products,
                     reaction.RequiredHeat,
-                    reaction.ProducedHeat
+                    reaction.ProducedHeat,
+                    reaction.RequiredElectricity,
+                    reaction.ProducedElectricity
                 );
 
             return ReactionResolutionPlanResult

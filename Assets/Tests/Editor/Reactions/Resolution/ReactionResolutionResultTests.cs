@@ -63,6 +63,10 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
     ReactionResolutionFailure
         .InsufficientProductCapacity
 )]
+        [TestCase(
+    ReactionResolutionFailure
+        .ReactantInstanceDoesNotMatchSessionCard
+)]
         public void Fail_PreservesExpectedFailure(
     ReactionResolutionFailure failure
 )

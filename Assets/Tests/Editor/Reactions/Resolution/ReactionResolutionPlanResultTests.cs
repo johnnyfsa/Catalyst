@@ -52,7 +52,9 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                         )
                     },
                     requiredHeat: 0,
-                    producedHeat: 1
+                    producedHeat: 1,
+                    requiredElectricity: 0,
+                    producedElectricity: 0
                 );
         }
 

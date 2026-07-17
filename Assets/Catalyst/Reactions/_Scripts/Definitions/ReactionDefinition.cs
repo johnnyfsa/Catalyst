@@ -23,7 +23,13 @@ namespace Catalyst.Reactions.Definitions
         private int requiredHeat;
 
         [SerializeField, Min(0)]
+        private int requiredElectricity;
+
+        [SerializeField, Min(0)]
         private int producedHeat;
+
+        [SerializeField, Min(0)]
+        private int producedElectricity;
 
         public string ReactionId => reactionId;
 
@@ -37,13 +43,20 @@ namespace Catalyst.Reactions.Definitions
 
         public int ProducedHeat => producedHeat;
 
+        public int RequiredElectricity => requiredElectricity;
+
+        public int ProducedElectricity => producedElectricity;
+
 #if UNITY_EDITOR
         internal void ConfigureForTests(
-            string id,
-            IEnumerable<ReactionCardAmount> reactionReactants,
-            IEnumerable<ReactionCardAmount> reactionProducts,
-            int heatRequired = 0,
-            int heatProduced = 0)
+    string id,
+    IEnumerable<ReactionCardAmount> reactionReactants,
+    IEnumerable<ReactionCardAmount> reactionProducts,
+    int heatRequired = 0,
+    int heatProduced = 0,
+    int electricityRequired = 0,
+    int electricityProduced = 0
+)
         {
             reactionId = id;
 
@@ -57,6 +70,8 @@ namespace Catalyst.Reactions.Definitions
 
             requiredHeat = heatRequired;
             producedHeat = heatProduced;
+            requiredElectricity = electricityRequired;
+            producedElectricity = electricityProduced;
         }
 
         private void OnValidate()

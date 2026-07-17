@@ -11,9 +11,10 @@ namespace Catalyst.Reactions.Runtime.Resolution
         ReactionDefinitionIsInvalid,
         TableDoesNotMatch,
 
-        ReactantDoesNotBelongToSession,
-        ReactantIsNotOnReactionTable,
         DuplicateReactantInstance,
+        ReactantDoesNotBelongToSession,
+        ReactantInstanceDoesNotMatchSessionCard,
+        ReactantIsNotOnReactionTable,
 
         InsufficientHeat,
         InsufficientProductCapacity

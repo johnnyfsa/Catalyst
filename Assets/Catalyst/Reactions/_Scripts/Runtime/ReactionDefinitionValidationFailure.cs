@@ -26,6 +26,9 @@ namespace Catalyst.Reactions.Runtime
         DuplicateProductDefinition,
 
         RequiredHeatIsNegative,
-        ProducedHeatIsNegative
+        ProducedHeatIsNegative,
+
+        RequiredElectricityIsNegative,
+        ProducedElectricityIsNegative
     }
 }
