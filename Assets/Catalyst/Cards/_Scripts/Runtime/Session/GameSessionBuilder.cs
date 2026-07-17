@@ -7,6 +7,7 @@ using Catalyst.Cards.Runtime.Draw;
 using Catalyst.Cards.Runtime.Randomness;
 using Catalyst.Cards.Runtime.Zones;
 using Catalyst.Cards.Runtime.Turn;
+using Catalyst.Cards.Runtime.Resources;
 
 namespace Catalyst.Cards.Runtime.Session
 {
@@ -59,7 +60,7 @@ namespace Catalyst.Cards.Runtime.Session
             }
 
             DeckRuntime deck =
-                deckBuilder.Build(deckEntries);
+     deckBuilder.Build(deckEntries);
 
             CardInstance[] sessionCards =
                 deck.Cards.ToArray();
@@ -75,21 +76,36 @@ namespace Catalyst.Cards.Runtime.Session
             DiscardPileRuntime discardPile =
                 new DiscardPileRuntime();
 
+            ResourceCounterRuntime heat =
+                new ResourceCounterRuntime(
+                    config.InitialHeat
+                );
+
+            ResourceCounterRuntime electricity =
+                new ResourceCounterRuntime(
+                    config.InitialElectricity
+                );
+
             drawService.DrawInitialHand(
                 deck,
                 hand,
                 config.InitialHandSize
             );
-            TurnRuntime turn = new TurnRuntime();
 
-            GameSession session = new GameSession(
-                sessionCards,
-                deck,
-                hand,
-                reactionTable,
-                discardPile,
-                turn
-            );
+            TurnRuntime turn =
+                new TurnRuntime();
+
+            GameSession session =
+                new GameSession(
+                    sessionCards,
+                    deck,
+                    hand,
+                    reactionTable,
+                    discardPile,
+                    turn,
+                    heat,
+                    electricity
+                );
 
             session.ValidateState();
 

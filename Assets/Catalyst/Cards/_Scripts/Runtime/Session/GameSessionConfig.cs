@@ -6,7 +6,9 @@ namespace Catalyst.Cards.Runtime.Session
     {
         public GameSessionConfig(
             int initialHandSize,
-            int maxHandSize
+            int maxHandSize,
+            int initialHeat = 0,
+            int initialElectricity = 0
         )
         {
             if (initialHandSize <= 0)
@@ -27,12 +29,36 @@ namespace Catalyst.Cards.Runtime.Session
                 );
             }
 
+            if (initialHeat < 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(initialHeat),
+                    initialHeat,
+                    "Initial heat cannot be negative."
+                );
+            }
+
+            if (initialElectricity < 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(initialElectricity),
+                    initialElectricity,
+                    "Initial electricity cannot be negative."
+                );
+            }
+
             InitialHandSize = initialHandSize;
             MaxHandSize = maxHandSize;
+            InitialHeat = initialHeat;
+            InitialElectricity = initialElectricity;
         }
 
         public int InitialHandSize { get; }
 
         public int MaxHandSize { get; }
+
+        public int InitialHeat { get; }
+
+        public int InitialElectricity { get; }
     }
 }

@@ -291,6 +291,58 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
             );
         }
 
+        [Test]
+        public void Build_CreatesResourcesWithConfiguredAmounts()
+        {
+            GameSession session =
+                BuildSession(
+                    cardCount: 12,
+                    seed: 12345,
+                    initialHeat: 3,
+                    initialElectricity: 4
+                );
+
+            Assert.That(
+                session.Heat,
+                Is.Not.Null
+            );
+
+            Assert.That(
+                session.Heat.Amount,
+                Is.EqualTo(3)
+            );
+
+            Assert.That(
+                session.Electricity,
+                Is.Not.Null
+            );
+
+            Assert.That(
+                session.Electricity.Amount,
+                Is.EqualTo(4)
+            );
+        }
+
+        [Test]
+        public void Build_WithoutConfiguredResources_StartsResourcesAtZero()
+        {
+            GameSession session =
+                BuildSession(
+                    cardCount: 12,
+                    seed: 12345
+                );
+
+            Assert.That(
+                session.Heat.Amount,
+                Is.Zero
+            );
+
+            Assert.That(
+                session.Electricity.Amount,
+                Is.Zero
+            );
+        }
+
         private GameSession BuildSession(
             int cardCount,
             int seed
@@ -302,9 +354,28 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
             );
         }
 
+
+
+        private GameSession BuildSession(
+    int cardCount,
+    int seed,
+    int initialHeat = 0,
+    int initialElectricity = 0
+)
+        {
+            return BuildSession(
+                CreateSequentialIds(cardCount),
+                seed,
+                initialHeat,
+                initialElectricity
+            );
+        }
+
         private GameSession BuildSession(
             Guid[] ids,
-            int seed
+            int seed,
+            int initialHeat = 0,
+            int initialElectricity = 0
         )
         {
             GameSessionBuilder builder =
@@ -314,7 +385,9 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
                 CreateEntries(ids.Length),
                 new GameSessionConfig(
                     initialHandSize: 8,
-                    maxHandSize: 8
+                    maxHandSize: 8,
+                    initialHeat: initialHeat,
+                    initialElectricity: initialElectricity
                 ),
                 new SeededRandomSource(seed)
             );

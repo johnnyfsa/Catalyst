@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Catalyst.Cards.Runtime.Turn;
 using Catalyst.Cards.Runtime.Zones;
+using Catalyst.Cards.Runtime.Resources;
 
 namespace Catalyst.Cards.Runtime.Session
 {
@@ -17,13 +18,15 @@ namespace Catalyst.Cards.Runtime.Session
             cardsById;
 
         internal GameSession(
-            IEnumerable<CardInstance> sessionCards,
-            DeckRuntime deck,
-            HandRuntime hand,
-            ReactionTableRuntime reactionTable,
-            DiscardPileRuntime discardPile,
-            TurnRuntime turn
-        )
+    IEnumerable<CardInstance> sessionCards,
+    DeckRuntime deck,
+    HandRuntime hand,
+    ReactionTableRuntime reactionTable,
+    DiscardPileRuntime discardPile,
+    TurnRuntime turn,
+    ResourceCounterRuntime heat,
+    ResourceCounterRuntime electricity
+)
         {
             if (sessionCards == null)
             {
@@ -61,6 +64,16 @@ namespace Catalyst.Cards.Runtime.Session
 
             readOnlySessionCards =
                 this.sessionCards.AsReadOnly();
+
+            Heat = heat
+?? throw new ArgumentNullException(
+    nameof(heat)
+);
+
+            Electricity = electricity
+                ?? throw new ArgumentNullException(
+                    nameof(electricity)
+                );
         }
 
         public IReadOnlyList<CardInstance> SessionCards =>
@@ -73,6 +86,10 @@ namespace Catalyst.Cards.Runtime.Session
         public ReactionTableRuntime ReactionTable { get; }
 
         public DiscardPileRuntime DiscardPile { get; }
+
+        public ResourceCounterRuntime Heat { get; }
+
+        public ResourceCounterRuntime Electricity { get; }
 
         public TurnRuntime Turn { get; }
 

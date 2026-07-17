@@ -50,6 +50,80 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
         [TestCase(-1, 8)]
         [TestCase(8, 0)]
         [TestCase(8, -1)]
+
+        [Test]
+        public void Constructor_WithoutResources_UsesZeroAmounts()
+        {
+            var config =
+                new GameSessionConfig(
+                    initialHandSize: 2,
+                    maxHandSize: 8
+                );
+
+            Assert.That(
+                config.InitialHeat,
+                Is.EqualTo(0)
+            );
+
+            Assert.That(
+                config.InitialElectricity,
+                Is.EqualTo(0)
+            );
+        }
+
+        [Test]
+        public void Constructor_WithResourceAmounts_PreservesValues()
+        {
+            var config =
+                new GameSessionConfig(
+                    initialHandSize: 2,
+                    maxHandSize: 8,
+                    initialHeat: 3,
+                    initialElectricity: 4
+                );
+
+            Assert.That(
+                config.InitialHeat,
+                Is.EqualTo(3)
+            );
+
+            Assert.That(
+                config.InitialElectricity,
+                Is.EqualTo(4)
+            );
+        }
+
+        [TestCase(-1)]
+        [TestCase(-5)]
+        public void Constructor_WithNegativeInitialHeat_Throws(
+            int initialHeat
+        )
+        {
+            Assert.That(
+                () => new GameSessionConfig(
+                    initialHandSize: 2,
+                    maxHandSize: 8,
+                    initialHeat: initialHeat
+                ),
+                Throws.TypeOf<ArgumentOutOfRangeException>()
+            );
+        }
+
+        [TestCase(-1)]
+        [TestCase(-5)]
+        public void Constructor_WithNegativeInitialElectricity_Throws(
+            int initialElectricity
+        )
+        {
+            Assert.That(
+                () => new GameSessionConfig(
+                    initialHandSize: 2,
+                    maxHandSize: 8,
+                    initialElectricity: initialElectricity
+                ),
+                Throws.TypeOf<ArgumentOutOfRangeException>()
+            );
+        }
         public void Constructor_WithInvalidValues_Throws(
             int initialHandSize,
             int maxHandSize
