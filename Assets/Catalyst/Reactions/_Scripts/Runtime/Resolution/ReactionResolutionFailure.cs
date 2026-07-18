@@ -17,6 +17,7 @@ namespace Catalyst.Reactions.Runtime.Resolution
         ReactantIsNotOnReactionTable,
 
         InsufficientHeat,
+        InsufficientElectricity,
         InsufficientProductCapacity
     }
 }

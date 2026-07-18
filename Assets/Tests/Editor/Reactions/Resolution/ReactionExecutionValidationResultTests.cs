@@ -51,6 +51,10 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
             ReactionResolutionFailure
                 .InsufficientProductCapacity
         )]
+        [TestCase(
+            ReactionResolutionFailure.InsufficientElectricity
+        )]
+
         public void Invalid_PreservesExecutionFailure(
             ReactionResolutionFailure failure
         )
@@ -69,6 +73,7 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                 result.Failure,
                 Is.EqualTo(failure)
             );
+
         }
 
         [Test]

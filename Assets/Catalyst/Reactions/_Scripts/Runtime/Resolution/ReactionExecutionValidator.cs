@@ -36,6 +36,17 @@ namespace Catalyst.Reactions.Runtime.Resolution
                 return reactantValidation;
             }
 
+            ReactionExecutionValidationResult resourceValidation =
+                ValidateResources(
+                    session,
+                    plan
+                );
+
+            if (!resourceValidation.IsValid)
+            {
+                return resourceValidation;
+            }
+
             if (!HasProductCapacity(
                     session,
                     plan.TotalProductCount
@@ -56,7 +67,8 @@ namespace Catalyst.Reactions.Runtime.Resolution
                 ReactionResolutionPlan plan
             )
         {
-            var reactantIds = new HashSet<System.Guid>();
+            var reactantIds =
+                new HashSet<System.Guid>();
 
             foreach (
                 CardInstance reactant
@@ -100,6 +112,35 @@ namespace Catalyst.Reactions.Runtime.Resolution
                             .ReactantIsNotOnReactionTable
                     );
                 }
+            }
+
+            return ReactionExecutionValidationResult.Valid();
+        }
+
+        private static ReactionExecutionValidationResult
+            ValidateResources(
+                GameSession session,
+                ReactionResolutionPlan plan
+            )
+        {
+            if (!session.Heat.CanConsume(
+                    plan.RequiredHeat
+                ))
+            {
+                return ReactionExecutionValidationResult.Invalid(
+                    ReactionResolutionFailure
+                        .InsufficientHeat
+                );
+            }
+
+            if (!session.Electricity.CanConsume(
+                    plan.RequiredElectricity
+                ))
+            {
+                return ReactionExecutionValidationResult.Invalid(
+                    ReactionResolutionFailure
+                        .InsufficientElectricity
+                );
             }
 
             return ReactionExecutionValidationResult.Valid();
