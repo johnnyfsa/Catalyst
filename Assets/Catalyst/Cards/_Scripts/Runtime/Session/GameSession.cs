@@ -59,7 +59,7 @@ namespace Catalyst.Cards.Runtime.Session
 
             foreach (CardInstance card in sessionCards)
             {
-                RegisterInitialCard(card);
+                RegisterCard(card);
             }
 
             readOnlySessionCards =
@@ -195,7 +195,7 @@ namespace Catalyst.Cards.Runtime.Session
             }
         }
 
-        private void RegisterInitialCard(CardInstance card)
+        private void RegisterCard(CardInstance card)
         {
             if (card == null)
             {
@@ -212,8 +212,17 @@ namespace Catalyst.Cards.Runtime.Session
                 );
             }
 
-            cardsById.Add(card.InstanceId, card);
+            cardsById.Add(
+                card.InstanceId,
+                card
+            );
+
             sessionCards.Add(card);
+        }
+
+        internal void RegisterCreatedCard(CardInstance card)
+        {
+            RegisterCard(card);
         }
 
         private void CountZoneCards(
