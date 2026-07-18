@@ -590,9 +590,9 @@ O próximo marco é a integração entre o domínio de gameplay e a camada visua
 
 Game Designer · Unity Developer · Gameplay Programmer
 
-* LinkedIn: [adicionar link]
-* Portfólio: [adicionar link]
-* E-mail: [adicionar contato]
+* LinkedIn: https://linkedin.com/in/jglmoraes
+* Portfólio: https://johnnymoraes.com
+* E-mail: joaofeirense@gmail.com
 
 ---
 
