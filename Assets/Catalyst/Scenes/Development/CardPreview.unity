@@ -458,50 +458,10 @@ PrefabInstance:
     - target: {fileID: 2152685100506196748, guid: c504487614ecf524282e61017699812f, type: 3}
       propertyPath: initialDefinition
       value: 
-      objectReference: {fileID: 11400000, guid: 9a3d30c49fb4dfd49ab958d260494a6c, type: 2}
-    - target: {fileID: 2152685100506196748, guid: c504487614ecf524282e61017699812f, type: 3}
-      propertyPath: previewDefinition
-      value: 
-      objectReference: {fileID: 11400000, guid: 61da49749750d144d9a6f40c30cafb7c, type: 2}
-    - target: {fileID: 3517049868115164246, guid: c504487614ecf524282e61017699812f, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3517049868115164246, guid: c504487614ecf524282e61017699812f, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4059773306814055098, guid: c504487614ecf524282e61017699812f, type: 3}
       propertyPath: m_Name
       value: Card
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096483378930687182, guid: c504487614ecf524282e61017699812f, type: 3}
-      propertyPath: m_text
-      value: Sodium Chloride
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096483378930687182, guid: c504487614ecf524282e61017699812f, type: 3}
-      propertyPath: m_fontSize
-      value: 29.85
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096483378930687182, guid: c504487614ecf524282e61017699812f, type: 3}
-      propertyPath: m_fontColor.g
-      value: 0.9254902
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096483378930687182, guid: c504487614ecf524282e61017699812f, type: 3}
-      propertyPath: m_fontColor.r
-      value: 0.9529412
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096483378930687182, guid: c504487614ecf524282e61017699812f, type: 3}
-      propertyPath: m_fontSizeBase
-      value: 34.94
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096483378930687182, guid: c504487614ecf524282e61017699812f, type: 3}
-      propertyPath: m_enableAutoSizing
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096483378930687182, guid: c504487614ecf524282e61017699812f, type: 3}
-      propertyPath: m_fontColor32.rgba
-      value: 4294962419
       objectReference: {fileID: 0}
     - target: {fileID: 7424581878103038576, guid: c504487614ecf524282e61017699812f, type: 3}
       propertyPath: m_LocalPosition.x

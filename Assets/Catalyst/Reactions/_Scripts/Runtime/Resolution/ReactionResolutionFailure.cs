@@ -18,6 +18,10 @@ namespace Catalyst.Reactions.Runtime.Resolution
 
         InsufficientHeat,
         InsufficientElectricity,
-        InsufficientProductCapacity
+        InsufficientProductCapacity,
+        DuplicateCreatedProductInstance,
+        CreatedProductIdAlreadyExists,
+        HeatOverflow,
+        ElectricityOverflow
     }
 }
