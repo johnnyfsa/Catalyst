@@ -12,12 +12,14 @@ namespace Catalyst.Tests.EditMode.Common.Creation
             createdDefinitions = new();
 
         public ReactionDefinition Create(
-            string reactionId,
-            IEnumerable<ReactionCardAmount> reactants,
-            IEnumerable<ReactionCardAmount> products,
-            int requiredHeat = 0,
-            int producedHeat = 0
-        )
+    string reactionId,
+    IEnumerable<ReactionCardAmount> reactants,
+    IEnumerable<ReactionCardAmount> products,
+    int requiredHeat = 0,
+    int producedHeat = 0,
+    int requiredElectricity = 0,
+    int producedElectricity = 0
+)
         {
             ReactionDefinition definition =
                 ScriptableObject
@@ -28,7 +30,9 @@ namespace Catalyst.Tests.EditMode.Common.Creation
                 reactants,
                 products,
                 requiredHeat,
-                producedHeat
+                producedHeat,
+                requiredElectricity,
+                producedElectricity
             );
 
             createdDefinitions.Add(definition);
