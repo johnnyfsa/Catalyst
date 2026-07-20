@@ -52,7 +52,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
                 );
 
             MainPhaseService mainPhaseService =
-                new MainPhaseService();
+                new MainPhaseService(movementService);
 
             ManualDiscardService discardService =
                 new ManualDiscardService(
@@ -92,7 +92,8 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
             MainPhaseEndResult blockedEnd =
                 mainPhaseService.TryEnd(
                     turn,
-                    hand
+                    hand,
+                    reactionTable: new ReactionTableRuntime()
                 );
 
             Assert.That(blockedEnd.Succeeded, Is.False);
@@ -115,7 +116,8 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
             MainPhaseEndResult mainEndResult =
                 mainPhaseService.TryEnd(
                     turn,
-                    hand
+                    hand,
+                    reactionTable: new ReactionTableRuntime()
                 );
 
             Assert.That(mainEndResult.Succeeded, Is.True);

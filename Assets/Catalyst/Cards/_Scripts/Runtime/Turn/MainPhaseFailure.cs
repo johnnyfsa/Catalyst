@@ -7,6 +7,7 @@ namespace Catalyst.Cards.Runtime.Turn
         NullHand = 2,
         TurnNotStarted = 3,
         NotInMainPhase = 4,
-        HandFull = 5
+        HandFull = 5,
+        NullReactionTable = 6
     }
 }

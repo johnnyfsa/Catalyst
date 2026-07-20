@@ -52,7 +52,7 @@ namespace Catalyst.Game.Bootstrap
                 new DrawPhaseService(drawService);
 
             MainPhaseService mainPhaseService =
-                new MainPhaseService();
+                new MainPhaseService(movementService);
 
             ManualDiscardService manualDiscardService =
                 new ManualDiscardService(

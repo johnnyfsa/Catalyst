@@ -21,7 +21,10 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
             definition =
                 ScriptableObject.CreateInstance<CardDefinition>();
 
-            mainPhaseService = new MainPhaseService();
+            mainPhaseService =
+    new MainPhaseService(
+        new CardMovementService()
+    );
         }
 
         [TearDown]
@@ -34,7 +37,14 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
                 );
             }
         }
-
+        [Test]
+        public void Constructor_WithNullMovementService_Throws()
+        {
+            Assert.That(
+                () => new MainPhaseService(null),
+                Throws.TypeOf<ArgumentNullException>()
+            );
+        }
         [Test]
         public void TryEnd_WithAvailableHandSpace_AdvancesToEnd()
         {
@@ -44,7 +54,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
             FillHand(hand, 7);
 
             MainPhaseEndResult result =
-                mainPhaseService.TryEnd(turn, hand);
+                mainPhaseService.TryEnd(turn, hand, CreateEmptyReactionTable());
 
             Assert.That(result.Succeeded, Is.True);
 
@@ -70,7 +80,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
             FillHand(hand, 8);
 
             MainPhaseEndResult result =
-                mainPhaseService.TryEnd(turn, hand);
+                mainPhaseService.TryEnd(turn, hand, CreateEmptyReactionTable());
 
             Assert.That(result.Succeeded, Is.False);
 
@@ -94,8 +104,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
             HandRuntime hand = new HandRuntime(8);
 
             MainPhaseEndResult result =
-                mainPhaseService.TryEnd(turn, hand);
-
+                mainPhaseService.TryEnd(turn, hand, CreateEmptyReactionTable());
             Assert.That(result.Succeeded, Is.True);
 
             Assert.That(
@@ -121,7 +130,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
             Assert.That(hand.IsFull, Is.False);
 
             MainPhaseEndResult result =
-                mainPhaseService.TryEnd(turn, hand);
+                mainPhaseService.TryEnd(turn, hand, CreateEmptyReactionTable());
 
             Assert.That(result.Succeeded, Is.True);
 
@@ -138,8 +147,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
             HandRuntime hand = new HandRuntime();
 
             MainPhaseEndResult result =
-                mainPhaseService.TryEnd(turn, hand);
-
+                mainPhaseService.TryEnd(turn, hand, CreateEmptyReactionTable());
             Assert.That(result.Succeeded, Is.False);
 
             Assert.That(
@@ -164,8 +172,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
             HandRuntime hand = new HandRuntime();
 
             MainPhaseEndResult result =
-                mainPhaseService.TryEnd(turn, hand);
-
+                mainPhaseService.TryEnd(turn, hand, CreateEmptyReactionTable());
             Assert.That(result.Succeeded, Is.False);
 
             Assert.That(
@@ -195,7 +202,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
             );
 
             MainPhaseEndResult result =
-                mainPhaseService.TryEnd(turn, hand);
+                mainPhaseService.TryEnd(turn, hand, CreateEmptyReactionTable());
 
             Assert.That(result.Succeeded, Is.False);
 
@@ -218,7 +225,8 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
             MainPhaseEndResult result =
                 mainPhaseService.TryEnd(
                     null,
-                    new HandRuntime()
+                    new HandRuntime(),
+                    CreateEmptyReactionTable()
                 );
 
             Assert.That(result.Succeeded, Is.False);
@@ -235,7 +243,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
             TurnRuntime turn = CreateMainPhaseTurn();
 
             MainPhaseEndResult result =
-                mainPhaseService.TryEnd(turn, null);
+                mainPhaseService.TryEnd(turn, null, CreateEmptyReactionTable());
 
             Assert.That(result.Succeeded, Is.False);
 
@@ -285,7 +293,8 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
             MainPhaseEndResult endResult =
                 mainPhaseService.TryEnd(
                     turn,
-                    hand
+                    hand,
+                    CreateEmptyReactionTable()
                 );
 
             Assert.That(discardResult.Succeeded, Is.True);
@@ -299,7 +308,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
                 Is.EqualTo(GamePhase.End)
             );
         }
-
+        #region Helper Methods
         private TurnRuntime CreateMainPhaseTurn()
         {
             TurnRuntime turn = new TurnRuntime();
@@ -329,5 +338,11 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
                 Assert.That(added, Is.True);
             }
         }
+        private static ReactionTableRuntime
+        CreateEmptyReactionTable()
+        {
+            return new ReactionTableRuntime();
+        }
+        #endregion
     }
 }

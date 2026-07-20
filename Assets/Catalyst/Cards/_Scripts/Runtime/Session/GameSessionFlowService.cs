@@ -97,7 +97,8 @@ namespace Catalyst.Cards.Runtime.Session
             MainPhaseEndResult result =
                 mainPhaseService.TryEnd(
                     session.Turn,
-                    session.Hand
+                    session.Hand,
+                    session.ReactionTable
                 );
 
             session.ValidateState();
@@ -158,6 +159,7 @@ namespace Catalyst.Cards.Runtime.Session
             return result;
         }
 
+
         #region helpers
         private static void EnsureSessionIsRunning(
     GameSession session
@@ -180,4 +182,5 @@ namespace Catalyst.Cards.Runtime.Session
         #endregion
 
     }
+
 }
