@@ -1,40 +1,468 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Catalyst.Cards.Definitions;
 using Catalyst.Cards.Runtime;
 using Catalyst.Cards.Runtime.Creation;
-using Catalyst.Cards.Runtime.Discard;
+using Catalyst.Cards.Runtime.Delivery;
 using Catalyst.Cards.Runtime.Draw;
 using Catalyst.Cards.Runtime.Movement;
 using Catalyst.Cards.Runtime.Randomness;
 using Catalyst.Cards.Runtime.Session;
 using Catalyst.Cards.Runtime.Turn;
 using Catalyst.Cards.Runtime.Zones;
+using Catalyst.Cards.Runtime.Discard;
 using NUnit.Framework;
 using UnityEngine;
+
 
 namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
 {
     public sealed class GameSessionFlowServiceTests
     {
-        private CardDefinition definition;
+        private CardDefinition acceptedDefinition;
+        private CardDefinition otherDefinition;
+
+        private CardMovementService movementService;
+        private CardDrawService drawService;
+        private DrawPhaseService drawPhaseService;
+        private MainPhaseService mainPhaseService;
+        private ManualDiscardService manualDiscardService;
+        private EndPhaseService endPhaseService;
+        private CardDeliveryService cardDeliveryService;
+
+        private GameSessionFlowService flowService;
 
         [SetUp]
         public void SetUp()
         {
-            definition =
+            acceptedDefinition =
                 ScriptableObject.CreateInstance<CardDefinition>();
+
+            otherDefinition =
+                ScriptableObject.CreateInstance<CardDefinition>();
+
+            movementService =
+                new CardMovementService();
+
+            drawService =
+                new CardDrawService(
+                    movementService
+                );
+
+            drawPhaseService =
+                new DrawPhaseService(
+                    drawService
+                );
+
+            mainPhaseService =
+                new MainPhaseService(
+                    movementService
+                );
+
+            manualDiscardService =
+                new ManualDiscardService(
+                    movementService
+                );
+
+            endPhaseService =
+                new EndPhaseService();
+
+            cardDeliveryService =
+                new CardDeliveryService(
+                    movementService
+                );
+
+            flowService =
+                new GameSessionFlowService(
+                    drawPhaseService,
+                    mainPhaseService,
+                    manualDiscardService,
+                    endPhaseService,
+                    cardDeliveryService
+                );
         }
 
         [TearDown]
         public void TearDown()
         {
-            if (definition != null)
+            if (acceptedDefinition != null)
             {
                 UnityEngine.Object.DestroyImmediate(
-                    definition
+                    acceptedDefinition
                 );
             }
+
+            if (otherDefinition != null)
+            {
+                UnityEngine.Object.DestroyImmediate(
+                    otherDefinition
+                );
+            }
+        }
+
+        [Test]
+        public void TryDeliverCard_WithSessionNotStarted_Throws()
+        {
+            GameSession session =
+                CreateSessionWithDeliveryZone();
+
+            CardInstance card =
+                session.Hand.Cards[0];
+
+            CardDeliveryZoneRuntime zone =
+                session.DeliveryZones[0];
+
+            Assert.That(
+                () => flowService.TryDeliverCard(
+                    session,
+                    card,
+                    zone
+                ),
+                Throws.TypeOf<InvalidOperationException>()
+            );
+        }
+
+        [Test]
+        public void TryDeliverCard_OutsideMainPhase_Throws()
+        {
+            GameSession session =
+                CreateSessionWithDeliveryZone();
+
+            flowService.Start(session);
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Draw)
+            );
+
+            CardInstance card =
+                session.Hand.Cards[0];
+
+            CardDeliveryZoneRuntime zone =
+                session.DeliveryZones[0];
+
+            Assert.That(
+                () => flowService.TryDeliverCard(
+                    session,
+                    card,
+                    zone
+                ),
+                Throws.TypeOf<InvalidOperationException>()
+            );
+        }
+
+        [Test]
+        public void TryDeliverCard_WithForeignZone_ReturnsExplicitFailure()
+        {
+            GameSession session =
+                CreateRunningSessionInMainPhase();
+
+            CardInstance card =
+                session.Hand.Cards[0];
+
+            var foreignZone =
+                new CardDeliveryZoneRuntime(
+                    card.Definition,
+                    requiredAmount: 1
+                );
+
+            CardDeliveryResult result =
+                flowService.TryDeliverCard(
+                    session,
+                    card,
+                    foreignZone
+                );
+
+            Assert.That(result.Succeeded, Is.False);
+
+            Assert.That(
+                result.Failure,
+                Is.EqualTo(
+                    CardDeliveryFailure
+                        .DeliveryZoneDoesNotBelongToSession
+                )
+            );
+        }
+
+        [Test]
+        public void TryDeliverCard_WithEquivalentForeignZone_ReturnsExplicitFailure()
+        {
+            GameSession session =
+                CreateRunningSessionInMainPhase();
+
+            CardDeliveryZoneRuntime ownedZone =
+                session.DeliveryZones[0];
+
+            var foreignZone =
+                new CardDeliveryZoneRuntime(
+                    ownedZone.AcceptedDefinition,
+                    ownedZone.RequiredAmount
+                );
+
+            CardInstance card =
+                session.Hand.Cards[0];
+
+            CardDeliveryResult result =
+                flowService.TryDeliverCard(
+                    session,
+                    card,
+                    foreignZone
+                );
+
+            Assert.That(result.Succeeded, Is.False);
+
+            Assert.That(
+                result.Failure,
+                Is.EqualTo(
+                    CardDeliveryFailure
+                        .DeliveryZoneDoesNotBelongToSession
+                )
+            );
+        }
+
+        [Test]
+        public void TryDeliverCard_WithForeignZone_DoesNotMutateSession()
+        {
+            GameSession session =
+                CreateRunningSessionInMainPhase();
+
+            CardInstance card =
+                session.Hand.Cards[0];
+
+            int initialHandCount =
+                session.Hand.Count;
+
+            CardDeliveryZoneRuntime ownedZone =
+                session.DeliveryZones[0];
+
+            var foreignZone =
+                new CardDeliveryZoneRuntime(
+                    ownedZone.AcceptedDefinition,
+                    ownedZone.RequiredAmount
+                );
+
+            CardDeliveryResult result =
+                flowService.TryDeliverCard(
+                    session,
+                    card,
+                    foreignZone
+                );
+
+            Assert.That(result.Succeeded, Is.False);
+            Assert.That(session.Hand.Count, Is.EqualTo(initialHandCount));
+            Assert.That(session.Hand.Contains(card), Is.True);
+            Assert.That(ownedZone.IsEmpty, Is.True);
+            Assert.That(foreignZone.IsEmpty, Is.True);
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void TryDeliverCard_WithWrongDefinition_ReturnsExplicitFailure()
+        {
+            GameSession session =
+                CreateRunningMixedSessionInMainPhase();
+
+            CardDeliveryZoneRuntime zone =
+                session.DeliveryZones[0];
+
+            CardInstance incompatibleCard =
+                session.Hand.Cards.FirstOrDefault(
+                    card => !ReferenceEquals(
+                        card.Definition,
+                        zone.AcceptedDefinition
+                    )
+                );
+
+            Assert.That(
+                incompatibleCard,
+                Is.Not.Null,
+                "The test session must contain an incompatible card in the hand."
+            );
+
+            CardDeliveryResult result =
+                flowService.TryDeliverCard(
+                    session,
+                    incompatibleCard,
+                    zone
+                );
+
+            Assert.That(result.Succeeded, Is.False);
+
+            Assert.That(
+                result.Failure,
+                Is.EqualTo(
+                    CardDeliveryFailure
+                        .DeliveryZoneRejectedCard
+                )
+            );
+
+            Assert.That(
+                session.Hand.Cards,
+                Does.Contain(incompatibleCard)
+            );
+
+            Assert.That(zone.IsEmpty, Is.True);
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void TryDeliverCard_WithCardNotInHand_ReturnsExplicitFailure()
+        {
+            GameSession session =
+                CreateRunningSessionInMainPhase();
+
+            CardDeliveryZoneRuntime zone =
+                session.DeliveryZones[0];
+
+            CardInstance externalCard =
+                new CardInstance(
+                    Guid.NewGuid(),
+                    zone.AcceptedDefinition
+                );
+
+            CardDeliveryResult result =
+                flowService.TryDeliverCard(
+                    session,
+                    externalCard,
+                    zone
+                );
+
+            Assert.That(result.Succeeded, Is.False);
+
+            Assert.That(
+                result.Failure,
+                Is.EqualTo(
+                    CardDeliveryFailure.CardNotInHand
+                )
+            );
+
+            Assert.That(zone.IsEmpty, Is.True);
+        }
+
+        [Test]
+        public void TryDeliverCard_WithValidCard_MovesCardToDeliveryZone()
+        {
+            GameSession session =
+                CreateRunningSessionInMainPhase();
+
+            CardDeliveryZoneRuntime zone =
+                session.DeliveryZones[0];
+
+            CardInstance card =
+                session.Hand.Cards.First(
+                    candidate => ReferenceEquals(
+                        candidate.Definition,
+                        zone.AcceptedDefinition
+                    )
+                );
+
+            CardDeliveryResult result =
+                flowService.TryDeliverCard(
+                    session,
+                    card,
+                    zone
+                );
+
+            Assert.That(result.Succeeded, Is.True);
+            Assert.That(session.Hand.Contains(card), Is.False);
+            Assert.That(zone.Contains(card), Is.True);
+            Assert.That(zone.CurrentAmount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void TryDeliverCard_WithValidCard_PreservesValidSessionState()
+        {
+            GameSession session =
+                CreateRunningSessionInMainPhase();
+
+            CardDeliveryZoneRuntime zone =
+                session.DeliveryZones[0];
+
+            CardInstance card =
+                session.Hand.Cards.First(
+                    candidate => ReferenceEquals(
+                        candidate.Definition,
+                        zone.AcceptedDefinition
+                    )
+                );
+
+            CardDeliveryResult result =
+                flowService.TryDeliverCard(
+                    session,
+                    card,
+                    zone
+                );
+
+            Assert.That(result.Succeeded, Is.True);
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void TryDeliverCard_CompletingZone_DoesNotEndSessionYet()
+        {
+            GameSession session =
+                CreateRunningSessionInMainPhase(
+                    requiredAmount: 1
+                );
+
+            CardDeliveryZoneRuntime zone =
+                session.DeliveryZones[0];
+
+            CardInstance card =
+                session.Hand.Cards.First(
+                    candidate => ReferenceEquals(
+                        candidate.Definition,
+                        zone.AcceptedDefinition
+                    )
+                );
+
+            CardDeliveryResult result =
+                flowService.TryDeliverCard(
+                    session,
+                    card,
+                    zone
+                );
+
+            Assert.That(result.Succeeded, Is.True);
+            Assert.That(zone.IsCompleted, Is.True);
+
+            Assert.That(
+                session.State,
+                Is.EqualTo(GameSessionState.Running)
+            );
+
+            Assert.That(
+                session.EndReason,
+                Is.EqualTo(GameSessionEndReason.None)
+            );
+        }
+
+        [Test]
+        public void Constructor_WithNullCardDeliveryService_Throws()
+        {
+            Assert.That(
+                () => new GameSessionFlowService(
+                    drawPhaseService,
+                    mainPhaseService,
+                    manualDiscardService,
+                    endPhaseService,
+                    cardDeliveryService: null
+                ),
+                Throws.TypeOf<ArgumentNullException>()
+            );
         }
 
         [Test]
@@ -201,7 +629,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
         public void Constructor_WithNullDrawPhaseService_Throws()
         {
             Assert.That(
-                () => new GameSessionFlowService(null, null, null, null),
+                () => new GameSessionFlowService(null, null, null, null, null),
                 Throws.TypeOf<ArgumentNullException>()
             );
         }
@@ -563,7 +991,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
                     ? new[]
                     {
                 new DeckEntry(
-                    definition,
+                    acceptedDefinition,
                     totalCardCount
                 )
                     }
@@ -615,12 +1043,15 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
 
             EndPhaseService endPhaseService =
                 new EndPhaseService();
+            CardDeliveryService cardDeliveryService =
+                new CardDeliveryService(movementService);
 
             return new GameSessionFlowService(
                 drawPhaseService,
                 mainPhaseService,
                 manualDiscardService,
-                endPhaseService
+                endPhaseService,
+                cardDeliveryService
             );
         }
 
@@ -653,6 +1084,244 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
                 return ids.Dequeue();
             }
         }
+
+
+        private GameSession CreateSessionWithDeliveryZone(
+               int requiredAmount = 2,
+               int initialHandSize = 2,
+               int maxHandSize = 4,
+               int remainingDeckCards = 1
+           )
+        {
+            int acceptedCardCount =
+                initialHandSize + remainingDeckCards;
+
+            var entries =
+                new[]
+                {
+                    new DeckEntry(
+                        acceptedDefinition,
+                        acceptedCardCount
+                    )
+                };
+
+            var zoneConfig =
+                new CardDeliveryZoneConfig(
+                    acceptedDefinition,
+                    requiredAmount
+                );
+
+            int totalCardCount =
+                acceptedCardCount;
+
+            GameSessionBuilder builder =
+                CreateBuilder(
+                    CreateSequentialIds(
+                        totalCardCount
+                    )
+                );
+
+            return builder.Build(
+                entries,
+                new GameSessionConfig(
+                    initialHandSize,
+                    maxHandSize,
+                    deliveryZones: new[]
+                    {
+                        zoneConfig
+                    }
+                ),
+                new SeededRandomSource(12345)
+            );
+        }
+        private GameSession CreateSessionWithMixedCards(
+    int requiredAmount = 2
+)
+        {
+            var entries =
+                new[]
+                {
+            new DeckEntry(
+                acceptedDefinition,
+                quantity: 3
+            ),
+            new DeckEntry(
+                otherDefinition,
+                quantity: 2
+            )
+                };
+
+            var zoneConfig =
+                new CardDeliveryZoneConfig(
+                    acceptedDefinition,
+                    requiredAmount
+                );
+
+            GameSessionBuilder builder =
+                CreateBuilder(
+                    CreateSequentialIds(5)
+                );
+
+            return builder.Build(
+                entries,
+                new GameSessionConfig(
+                    initialHandSize: 4,
+                    maxHandSize: 5,
+                    deliveryZones: new[]
+                    {
+                zoneConfig
+                    }
+                ),
+                new SeededRandomSource(12345)
+            );
+        }
+        private GameSession CreateRunningSessionInMainPhase(
+            int requiredAmount = 2
+        )
+        {
+            GameSession session =
+                CreateSessionWithDeliveryZone(
+                    requiredAmount: requiredAmount,
+                    initialHandSize: 2,
+                    maxHandSize: 4,
+                    remainingDeckCards: 1
+                );
+
+            flowService.Start(session);
+
+            DrawPhaseResult result =
+                flowService.ResolveDrawPhase(
+                    session
+                );
+
+            Assert.That(
+                result.Outcome,
+                Is.Not.EqualTo(
+                    DrawPhaseOutcome.DeckOut
+                )
+            );
+
+            Assert.That(
+                session.State,
+                Is.EqualTo(
+                    GameSessionState.Running
+                )
+            );
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Main)
+            );
+
+            return session;
+        }
+
+        private GameSession CreateRunningMixedSessionInMainPhase(
+            int requiredAmount = 2
+        )
+        {
+            GameSession session =
+                CreateSessionWithMixedCards(
+                    requiredAmount
+                );
+
+            flowService.Start(session);
+
+            DrawPhaseResult result =
+                flowService.ResolveDrawPhase(
+                    session
+                );
+
+            Assert.That(
+                result.Outcome,
+                Is.Not.EqualTo(
+                    DrawPhaseOutcome.DeckOut
+                )
+            );
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Main)
+            );
+
+            return session;
+        }
+
+        private GameSessionBuilder CreateBuilder(
+            IEnumerable<Guid> ids
+        )
+        {
+            ICardInstanceIdSource idSource =
+                new SequenceIdSource(ids);
+
+            CardInstanceFactory instanceFactory =
+                new CardInstanceFactory(
+                    idSource
+                );
+
+            DeckRuntimeBuilder deckBuilder =
+                new DeckRuntimeBuilder(
+                    instanceFactory
+                );
+
+            return new GameSessionBuilder(
+                deckBuilder,
+                drawService
+            );
+        }
+
+        private static Guid[] CreateSequentialIds(
+            int count
+        )
+        {
+            Guid[] ids =
+                new Guid[count];
+
+            for (
+                int index = 0;
+                index < count;
+                index++
+            )
+            {
+                string suffix =
+                    (index + 1)
+                    .ToString("D12");
+
+                ids[index] =
+                    Guid.Parse(
+                        $"00000000-0000-0000-0000-{suffix}"
+                    );
+            }
+
+            return ids;
+        }
+
+        private sealed class SequenceIdSource
+            : ICardInstanceIdSource
+        {
+            private readonly Queue<Guid> ids;
+
+            public SequenceIdSource(
+                IEnumerable<Guid> ids
+            )
+            {
+                this.ids =
+                    new Queue<Guid>(ids);
+            }
+
+            public Guid NextId()
+            {
+                if (ids.Count == 0)
+                {
+                    throw new InvalidOperationException(
+                        "No more test IDs are available."
+                    );
+                }
+
+                return ids.Dequeue();
+            }
+        }
+
         #endregion
     }
 }

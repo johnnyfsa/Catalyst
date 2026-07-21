@@ -303,6 +303,33 @@ namespace Catalyst.Cards.Runtime.Session
             return result.AsReadOnly();
         }
 
+        public bool ContainsDeliveryZone(
+    CardDeliveryZoneRuntime deliveryZone
+)
+        {
+            if (deliveryZone == null)
+            {
+                return false;
+            }
+
+            foreach (
+                CardDeliveryZoneRuntime sessionZone
+                in DeliveryZones
+            )
+            {
+                if (ReferenceEquals(
+                    sessionZone,
+                    deliveryZone
+                ))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+
         private void CountZoneCards(
             CardZoneRuntime zone,
             IDictionary<Guid, int> zoneOccurrences
@@ -333,5 +360,6 @@ namespace Catalyst.Cards.Runtime.Session
                 zoneOccurrences[card.InstanceId]++;
             }
         }
+
     }
 }

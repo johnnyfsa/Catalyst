@@ -1,6 +1,8 @@
 using System;
 using Catalyst.Cards.Runtime.Turn;
 using Catalyst.Cards.Runtime.Discard;
+using Catalyst.Cards.Runtime.Delivery;
+using Catalyst.Cards.Runtime.Zones;
 
 namespace Catalyst.Cards.Runtime.Session
 {
@@ -11,11 +13,14 @@ namespace Catalyst.Cards.Runtime.Session
         private readonly ManualDiscardService manualDiscardService;
         private readonly EndPhaseService endPhaseService;
 
+        private readonly CardDeliveryService cardDeliveryService;
+
         public GameSessionFlowService(
     DrawPhaseService drawPhaseService,
     MainPhaseService mainPhaseService,
     ManualDiscardService manualDiscardService,
-    EndPhaseService endPhaseService
+    EndPhaseService endPhaseService,
+    CardDeliveryService cardDeliveryService
 )
         {
             this.drawPhaseService = drawPhaseService
@@ -36,6 +41,10 @@ namespace Catalyst.Cards.Runtime.Session
             this.endPhaseService = endPhaseService
                 ?? throw new ArgumentNullException(
                     nameof(endPhaseService)
+                );
+            this.cardDeliveryService = cardDeliveryService
+                ?? throw new ArgumentNullException(
+                    nameof(cardDeliveryService)
                 );
         }
 
@@ -152,6 +161,43 @@ namespace Catalyst.Cards.Runtime.Session
             EndPhaseResult result =
                 endPhaseService.Resolve(
                     session.Turn
+                );
+
+            session.ValidateState();
+
+            return result;
+        }
+
+        public CardDeliveryResult TryDeliverCard(
+        GameSession session,
+        CardInstance card,
+        CardDeliveryZoneRuntime deliveryZone
+    )
+        {
+            EnsureSessionIsRunning(session);
+
+            if (session.Turn.CurrentPhase != GamePhase.Main)
+            {
+                throw new InvalidOperationException(
+                    "Cards can only be delivered during the Main phase."
+                );
+            }
+
+            if (!session.ContainsDeliveryZone(
+                deliveryZone
+            ))
+            {
+                return CardDeliveryResult.Fail(
+                    CardDeliveryFailure
+                        .DeliveryZoneDoesNotBelongToSession
+                );
+            }
+
+            CardDeliveryResult result =
+                cardDeliveryService.TryDeliver(
+                    card,
+                    session.Hand,
+                    deliveryZone
                 );
 
             session.ValidateState();

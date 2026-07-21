@@ -242,6 +242,74 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
             );
         }
 
+        [Test]
+        public void ContainsDeliveryZone_WithOwnedZone_ReturnsTrue()
+        {
+            GameSession session =
+                CreateSessionWithDeliveryZone();
+
+            CardDeliveryZoneRuntime zone =
+                session.DeliveryZones[0];
+
+            Assert.That(
+                session.ContainsDeliveryZone(zone),
+                Is.True
+            );
+        }
+
+        [Test]
+        public void ContainsDeliveryZone_WithForeignZone_ReturnsFalse()
+        {
+            GameSession session =
+                CreateSessionWithDeliveryZone();
+
+            var foreignZone =
+                new CardDeliveryZoneRuntime(
+                    definition,
+                    requiredAmount: 1
+                );
+
+            Assert.That(
+                session.ContainsDeliveryZone(foreignZone),
+                Is.False
+            );
+        }
+
+        [Test]
+        public void ContainsDeliveryZone_WithEquivalentForeignZone_ReturnsFalse()
+        {
+            GameSession session =
+                CreateSessionWithDeliveryZone();
+
+            CardDeliveryZoneRuntime ownedZone =
+                session.DeliveryZones[0];
+
+            var equivalentForeignZone =
+                new CardDeliveryZoneRuntime(
+                    ownedZone.AcceptedDefinition,
+                    ownedZone.RequiredAmount
+                );
+
+            Assert.That(
+                session.ContainsDeliveryZone(
+                    equivalentForeignZone
+                ),
+                Is.False
+            );
+        }
+
+        [Test]
+        public void ContainsDeliveryZone_WithNullZone_ReturnsFalse()
+        {
+            GameSession session =
+                CreateSessionWithDeliveryZone();
+
+            Assert.That(
+                session.ContainsDeliveryZone(null),
+                Is.False
+            );
+        }
+
         #region Helpers
 
         private GameSession CreateSession()

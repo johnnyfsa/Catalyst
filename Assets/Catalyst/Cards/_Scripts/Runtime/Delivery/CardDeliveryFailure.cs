@@ -8,6 +8,7 @@ namespace Catalyst.Cards.Runtime.Delivery
         NullDeliveryZone = 3,
         CardNotInHand = 4,
         DeliveryZoneRejectedCard = 5,
-        MovementFailed = 6
+        MovementFailed = 6,
+        DeliveryZoneDoesNotBelongToSession = 7
     }
 }

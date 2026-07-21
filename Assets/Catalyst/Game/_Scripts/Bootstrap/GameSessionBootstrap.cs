@@ -8,6 +8,7 @@ using Catalyst.Cards.Runtime.Movement;
 using Catalyst.Cards.Runtime.Randomness;
 using Catalyst.Cards.Runtime.Session;
 using Catalyst.Cards.Runtime.Turn;
+using Catalyst.Cards.Runtime.Delivery;
 using UnityEngine;
 
 namespace Catalyst.Game.Bootstrap
@@ -62,12 +63,16 @@ namespace Catalyst.Game.Bootstrap
             EndPhaseService endPhaseService =
                 new EndPhaseService();
 
+            CardDeliveryService cardDeliveryService =
+                new CardDeliveryService(movementService);
+
             SessionFlow =
                 new GameSessionFlowService(
                     drawPhaseService,
                     mainPhaseService,
                     manualDiscardService,
-                    endPhaseService
+                    endPhaseService,
+                    cardDeliveryService
                 );
 
             Initialize(
