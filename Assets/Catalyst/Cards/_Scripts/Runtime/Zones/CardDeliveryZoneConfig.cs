@@ -1,12 +1,11 @@
 using System;
 using Catalyst.Cards.Definitions;
 
-namespace Catalyst.Cards.Runtime.Zones
+namespace Catalyst.Cards.Runtime.Session
 {
-    public sealed class CardObjectiveZoneRuntime
-        : CardZoneRuntime
+    public sealed class CardDeliveryZoneConfig
     {
-        public CardObjectiveZoneRuntime(
+        public CardDeliveryZoneConfig(
             CardDefinition acceptedDefinition,
             int requiredAmount
         )
@@ -31,24 +30,5 @@ namespace Catalyst.Cards.Runtime.Zones
         public CardDefinition AcceptedDefinition { get; }
 
         public int RequiredAmount { get; }
-
-        public int CurrentAmount => Count;
-
-        public bool IsCompleted =>
-            CurrentAmount >= RequiredAmount;
-
-        internal override bool CanAdd(
-            CardInstance card
-        )
-        {
-            return card != null
-                && ReferenceEquals(
-                    card.Definition,
-                    AcceptedDefinition
-                )
-                && base.CanAdd(card);
-        }
-
-        protected override bool AllowsRemoval => false;
     }
 }

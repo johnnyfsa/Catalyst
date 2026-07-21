@@ -7,6 +7,7 @@ using Catalyst.Cards.Runtime.Draw;
 using Catalyst.Cards.Runtime.Movement;
 using Catalyst.Cards.Runtime.Randomness;
 using Catalyst.Cards.Runtime.Session;
+using Catalyst.Cards.Runtime.Zones;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -32,6 +33,81 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
                     definition
                 );
             }
+        }
+
+        [Test]
+        public void ValidateState_WhenCardIsInDeliveryZone_DoesNotThrow()
+        {
+            GameSession session =
+                CreateSessionWithDeliveryZone();
+
+            CardInstance card =
+                session.Hand.Cards[0];
+
+            CardDeliveryZoneRuntime deliveryZone =
+                session.DeliveryZones[0];
+
+            bool removed =
+                session.Hand.TryRemove(card);
+
+            bool added =
+                deliveryZone.TryAdd(card);
+
+            Assert.That(removed, Is.True);
+            Assert.That(added, Is.True);
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void ValidateState_WhenCardExistsInHandAndDeliveryZone_Throws()
+        {
+            GameSession session =
+                CreateSessionWithDeliveryZone();
+
+            CardInstance card =
+                session.Hand.Cards[0];
+
+            CardDeliveryZoneRuntime deliveryZone =
+                session.DeliveryZones[0];
+
+            bool added =
+                deliveryZone.TryAdd(card);
+
+            Assert.That(added, Is.True);
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.TypeOf<InvalidOperationException>()
+            );
+        }
+
+        [Test]
+        public void ValidateState_WhenDeliveryZoneContainsUnregisteredCard_Throws()
+        {
+            GameSession session =
+                CreateSessionWithDeliveryZone();
+
+            CardInstance unregisteredCard =
+                CreateCard(100);
+
+            CardDeliveryZoneRuntime deliveryZone =
+                session.DeliveryZones[0];
+
+            bool added =
+                deliveryZone.TryAdd(
+                    unregisteredCard
+                );
+
+            Assert.That(added, Is.True);
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.TypeOf<InvalidOperationException>()
+            );
         }
 
         [Test]
@@ -166,6 +242,8 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
             );
         }
 
+        #region Helpers
+
         private GameSession CreateSession()
         {
             var idSource =
@@ -257,5 +335,61 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
                 return ids.Dequeue();
             }
         }
+
+        private GameSession CreateSessionWithDeliveryZone()
+        {
+            var idSource =
+                new QueueIdSource(
+                    CreateGuid(1)
+                );
+
+            var instanceFactory =
+                new CardInstanceFactory(idSource);
+
+            var deckBuilder =
+                new DeckRuntimeBuilder(instanceFactory);
+
+            var movementService =
+                new CardMovementService();
+
+            var drawService =
+                new CardDrawService(movementService);
+
+            var builder =
+                new GameSessionBuilder(
+                    deckBuilder,
+                    drawService
+                );
+
+            var entries =
+                new[]
+                {
+            new DeckEntry(
+                definition,
+                quantity: 1
+            )
+                };
+
+            var deliveryZoneConfig =
+                new CardDeliveryZoneConfig(
+                    definition,
+                    requiredAmount: 1
+                );
+
+            return builder.Build(
+                entries,
+                new GameSessionConfig(
+                    initialHandSize: 1,
+                    maxHandSize: 8,
+                    deliveryZones: new[]
+                    {
+                deliveryZoneConfig
+                    }
+                ),
+                new SeededRandomSource(12345)
+            );
+        }
+
+        #endregion
     }
 }

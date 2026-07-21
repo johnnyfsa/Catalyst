@@ -8,6 +8,7 @@ using Catalyst.Cards.Runtime.Draw;
 using Catalyst.Cards.Runtime.Movement;
 using Catalyst.Cards.Runtime.Randomness;
 using Catalyst.Cards.Runtime.Session;
+using Catalyst.Cards.Runtime.Zones;
 using NUnit.Framework;
 using UnityEngine;
 using Catalyst.Cards.Runtime.Turn;
@@ -18,6 +19,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
     {
         private CardDefinition hydrogen;
         private CardDefinition oxygen;
+        private CardDefinition water;
 
         [SetUp]
         public void SetUp()
@@ -26,6 +28,8 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
                 ScriptableObject.CreateInstance<CardDefinition>();
 
             oxygen =
+                ScriptableObject.CreateInstance<CardDefinition>();
+            water =
                 ScriptableObject.CreateInstance<CardDefinition>();
         }
 
@@ -44,6 +48,318 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
         }
 
         [Test]
+        public void Build_CreatesConfiguredDeliveryZone()
+        {
+            GameSessionBuilder builder =
+                CreateBuilder(
+                    CreateSequentialIds(12)
+                );
+
+            var zoneConfig =
+                new CardDeliveryZoneConfig(
+                    water,
+                    requiredAmount: 10
+                );
+
+            GameSession session =
+                builder.Build(
+                    CreateEntries(12),
+                    new GameSessionConfig(
+                        initialHandSize: 8,
+                        maxHandSize: 8,
+                        deliveryZones: new[]
+                        {
+                    zoneConfig
+                        }
+                    ),
+                    new SeededRandomSource(12345)
+                );
+
+            Assert.That(
+                session.DeliveryZones.Count,
+                Is.EqualTo(1)
+            );
+
+            CardDeliveryZoneRuntime zone =
+                session.DeliveryZones[0];
+
+            Assert.That(
+                zone.AcceptedDefinition,
+                Is.SameAs(water)
+            );
+
+            Assert.That(
+                zone.RequiredAmount,
+                Is.EqualTo(10)
+            );
+
+            Assert.That(
+                zone.CurrentAmount,
+                Is.Zero
+            );
+
+            Assert.That(
+                zone.IsCompleted,
+                Is.False
+            );
+
+            Assert.That(
+                zone.IsEmpty,
+                Is.True
+            );
+        }
+
+        [Test]
+        public void Build_CreatesAllConfiguredDeliveryZones()
+        {
+            GameSessionBuilder builder =
+                CreateBuilder(
+                    CreateSequentialIds(12)
+                );
+
+            var waterZoneConfig =
+                new CardDeliveryZoneConfig(
+                    water,
+                    requiredAmount: 10
+                );
+
+            var oxygenZoneConfig =
+                new CardDeliveryZoneConfig(
+                    oxygen,
+                    requiredAmount: 2
+                );
+
+            GameSession session =
+                builder.Build(
+                    CreateEntries(12),
+                    new GameSessionConfig(
+                        initialHandSize: 8,
+                        maxHandSize: 8,
+                        deliveryZones: new[]
+                        {
+                    waterZoneConfig,
+                    oxygenZoneConfig
+                        }
+                    ),
+                    new SeededRandomSource(12345)
+                );
+
+            Assert.That(
+                session.DeliveryZones.Count,
+                Is.EqualTo(2)
+            );
+
+            Assert.That(
+                session.DeliveryZones[0]
+                    .AcceptedDefinition,
+                Is.SameAs(water)
+            );
+
+            Assert.That(
+                session.DeliveryZones[0]
+                    .RequiredAmount,
+                Is.EqualTo(10)
+            );
+
+            Assert.That(
+                session.DeliveryZones[1]
+                    .AcceptedDefinition,
+                Is.SameAs(oxygen)
+            );
+
+            Assert.That(
+                session.DeliveryZones[1]
+                    .RequiredAmount,
+                Is.EqualTo(2)
+            );
+        }
+
+        [Test]
+        public void Build_DeliveryZonesStartEmpty()
+        {
+            GameSessionBuilder builder =
+                CreateBuilder(
+                    CreateSequentialIds(12)
+                );
+
+            var hydrogenZoneConfig =
+                new CardDeliveryZoneConfig(
+                    hydrogen,
+                    requiredAmount: 3
+                );
+
+            GameSession session =
+                builder.Build(
+                    CreateEntries(12),
+                    new GameSessionConfig(
+                        initialHandSize: 8,
+                        maxHandSize: 8,
+                        deliveryZones: new[]
+                        {
+                    hydrogenZoneConfig
+                        }
+                    ),
+                    new SeededRandomSource(12345)
+                );
+
+            CardDeliveryZoneRuntime zone =
+                session.DeliveryZones[0];
+
+            Assert.That(zone.Count, Is.Zero);
+            Assert.That(zone.CurrentAmount, Is.Zero);
+            Assert.That(zone.IsEmpty, Is.True);
+            Assert.That(zone.IsCompleted, Is.False);
+        }
+
+        [Test]
+        public void Build_DoesNotPlaceMatchingCardsInDeliveryZone()
+        {
+            GameSessionBuilder builder =
+                CreateBuilder(
+                    CreateSequentialIds(12)
+                );
+
+            var hydrogenZoneConfig =
+                new CardDeliveryZoneConfig(
+                    hydrogen,
+                    requiredAmount: 3
+                );
+
+            GameSession session =
+                builder.Build(
+                    CreateEntries(12),
+                    new GameSessionConfig(
+                        initialHandSize: 8,
+                        maxHandSize: 8,
+                        deliveryZones: new[]
+                        {
+                    hydrogenZoneConfig
+                        }
+                    ),
+                    new SeededRandomSource(12345)
+                );
+
+            CardDeliveryZoneRuntime zone =
+                session.DeliveryZones[0];
+
+            bool matchingCardExistsInSession =
+                session.SessionCards.Any(
+                    card => ReferenceEquals(
+                        card.Definition,
+                        hydrogen
+                    )
+                );
+
+            Assert.That(
+                matchingCardExistsInSession,
+                Is.True
+            );
+
+            Assert.That(
+                zone.CurrentAmount,
+                Is.Zero
+            );
+
+            Assert.That(
+                zone.IsEmpty,
+                Is.True
+            );
+        }
+
+
+        [Test]
+        public void Build_WithDeliveryZones_ProducesValidInitialOwnership()
+        {
+            GameSessionBuilder builder =
+                CreateBuilder(
+                    CreateSequentialIds(12)
+                );
+
+            var zoneConfig =
+                new CardDeliveryZoneConfig(
+                    water,
+                    requiredAmount: 10
+                );
+
+            GameSession session =
+                builder.Build(
+                    CreateEntries(12),
+                    new GameSessionConfig(
+                        initialHandSize: 8,
+                        maxHandSize: 8,
+                        deliveryZones: new[]
+                        {
+                    zoneConfig
+                        }
+                    ),
+                    new SeededRandomSource(12345)
+                );
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void Build_DeliveryZoneCollectionCannotBeModifiedExternally()
+        {
+            GameSessionBuilder builder =
+                CreateBuilder(
+                    CreateSequentialIds(12)
+                );
+
+            var zoneConfig =
+                new CardDeliveryZoneConfig(
+                    water,
+                    requiredAmount: 10
+                );
+
+            GameSession session =
+                builder.Build(
+                    CreateEntries(12),
+                    new GameSessionConfig(
+                        initialHandSize: 8,
+                        maxHandSize: 8,
+                        deliveryZones: new[]
+                        {
+                    zoneConfig
+                        }
+                    ),
+                    new SeededRandomSource(12345)
+                );
+
+            var exposedCollection =
+                session.DeliveryZones
+                    as IList<CardDeliveryZoneRuntime>;
+
+            Assert.That(
+                exposedCollection,
+                Is.Not.Null
+            );
+
+            Assert.That(
+                exposedCollection.IsReadOnly,
+                Is.True
+            );
+
+            Assert.That(
+                () => exposedCollection.Add(
+                    new CardDeliveryZoneRuntime(
+                        water,
+                        requiredAmount: 2
+                    )
+                ),
+                Throws.TypeOf<NotSupportedException>()
+            );
+
+            Assert.That(
+                session.DeliveryZones.Count,
+                Is.EqualTo(1)
+            );
+        }
+
+        [Test]
         public void Build_CreatesAllSessionZones()
         {
             GameSession session = BuildSession(
@@ -55,9 +371,19 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
             Assert.That(session.Hand, Is.Not.Null);
             Assert.That(session.ReactionTable, Is.Not.Null);
             Assert.That(session.DiscardPile, Is.Not.Null);
+
+            Assert.That(
+                session.DeliveryZones,
+                Is.Not.Null
+            );
+
+            Assert.That(
+                session.DeliveryZones,
+                Is.Empty
+            );
+
             Assert.That(session.Turn, Is.Not.Null);
         }
-
         [Test]
         public void Build_CreatesTurnRuntimeNotYetStarted()
         {
@@ -88,13 +414,22 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
                 Is.EqualTo(12)
             );
 
+            int cardsInDeliveryZones =
+                session.DeliveryZones.Sum(
+                    zone => zone.Count
+                );
+
             int cardsInZones =
                 session.Deck.Count
                 + session.Hand.Count
                 + session.ReactionTable.Count
-                + session.DiscardPile.Count;
+                + session.DiscardPile.Count
+                + cardsInDeliveryZones;
 
-            Assert.That(cardsInZones, Is.EqualTo(12));
+            Assert.That(
+                cardsInZones,
+                Is.EqualTo(12)
+            );
         }
 
         [Test]

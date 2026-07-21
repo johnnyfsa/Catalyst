@@ -5,9 +5,9 @@ using Catalyst.Cards.Definitions;
 using Catalyst.Cards.Runtime.Creation;
 using Catalyst.Cards.Runtime.Draw;
 using Catalyst.Cards.Runtime.Randomness;
-using Catalyst.Cards.Runtime.Zones;
-using Catalyst.Cards.Runtime.Turn;
 using Catalyst.Cards.Runtime.Resources;
+using Catalyst.Cards.Runtime.Turn;
+using Catalyst.Cards.Runtime.Zones;
 
 namespace Catalyst.Cards.Runtime.Session
 {
@@ -60,7 +60,7 @@ namespace Catalyst.Cards.Runtime.Session
             }
 
             DeckRuntime deck =
-     deckBuilder.Build(deckEntries);
+                deckBuilder.Build(deckEntries);
 
             CardInstance[] sessionCards =
                 deck.Cards.ToArray();
@@ -68,13 +68,20 @@ namespace Catalyst.Cards.Runtime.Session
             deck.Shuffle(randomSource);
 
             HandRuntime hand =
-                new HandRuntime(config.MaxHandSize);
+                new HandRuntime(
+                    config.MaxHandSize
+                );
 
             ReactionTableRuntime reactionTable =
                 new ReactionTableRuntime();
 
             DiscardPileRuntime discardPile =
                 new DiscardPileRuntime();
+
+            CardDeliveryZoneRuntime[] deliveryZones =
+                BuildDeliveryZones(
+                    config.DeliveryZones
+                );
 
             ResourceCounterRuntime heat =
                 new ResourceCounterRuntime(
@@ -102,6 +109,7 @@ namespace Catalyst.Cards.Runtime.Session
                     hand,
                     reactionTable,
                     discardPile,
+                    deliveryZones,
                     turn,
                     heat,
                     electricity
@@ -110,6 +118,23 @@ namespace Catalyst.Cards.Runtime.Session
             session.ValidateState();
 
             return session;
+        }
+
+        private static CardDeliveryZoneRuntime[]
+            BuildDeliveryZones(
+                IEnumerable<CardDeliveryZoneConfig>
+                    zoneConfigs
+            )
+        {
+            return zoneConfigs
+                .Select(
+                    zoneConfig =>
+                        new CardDeliveryZoneRuntime(
+                            zoneConfig.AcceptedDefinition,
+                            zoneConfig.RequiredAmount
+                        )
+                )
+                .ToArray();
         }
     }
 }

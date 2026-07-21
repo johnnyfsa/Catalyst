@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Catalyst.Tests.EditMode.Cards.Runtime.Zones
 {
-    public sealed class CardObjectiveZoneRuntimeTests
+    public sealed class CardDeliveryZoneRuntimeTests
     {
         private CardDefinition acceptedDefinition;
         private CardDefinition otherDefinition;
@@ -44,7 +44,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Zones
         public void Constructor_WithNullAcceptedDefinition_Throws()
         {
             Assert.That(
-                () => new CardObjectiveZoneRuntime(
+                () => new CardDeliveryZoneRuntime(
                     acceptedDefinition: null,
                     requiredAmount: 10
                 ),
@@ -59,7 +59,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Zones
         )
         {
             Assert.That(
-                () => new CardObjectiveZoneRuntime(
+                () => new CardDeliveryZoneRuntime(
                     acceptedDefinition,
                     requiredAmount
                 ),
@@ -70,7 +70,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Zones
         [Test]
         public void NewZone_ExposesConfiguredObjective()
         {
-            CardObjectiveZoneRuntime zone =
+            CardDeliveryZoneRuntime zone =
                 CreateZone(requiredAmount: 10);
 
             Assert.That(
@@ -91,7 +91,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Zones
         [Test]
         public void CanAdd_WithAcceptedDefinition_ReturnsTrue()
         {
-            CardObjectiveZoneRuntime zone =
+            CardDeliveryZoneRuntime zone =
                 CreateZone();
 
             CardInstance card =
@@ -106,7 +106,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Zones
         [Test]
         public void CanAdd_WithDifferentDefinition_ReturnsFalse()
         {
-            CardObjectiveZoneRuntime zone =
+            CardDeliveryZoneRuntime zone =
                 CreateZone();
 
             CardInstance card =
@@ -121,7 +121,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Zones
         [Test]
         public void CanAdd_WithDifferentDefinitionInstance_ReturnsFalse()
         {
-            CardObjectiveZoneRuntime zone =
+            CardDeliveryZoneRuntime zone =
                 CreateZone();
 
             CardDefinition equivalentDefinition =
@@ -148,7 +148,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Zones
         [Test]
         public void TryAdd_WithAcceptedDefinition_AddsCard()
         {
-            CardObjectiveZoneRuntime zone =
+            CardDeliveryZoneRuntime zone =
                 CreateZone(requiredAmount: 3);
 
             CardInstance card =
@@ -165,7 +165,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Zones
         [Test]
         public void TryAdd_WithDifferentDefinition_DoesNotMutateZone()
         {
-            CardObjectiveZoneRuntime zone =
+            CardDeliveryZoneRuntime zone =
                 CreateZone();
 
             CardInstance card =
@@ -181,7 +181,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Zones
         [Test]
         public void AddingRequiredAmount_CompletesObjective()
         {
-            CardObjectiveZoneRuntime zone =
+            CardDeliveryZoneRuntime zone =
                 CreateZone(requiredAmount: 2);
 
             Assert.That(
@@ -203,7 +203,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Zones
         [Test]
         public void AddingMoreThanRequiredAmount_RemainsCompleted()
         {
-            CardObjectiveZoneRuntime zone =
+            CardDeliveryZoneRuntime zone =
                 CreateZone(requiredAmount: 2);
 
             zone.TryAdd(CreateCard(acceptedDefinition));
@@ -217,7 +217,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Zones
         [Test]
         public void StoredCard_CannotBeRemoved()
         {
-            CardObjectiveZoneRuntime zone =
+            CardDeliveryZoneRuntime zone =
                 CreateZone();
 
             CardInstance card =
@@ -234,7 +234,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Zones
         [Test]
         public void SameCard_CannotBeAddedTwice()
         {
-            CardObjectiveZoneRuntime zone =
+            CardDeliveryZoneRuntime zone =
                 CreateZone();
 
             CardInstance card =
@@ -245,11 +245,11 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Zones
             Assert.That(zone.Count, Is.EqualTo(1));
         }
 
-        private CardObjectiveZoneRuntime CreateZone(
+        private CardDeliveryZoneRuntime CreateZone(
             int requiredAmount = 10
         )
         {
-            return new CardObjectiveZoneRuntime(
+            return new CardDeliveryZoneRuntime(
                 acceptedDefinition,
                 requiredAmount
             );

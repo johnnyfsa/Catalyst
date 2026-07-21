@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Catalyst.Cards.Runtime.Resources;
 using Catalyst.Cards.Runtime.Turn;
 using Catalyst.Cards.Runtime.Zones;
-using Catalyst.Cards.Runtime.Resources;
 
 namespace Catalyst.Cards.Runtime.Session
 {
@@ -17,16 +17,20 @@ namespace Catalyst.Cards.Runtime.Session
         private readonly Dictionary<Guid, CardInstance>
             cardsById;
 
+        private readonly ReadOnlyCollection
+            <CardDeliveryZoneRuntime> deliveryZones;
+
         internal GameSession(
-    IEnumerable<CardInstance> sessionCards,
-    DeckRuntime deck,
-    HandRuntime hand,
-    ReactionTableRuntime reactionTable,
-    DiscardPileRuntime discardPile,
-    TurnRuntime turn,
-    ResourceCounterRuntime heat,
-    ResourceCounterRuntime electricity
-)
+            IEnumerable<CardInstance> sessionCards,
+            DeckRuntime deck,
+            HandRuntime hand,
+            ReactionTableRuntime reactionTable,
+            DiscardPileRuntime discardPile,
+            IEnumerable<CardDeliveryZoneRuntime> deliveryZones,
+            TurnRuntime turn,
+            ResourceCounterRuntime heat,
+            ResourceCounterRuntime electricity
+        )
         {
             if (sessionCards == null)
             {
@@ -36,10 +40,14 @@ namespace Catalyst.Cards.Runtime.Session
             }
 
             Deck = deck
-                ?? throw new ArgumentNullException(nameof(deck));
+                ?? throw new ArgumentNullException(
+                    nameof(deck)
+                );
 
             Hand = hand
-                ?? throw new ArgumentNullException(nameof(hand));
+                ?? throw new ArgumentNullException(
+                    nameof(hand)
+                );
 
             ReactionTable = reactionTable
                 ?? throw new ArgumentNullException(
@@ -52,10 +60,28 @@ namespace Catalyst.Cards.Runtime.Session
                 );
 
             Turn = turn
-                ?? throw new ArgumentNullException(nameof(turn));
+                ?? throw new ArgumentNullException(
+                    nameof(turn)
+                );
 
-            this.sessionCards = new List<CardInstance>();
-            cardsById = new Dictionary<Guid, CardInstance>();
+            Heat = heat
+                ?? throw new ArgumentNullException(
+                    nameof(heat)
+                );
+
+            Electricity = electricity
+                ?? throw new ArgumentNullException(
+                    nameof(electricity)
+                );
+
+            this.deliveryZones =
+                CopyDeliveryZones(deliveryZones);
+
+            this.sessionCards =
+                new List<CardInstance>();
+
+            cardsById =
+                new Dictionary<Guid, CardInstance>();
 
             foreach (CardInstance card in sessionCards)
             {
@@ -64,16 +90,6 @@ namespace Catalyst.Cards.Runtime.Session
 
             readOnlySessionCards =
                 this.sessionCards.AsReadOnly();
-
-            Heat = heat
-?? throw new ArgumentNullException(
-    nameof(heat)
-);
-
-            Electricity = electricity
-                ?? throw new ArgumentNullException(
-                    nameof(electricity)
-                );
         }
 
         public IReadOnlyList<CardInstance> SessionCards =>
@@ -86,6 +102,9 @@ namespace Catalyst.Cards.Runtime.Session
         public ReactionTableRuntime ReactionTable { get; }
 
         public DiscardPileRuntime DiscardPile { get; }
+
+        public IReadOnlyList<CardDeliveryZoneRuntime>
+            DeliveryZones => deliveryZones;
 
         public ResourceCounterRuntime Heat { get; }
 
@@ -162,24 +181,47 @@ namespace Catalyst.Cards.Runtime.Session
 
         internal void ValidateState()
         {
-            Dictionary<Guid, int> zoneOccurrences =
+            var zoneOccurrences =
                 new Dictionary<Guid, int>();
 
             foreach (CardInstance card in sessionCards)
             {
-                zoneOccurrences.Add(card.InstanceId, 0);
+                zoneOccurrences.Add(
+                    card.InstanceId,
+                    0
+                );
             }
 
-            CountZoneCards(Deck, zoneOccurrences);
-            CountZoneCards(Hand, zoneOccurrences);
+            CountZoneCards(
+                Deck,
+                zoneOccurrences
+            );
+
+            CountZoneCards(
+                Hand,
+                zoneOccurrences
+            );
+
             CountZoneCards(
                 ReactionTable,
                 zoneOccurrences
             );
+
             CountZoneCards(
                 DiscardPile,
                 zoneOccurrences
             );
+
+            foreach (
+                CardDeliveryZoneRuntime deliveryZone
+                in deliveryZones
+            )
+            {
+                CountZoneCards(
+                    deliveryZone,
+                    zoneOccurrences
+                );
+            }
 
             foreach (
                 KeyValuePair<Guid, int> occurrence
@@ -193,6 +235,13 @@ namespace Catalyst.Cards.Runtime.Session
                     );
                 }
             }
+        }
+
+        internal void RegisterCreatedCard(
+            CardInstance card
+        )
+        {
+            RegisterCard(card);
         }
 
         private void RegisterCard(CardInstance card)
@@ -220,9 +269,38 @@ namespace Catalyst.Cards.Runtime.Session
             sessionCards.Add(card);
         }
 
-        internal void RegisterCreatedCard(CardInstance card)
+        private static ReadOnlyCollection
+            <CardDeliveryZoneRuntime> CopyDeliveryZones(
+                IEnumerable<CardDeliveryZoneRuntime> source
+            )
         {
-            RegisterCard(card);
+            if (source == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(source)
+                );
+            }
+
+            var result =
+                new List<CardDeliveryZoneRuntime>();
+
+            foreach (
+                CardDeliveryZoneRuntime deliveryZone
+                in source
+            )
+            {
+                if (deliveryZone == null)
+                {
+                    throw new ArgumentException(
+                        "Delivery zone collection cannot contain null entries.",
+                        nameof(source)
+                    );
+                }
+
+                result.Add(deliveryZone);
+            }
+
+            return result.AsReadOnly();
         }
 
         private void CountZoneCards(
@@ -242,7 +320,10 @@ namespace Catalyst.Cards.Runtime.Session
                     );
                 }
 
-                if (!ReferenceEquals(card, registeredCard))
+                if (!ReferenceEquals(
+                    card,
+                    registeredCard
+                ))
                 {
                     throw new InvalidOperationException(
                         $"Zone contains a different object using registered instance ID '{card.InstanceId}'."
