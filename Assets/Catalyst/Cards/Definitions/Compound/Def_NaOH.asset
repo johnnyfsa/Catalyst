@@ -15,6 +15,6 @@ MonoBehaviour:
   id: sodium_hydroxyde
   displayName: Sodium Hydroxyde
   cardType: 1
-  formula: NaOh
+  formula: NaOH
   artwork: {fileID: 21300000, guid: 248bced07e6120a4988199db6bc5512a, type: 3}
   tags: []

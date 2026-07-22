@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b0cf8c31f2005f468689bf97a7d328d, type: 3}
+  m_Name: Def_Water_Electrolisys
+  m_EditorClassIdentifier: 
+  reactionId: water_electrolisys
+  reactants:
+  - cardDefinition: {fileID: 11400000, guid: 62de5a9c413b6d742bb3412a315930e5, type: 2}
+    quantity: 2
+  products:
+  - cardDefinition: {fileID: 11400000, guid: ffc3c2d0a850b2c47b9438d0c5f84fc3, type: 2}
+    quantity: 2
+  - cardDefinition: {fileID: 11400000, guid: b06e22b3db076de42b091a4bdc7ba0a5, type: 2}
+    quantity: 1
+  requiredHeat: 0
+  requiredElectricity: 1
+  producedHeat: 0
+  producedElectricity: 0

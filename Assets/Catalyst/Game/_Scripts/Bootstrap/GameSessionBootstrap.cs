@@ -44,8 +44,7 @@ namespace Catalyst.Game.Bootstrap
 
         [Header("Deck")]
         [SerializeField]
-        private List<DeckEntry> deckEntries =
-            new List<DeckEntry>();
+        private DeckDefinition deckDefinition;
 
         [Header("Hand")]
         [SerializeField]
@@ -119,9 +118,16 @@ namespace Catalyst.Game.Bootstrap
                     ? maximumTurns
                     : null;
 
-            Initialize(
+            if (deckDefinition == null)
+            {
+                throw new InvalidOperationException(
+                    "A DeckDefinition must be assigned."
+                );
+            }
+
+            InitializeFromDeckDefinition(
                 sessionBuilder,
-                deckEntries,
+                deckDefinition,
                 new GameSessionConfig(
                     initialHandSize: initialHandSize,
                     maxHandSize: maxHandSize,
@@ -150,11 +156,10 @@ namespace Catalyst.Game.Bootstrap
             );
         }
 
-        internal GameSession Initialize(
-            IEnumerable<DeckEntry> entries,
-            int requestedInitialHandSize,
-            int requestedMaxHandSize,
-            int seed
+        internal GameSession InitializeFromDeckDefinition(
+            DeckDefinition definition,
+            GameSessionConfig config,
+            IRandomSource randomSource
         )
         {
             CardMovementService movementService =
@@ -170,8 +175,22 @@ namespace Catalyst.Game.Bootstrap
                     drawService
                 );
 
-            return Initialize(
+            return InitializeFromDeckDefinition(
                 sessionBuilder,
+                definition,
+                config,
+                randomSource
+            );
+        }
+
+        internal GameSession InitializeFromDeckEntries(
+            IEnumerable<DeckEntry> entries,
+            int requestedInitialHandSize,
+            int requestedMaxHandSize,
+            int seed
+        )
+        {
+            return InitializeFromDeckEntries(
                 entries,
                 new GameSessionConfig(
                     initialHandSize:
@@ -183,7 +202,7 @@ namespace Catalyst.Game.Bootstrap
             );
         }
 
-        internal GameSession Initialize(
+        internal GameSession InitializeFromDeckEntries(
             IEnumerable<DeckEntry> entries,
             GameSessionConfig config,
             IRandomSource randomSource
@@ -205,6 +224,56 @@ namespace Catalyst.Game.Bootstrap
             return Initialize(
                 sessionBuilder,
                 entries,
+                config,
+                randomSource
+            );
+        }
+
+        internal GameSession Initialize(
+            IEnumerable<DeckEntry> entries,
+            int requestedInitialHandSize,
+            int requestedMaxHandSize,
+            int seed
+        )
+        {
+            return InitializeFromDeckEntries(
+                entries,
+                requestedInitialHandSize,
+                requestedMaxHandSize,
+                seed
+            );
+        }
+
+        internal GameSession Initialize(
+            IEnumerable<DeckEntry> entries,
+            GameSessionConfig config,
+            IRandomSource randomSource
+        )
+        {
+            return InitializeFromDeckEntries(
+                entries,
+                config,
+                randomSource
+            );
+        }
+
+        private GameSession InitializeFromDeckDefinition(
+            GameSessionBuilder sessionBuilder,
+            DeckDefinition definition,
+            GameSessionConfig config,
+            IRandomSource randomSource
+        )
+        {
+            if (definition == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(definition)
+                );
+            }
+
+            return Initialize(
+                sessionBuilder,
+                definition.Entries,
                 config,
                 randomSource
             );

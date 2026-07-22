@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7452cd506f46e5649963c200c098c5b1, type: 3}
+  m_Name: Deck_GreatDrought
+  m_EditorClassIdentifier: 
+  entries:
+  - cardDefinition: {fileID: 11400000, guid: ffc3c2d0a850b2c47b9438d0c5f84fc3, type: 2}
+    quantity: 6
+  - cardDefinition: {fileID: 11400000, guid: b06e22b3db076de42b091a4bdc7ba0a5, type: 2}
+    quantity: 6
+  - cardDefinition: {fileID: 11400000, guid: aed76f0eab182b94ebfc5fb1ee8d4bd2, type: 2}
+    quantity: 2
+  - cardDefinition: {fileID: 11400000, guid: c3a6c911a7c76f94488744cf1a6dd511, type: 2}
+    quantity: 2
+  - cardDefinition: {fileID: 11400000, guid: f0ef92e99651892429e2c20f8f7723e4, type: 2}
+    quantity: 4
+  - cardDefinition: {fileID: 11400000, guid: 62de5a9c413b6d742bb3412a315930e5, type: 2}
+    quantity: 2
+  - cardDefinition: {fileID: 11400000, guid: 2319faeb691ee93448b2e81c3bf73b56, type: 2}
+    quantity: 2
+  - cardDefinition: {fileID: 11400000, guid: 6ddb3e43e0f9e5a499bda2de1520343d, type: 2}
+    quantity: 1
