@@ -169,10 +169,10 @@ namespace Catalyst.Cards.Runtime.Session
         }
 
         public CardDeliveryResult TryDeliverCard(
-        GameSession session,
-        CardInstance card,
-        CardDeliveryZoneRuntime deliveryZone
-    )
+     GameSession session,
+     CardInstance card,
+     CardDeliveryZoneRuntime deliveryZone
+ )
         {
             EnsureSessionIsRunning(session);
 
@@ -180,6 +180,13 @@ namespace Catalyst.Cards.Runtime.Session
             {
                 throw new InvalidOperationException(
                     "Cards can only be delivered during the Main phase."
+                );
+            }
+
+            if (deliveryZone == null)
+            {
+                return CardDeliveryResult.Fail(
+                    CardDeliveryFailure.NullDeliveryZone
                 );
             }
 
@@ -199,6 +206,14 @@ namespace Catalyst.Cards.Runtime.Session
                     session.Hand,
                     deliveryZone
                 );
+
+            if (result.Succeeded &&
+                session.Mission.IsCompleted)
+            {
+                session.End(
+                    GameSessionEndReason.MissionCompleted
+                );
+            }
 
             session.ValidateState();
 
