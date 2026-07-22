@@ -153,15 +153,29 @@ namespace Catalyst.Cards.Runtime.Session
         /// <param name="session"></param>
         /// <returns></returns>
         public EndPhaseResult ResolveEndPhase(
-            GameSession session
-        )
+    GameSession session
+)
         {
             EnsureSessionIsRunning(session);
+
+            int completedTurnNumber =
+                session.Turn.TurnNumber;
 
             EndPhaseResult result =
                 endPhaseService.Resolve(
                     session.Turn
                 );
+
+            if (result.Succeeded &&
+                HasReachedTurnLimit(
+                    session,
+                    completedTurnNumber
+                ))
+            {
+                session.End(
+                    GameSessionEndReason.MaxTurnsReached
+                );
+            }
 
             session.ValidateState();
 
@@ -239,6 +253,16 @@ namespace Catalyst.Cards.Runtime.Session
                     "The game session must be running."
                 );
             }
+        }
+
+        private static bool HasReachedTurnLimit(
+    GameSession session,
+    int completedTurnNumber
+)
+        {
+            return session.HasTurnLimit
+                && completedTurnNumber >=
+                    session.MaximumTurns.Value;
         }
         #endregion
 

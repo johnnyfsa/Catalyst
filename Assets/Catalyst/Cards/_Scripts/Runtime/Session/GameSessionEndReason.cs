@@ -4,6 +4,7 @@ namespace Catalyst.Cards.Runtime.Session
     {
         None = 0,
         DeckOut = 1,
-        MissionCompleted = 2
+        MissionCompleted = 2,
+        MaxTurnsReached = 3
     }
 }
