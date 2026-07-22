@@ -1,20 +1,47 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Catalyst.Cards.Definitions;
 using Catalyst.Cards.Runtime.Creation;
+using Catalyst.Cards.Runtime.Delivery;
 using Catalyst.Cards.Runtime.Discard;
 using Catalyst.Cards.Runtime.Draw;
 using Catalyst.Cards.Runtime.Movement;
 using Catalyst.Cards.Runtime.Randomness;
 using Catalyst.Cards.Runtime.Session;
 using Catalyst.Cards.Runtime.Turn;
-using Catalyst.Cards.Runtime.Delivery;
 using UnityEngine;
 
 namespace Catalyst.Game.Bootstrap
 {
     public sealed class GameSessionBootstrap : MonoBehaviour
     {
+        [Serializable]
+        private sealed class DeliveryZoneSetup
+        {
+            [SerializeField]
+            private CardDefinition acceptedDefinition;
+
+            [SerializeField]
+            [Min(1)]
+            private int requiredAmount = 1;
+
+            public CardDeliveryZoneConfig CreateRuntimeConfig()
+            {
+                if (acceptedDefinition == null)
+                {
+                    throw new InvalidOperationException(
+                        "A delivery zone must have an accepted CardDefinition."
+                    );
+                }
+
+                return new CardDeliveryZoneConfig(
+                    acceptedDefinition,
+                    requiredAmount
+                );
+            }
+        }
+
         [Header("Deck")]
         [SerializeField]
         private List<DeckEntry> deckEntries =
@@ -28,6 +55,28 @@ namespace Catalyst.Game.Bootstrap
         [SerializeField]
         [Min(1)]
         private int maxHandSize = 8;
+
+        [Header("Resources")]
+        [SerializeField]
+        [Min(0)]
+        private int initialHeat;
+
+        [SerializeField]
+        [Min(0)]
+        private int initialElectricity;
+
+        [Header("Mission")]
+        [SerializeField]
+        private List<DeliveryZoneSetup> deliveryZones =
+            new List<DeliveryZoneSetup>();
+
+        [Header("Turn Limit")]
+        [SerializeField]
+        private bool useTurnLimit = true;
+
+        [SerializeField]
+        [Min(1)]
+        private int maximumTurns = 10;
 
         [Header("Randomness")]
         [SerializeField]
@@ -44,16 +93,240 @@ namespace Catalyst.Game.Bootstrap
         private void Awake()
         {
             CardMovementService movementService =
-        new CardMovementService();
+                new CardMovementService();
 
             CardDrawService drawService =
-                new CardDrawService(movementService);
+                new CardDrawService(
+                    movementService
+                );
 
+            GameSessionBuilder sessionBuilder =
+                CreateSessionBuilder(
+                    drawService
+                );
+
+            SessionFlow =
+                CreateSessionFlow(
+                    movementService,
+                    drawService
+                );
+
+            CardDeliveryZoneConfig[] deliveryZoneConfigs =
+                BuildDeliveryZoneConfigs();
+
+            int? configuredMaximumTurns =
+                useTurnLimit
+                    ? maximumTurns
+                    : null;
+
+            Initialize(
+                sessionBuilder,
+                deckEntries,
+                new GameSessionConfig(
+                    initialHandSize: initialHandSize,
+                    maxHandSize: maxHandSize,
+                    initialHeat: initialHeat,
+                    initialElectricity:
+                        initialElectricity,
+                    deliveryZones:
+                        deliveryZoneConfigs,
+                    maximumTurns:
+                        configuredMaximumTurns
+                ),
+                new SeededRandomSource(
+                    randomSeed
+                )
+            );
+
+            Debug.Log(
+                $"Session initialized. " +
+                $"Cards: {Session.SessionCards.Count}, " +
+                $"Deck: {Session.Deck.Count}, " +
+                $"Hand: {Session.Hand.Count}, " +
+                $"Delivery zones: {Session.DeliveryZones.Count}, " +
+                $"Heat: {Session.Heat.Amount}, " +
+                $"Electricity: {Session.Electricity.Amount}, " +
+                $"Turn limit: {FormatTurnLimit(Session)}"
+            );
+        }
+
+        internal GameSession Initialize(
+            IEnumerable<DeckEntry> entries,
+            int requestedInitialHandSize,
+            int requestedMaxHandSize,
+            int seed
+        )
+        {
+            CardMovementService movementService =
+                new CardMovementService();
+
+            CardDrawService drawService =
+                new CardDrawService(
+                    movementService
+                );
+
+            GameSessionBuilder sessionBuilder =
+                CreateSessionBuilder(
+                    drawService
+                );
+
+            return Initialize(
+                sessionBuilder,
+                entries,
+                new GameSessionConfig(
+                    initialHandSize:
+                        requestedInitialHandSize,
+                    maxHandSize:
+                        requestedMaxHandSize
+                ),
+                new SeededRandomSource(seed)
+            );
+        }
+
+        internal GameSession Initialize(
+            IEnumerable<DeckEntry> entries,
+            GameSessionConfig config,
+            IRandomSource randomSource
+        )
+        {
+            CardMovementService movementService =
+                new CardMovementService();
+
+            CardDrawService drawService =
+                new CardDrawService(
+                    movementService
+                );
+
+            GameSessionBuilder sessionBuilder =
+                CreateSessionBuilder(
+                    drawService
+                );
+
+            return Initialize(
+                sessionBuilder,
+                entries,
+                config,
+                randomSource
+            );
+        }
+
+        private GameSession Initialize(
+            GameSessionBuilder sessionBuilder,
+            IEnumerable<DeckEntry> entries,
+            GameSessionConfig config,
+            IRandomSource randomSource
+        )
+        {
+            if (Session != null)
+            {
+                throw new InvalidOperationException(
+                    "The game session has already been initialized."
+                );
+            }
+
+            if (sessionBuilder == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(sessionBuilder)
+                );
+            }
+
+            if (entries == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(entries)
+                );
+            }
+
+            if (config == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(config)
+                );
+            }
+
+            if (randomSource == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(randomSource)
+                );
+            }
+
+            Session = sessionBuilder.Build(
+                entries,
+                config,
+                randomSource
+            );
+
+            return Session;
+        }
+
+        private CardDeliveryZoneConfig[]
+            BuildDeliveryZoneConfigs()
+        {
+            if (deliveryZones == null)
+            {
+                return Array.Empty
+                    <CardDeliveryZoneConfig>();
+            }
+
+            return deliveryZones
+                .Select(
+                    setup =>
+                    {
+                        if (setup == null)
+                        {
+                            throw new InvalidOperationException(
+                                "Delivery zone setup collection cannot contain null entries."
+                            );
+                        }
+
+                        return setup
+                            .CreateRuntimeConfig();
+                    }
+                )
+                .ToArray();
+        }
+
+        private static GameSessionBuilder
+            CreateSessionBuilder(
+                CardDrawService drawService
+            )
+        {
+            ICardInstanceIdSource idSource =
+                new GuidCardInstanceIdSource();
+
+            CardInstanceFactory instanceFactory =
+                new CardInstanceFactory(
+                    idSource
+                );
+
+            DeckRuntimeBuilder deckBuilder =
+                new DeckRuntimeBuilder(
+                    instanceFactory
+                );
+
+            return new GameSessionBuilder(
+                deckBuilder,
+                drawService
+            );
+        }
+
+        private static GameSessionFlowService
+            CreateSessionFlow(
+                CardMovementService movementService,
+                CardDrawService drawService
+            )
+        {
             DrawPhaseService drawPhaseService =
-                new DrawPhaseService(drawService);
+                new DrawPhaseService(
+                    drawService
+                );
 
             MainPhaseService mainPhaseService =
-                new MainPhaseService(movementService);
+                new MainPhaseService(
+                    movementService
+                );
 
             ManualDiscardService manualDiscardService =
                 new ManualDiscardService(
@@ -64,82 +337,27 @@ namespace Catalyst.Game.Bootstrap
                 new EndPhaseService();
 
             CardDeliveryService cardDeliveryService =
-                new CardDeliveryService(movementService);
-
-            SessionFlow =
-                new GameSessionFlowService(
-                    drawPhaseService,
-                    mainPhaseService,
-                    manualDiscardService,
-                    endPhaseService,
-                    cardDeliveryService
+                new CardDeliveryService(
+                    movementService
                 );
 
-            Initialize(
-                deckEntries,
-                initialHandSize,
-                maxHandSize,
-                randomSeed
+            return new GameSessionFlowService(
+                drawPhaseService,
+                mainPhaseService,
+                manualDiscardService,
+                endPhaseService,
+                cardDeliveryService
             );
-            Debug.Log(
-    $"Session initialized. " +
-    $"Cards: {Session.SessionCards.Count}, " +
-    $"Deck: {Session.Deck.Count}, " +
-    $"Hand: {Session.Hand.Count}"
-);
         }
 
-        internal GameSession Initialize(
-            IEnumerable<DeckEntry> entries,
-            int requestedInitialHandSize,
-            int requestedMaxHandSize,
-            int seed
+        private static string FormatTurnLimit(
+            GameSession session
         )
         {
-            if (Session != null)
-            {
-                throw new InvalidOperationException(
-                    "The game session has already been initialized."
-                );
-            }
-
-            ICardInstanceIdSource idSource =
-                new GuidCardInstanceIdSource();
-
-            CardInstanceFactory instanceFactory =
-                new CardInstanceFactory(idSource);
-
-            DeckRuntimeBuilder deckBuilder =
-                new DeckRuntimeBuilder(instanceFactory);
-
-            CardMovementService movementService =
-                new CardMovementService();
-
-            CardDrawService drawService =
-                new CardDrawService(movementService);
-
-            GameSessionBuilder sessionBuilder =
-                new GameSessionBuilder(
-                    deckBuilder,
-                    drawService
-                );
-
-            GameSessionConfig config =
-                new GameSessionConfig(
-                    requestedInitialHandSize,
-                    requestedMaxHandSize
-                );
-
-            IRandomSource randomSource =
-                new SeededRandomSource(seed);
-
-            Session = sessionBuilder.Build(
-                entries,
-                config,
-                randomSource
-            );
-
-            return Session;
+            return session.HasTurnLimit
+                ? session.MaximumTurns.Value
+                    .ToString()
+                : "None";
         }
     }
 }
