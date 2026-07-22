@@ -360,6 +360,148 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
         }
 
         [Test]
+        public void Build_CreatesMissionRuntime()
+        {
+            GameSession session =
+                BuildSession(
+                    cardCount: 12,
+                    seed: 12345
+                );
+
+            Assert.That(
+                session.Mission,
+                Is.Not.Null
+            );
+        }
+
+        [Test]
+        public void Build_WithoutDeliveryZones_CreatesInactiveMission()
+        {
+            GameSession session =
+                BuildSession(
+                    cardCount: 12,
+                    seed: 12345
+                );
+
+            Assert.That(
+                session.Mission.HasObjectives,
+                Is.False
+            );
+
+            Assert.That(
+                session.Mission.IsCompleted,
+                Is.False
+            );
+        }
+
+        [Test]
+        public void Build_MissionObservesConfiguredDeliveryZones()
+        {
+            GameSessionBuilder builder =
+                CreateBuilder(
+                    CreateSequentialIds(12)
+                );
+
+            var waterObjective =
+                new CardDeliveryZoneConfig(
+                    water,
+                    requiredAmount: 10
+                );
+
+            GameSession session =
+                builder.Build(
+                    CreateEntries(12),
+                    new GameSessionConfig(
+                        initialHandSize: 8,
+                        maxHandSize: 8,
+                        deliveryZones: new[]
+                        {
+                    waterObjective
+                        }
+                    ),
+                    new SeededRandomSource(12345)
+                );
+
+            Assert.That(
+                session.Mission.HasObjectives,
+                Is.True
+            );
+
+            Assert.That(
+                session.Mission.DeliveryObjectives.Count,
+                Is.EqualTo(1)
+            );
+        }
+
+        [Test]
+        public void Build_MissionUsesSameDeliveryZoneInstances()
+        {
+            GameSessionBuilder builder =
+                CreateBuilder(
+                    CreateSequentialIds(12)
+                );
+
+            var waterObjective =
+                new CardDeliveryZoneConfig(
+                    water,
+                    requiredAmount: 10
+                );
+
+            GameSession session =
+                builder.Build(
+                    CreateEntries(12),
+                    new GameSessionConfig(
+                        initialHandSize: 8,
+                        maxHandSize: 8,
+                        deliveryZones: new[]
+                        {
+                    waterObjective
+                        }
+                    ),
+                    new SeededRandomSource(12345)
+                );
+
+            Assert.That(
+                session.Mission.DeliveryObjectives[0],
+                Is.SameAs(session.DeliveryZones[0])
+            );
+        }
+
+        [Test]
+        public void Build_MissionStartsIncomplete()
+        {
+            GameSessionBuilder builder =
+                CreateBuilder(
+                    CreateSequentialIds(12)
+                );
+
+            var waterObjective =
+                new CardDeliveryZoneConfig(
+                    water,
+                    requiredAmount: 1
+                );
+
+            GameSession session =
+                builder.Build(
+                    CreateEntries(12),
+                    new GameSessionConfig(
+                        initialHandSize: 8,
+                        maxHandSize: 8,
+                        deliveryZones: new[]
+                        {
+                    waterObjective
+                        }
+                    ),
+                    new SeededRandomSource(12345)
+                );
+
+            Assert.That(
+                session.Mission.IsCompleted,
+                Is.False
+            );
+        }
+
+        [Test]
         public void Build_CreatesAllSessionZones()
         {
             GameSession session = BuildSession(

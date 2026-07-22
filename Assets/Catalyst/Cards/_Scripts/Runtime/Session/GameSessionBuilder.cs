@@ -4,6 +4,7 @@ using System.Linq;
 using Catalyst.Cards.Definitions;
 using Catalyst.Cards.Runtime.Creation;
 using Catalyst.Cards.Runtime.Draw;
+using Catalyst.Cards.Runtime.Missions;
 using Catalyst.Cards.Runtime.Randomness;
 using Catalyst.Cards.Runtime.Resources;
 using Catalyst.Cards.Runtime.Turn;
@@ -99,6 +100,11 @@ namespace Catalyst.Cards.Runtime.Session
                 config.InitialHandSize
             );
 
+            MissionRuntime mission =
+    new MissionRuntime(
+        deliveryZones
+    );
+
             TurnRuntime turn =
                 new TurnRuntime();
 
@@ -112,7 +118,8 @@ namespace Catalyst.Cards.Runtime.Session
                     deliveryZones,
                     turn,
                     heat,
-                    electricity
+                    electricity,
+                    mission
                 );
 
             session.ValidateState();

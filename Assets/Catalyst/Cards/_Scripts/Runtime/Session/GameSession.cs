@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using Catalyst.Cards.Runtime.Resources;
 using Catalyst.Cards.Runtime.Turn;
 using Catalyst.Cards.Runtime.Zones;
+using Catalyst.Cards.Runtime.Missions;
 
 namespace Catalyst.Cards.Runtime.Session
 {
@@ -19,6 +20,7 @@ namespace Catalyst.Cards.Runtime.Session
 
         private readonly ReadOnlyCollection
             <CardDeliveryZoneRuntime> deliveryZones;
+        public MissionRuntime Mission { get; }
 
         internal GameSession(
             IEnumerable<CardInstance> sessionCards,
@@ -29,7 +31,8 @@ namespace Catalyst.Cards.Runtime.Session
             IEnumerable<CardDeliveryZoneRuntime> deliveryZones,
             TurnRuntime turn,
             ResourceCounterRuntime heat,
-            ResourceCounterRuntime electricity
+            ResourceCounterRuntime electricity,
+            MissionRuntime mission
         )
         {
             if (sessionCards == null)
@@ -73,6 +76,10 @@ namespace Catalyst.Cards.Runtime.Session
                 ?? throw new ArgumentNullException(
                     nameof(electricity)
                 );
+            Mission = mission
+                ?? throw new ArgumentNullException(
+                    nameof(mission)
+    );
 
             this.deliveryZones =
                 CopyDeliveryZones(deliveryZones);

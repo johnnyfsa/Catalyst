@@ -10,27 +10,38 @@ using Catalyst.Cards.Runtime.Session;
 using Catalyst.Cards.Runtime.Zones;
 using NUnit.Framework;
 using UnityEngine;
+using System.Linq;
 
 namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
 {
     public sealed class GameSessionTests
     {
-        private CardDefinition definition;
-
+        private CardDefinition firstDefinition;
+        private CardDefinition secondDefinition;
         [SetUp]
         public void SetUp()
         {
-            definition =
+            firstDefinition =
+                ScriptableObject.CreateInstance<CardDefinition>();
+
+            secondDefinition =
                 ScriptableObject.CreateInstance<CardDefinition>();
         }
 
         [TearDown]
         public void TearDown()
         {
-            if (definition != null)
+            if (firstDefinition != null)
             {
                 UnityEngine.Object.DestroyImmediate(
-                    definition
+                    firstDefinition
+                );
+            }
+
+            if (secondDefinition != null)
+            {
+                UnityEngine.Object.DestroyImmediate(
+                    secondDefinition
                 );
             }
         }
@@ -187,7 +198,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
             CardInstance duplicateCard =
                 new CardInstance(
                     registeredCard.InstanceId,
-                    definition
+                    firstDefinition
                 );
 
             Assert.That(
@@ -213,7 +224,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
             CardInstance duplicateCard =
                 new CardInstance(
                     registeredCard.InstanceId,
-                    definition
+                    firstDefinition
                 );
 
             Assert.That(
@@ -265,7 +276,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
 
             var foreignZone =
                 new CardDeliveryZoneRuntime(
-                    definition,
+                    secondDefinition,
                     requiredAmount: 1
                 );
 
@@ -295,6 +306,141 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
                     equivalentForeignZone
                 ),
                 Is.False
+            );
+        }
+
+        [Test]
+        public void Mission_BecomesCompletedWhenDeliveryZoneCompletes()
+        {
+            GameSession session =
+                CreateSessionWithDeliveryZone();
+
+            CardDeliveryZoneRuntime zone =
+                session.DeliveryZones[0];
+
+            CardInstance card =
+                session.Hand.Cards[0];
+
+            Assert.That(
+                session.Mission.IsCompleted,
+                Is.False
+            );
+
+            Assert.That(
+                session.Hand.TryRemove(card),
+                Is.True
+            );
+
+            Assert.That(
+                zone.TryAdd(card),
+                Is.True
+            );
+
+            Assert.That(
+                zone.IsCompleted,
+                Is.True
+            );
+
+            Assert.That(
+                session.Mission.IsCompleted,
+                Is.True
+            );
+        }
+
+        [Test]
+        public void Mission_RemainsIncompleteWhileAnyDeliveryZoneIsIncomplete()
+        {
+            GameSession session =
+                CreateSessionWithTwoDeliveryZones();
+
+            CardDeliveryZoneRuntime firstZone =
+                session.DeliveryZones[0];
+
+            CardDeliveryZoneRuntime secondZone =
+                session.DeliveryZones[1];
+
+            CardInstance matchingCard =
+                session.Hand.Cards.First(
+                    card => ReferenceEquals(
+                        card.Definition,
+                        firstZone.AcceptedDefinition
+                    )
+                );
+
+            Assert.That(
+                session.Mission.IsCompleted,
+                Is.False
+            );
+
+            Assert.That(
+                session.Hand.TryRemove(matchingCard),
+                Is.True
+            );
+
+            Assert.That(
+                firstZone.TryAdd(matchingCard),
+                Is.True
+            );
+
+            Assert.That(
+                firstZone.IsCompleted,
+                Is.True
+            );
+
+            Assert.That(
+                secondZone.IsCompleted,
+                Is.False
+            );
+
+            Assert.That(
+                session.Mission.IsCompleted,
+                Is.False
+            );
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void Mission_BecomesCompletedWhenAllDeliveryZonesComplete()
+        {
+            GameSession session =
+                CreateSessionWithTwoDeliveryZones();
+
+            foreach (
+                CardDeliveryZoneRuntime zone
+                in session.DeliveryZones
+            )
+            {
+                CardInstance matchingCard =
+                    session.Hand.Cards.First(
+                        card => ReferenceEquals(
+                            card.Definition,
+                            zone.AcceptedDefinition
+                        )
+                    );
+
+                Assert.That(
+                    session.Hand.TryRemove(matchingCard),
+                    Is.True
+                );
+
+                Assert.That(
+                    zone.TryAdd(matchingCard),
+                    Is.True
+                );
+            }
+
+            Assert.That(
+                session.Mission.IsCompleted,
+                Is.True
+            );
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
             );
         }
 
@@ -340,10 +486,10 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
             var entries =
                 new[]
                 {
-                    new DeckEntry(
-                        definition,
-                        quantity: 1
-                    )
+            new DeckEntry(
+                firstDefinition,
+                quantity: 1
+            )
                 };
 
             return builder.Build(
@@ -362,7 +508,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
         {
             return new CardInstance(
                 CreateGuid(id),
-                definition
+                firstDefinition
             );
         }
 
@@ -404,7 +550,9 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
             }
         }
 
-        private GameSession CreateSessionWithDeliveryZone()
+        private GameSession CreateSessionWithDeliveryZone(
+     int requiredAmount = 1
+ )
         {
             var idSource =
                 new QueueIdSource(
@@ -433,15 +581,15 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
                 new[]
                 {
             new DeckEntry(
-                definition,
+                firstDefinition,
                 quantity: 1
             )
                 };
 
             var deliveryZoneConfig =
                 new CardDeliveryZoneConfig(
-                    definition,
-                    requiredAmount: 1
+                    firstDefinition,
+                    requiredAmount
                 );
 
             return builder.Build(
@@ -458,6 +606,74 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
             );
         }
 
+        private GameSession CreateSessionWithTwoDeliveryZones()
+        {
+            Guid[] ids =
+            {
+        CreateGuid(1),
+        CreateGuid(2)
+    };
+
+            var idSource =
+                new QueueIdSource(ids);
+
+            var instanceFactory =
+                new CardInstanceFactory(idSource);
+
+            var deckBuilder =
+                new DeckRuntimeBuilder(instanceFactory);
+
+            var movementService =
+                new CardMovementService();
+
+            var drawService =
+                new CardDrawService(movementService);
+
+            var builder =
+                new GameSessionBuilder(
+                    deckBuilder,
+                    drawService
+                );
+
+            var entries =
+                new[]
+                {
+            new DeckEntry(
+                firstDefinition,
+                quantity: 1
+            ),
+            new DeckEntry(
+                secondDefinition,
+                quantity: 1
+            )
+                };
+
+            var firstZoneConfig =
+                new CardDeliveryZoneConfig(
+                    firstDefinition,
+                    requiredAmount: 1
+                );
+
+            var secondZoneConfig =
+                new CardDeliveryZoneConfig(
+                    secondDefinition,
+                    requiredAmount: 1
+                );
+
+            return builder.Build(
+                entries,
+                new GameSessionConfig(
+                    initialHandSize: 2,
+                    maxHandSize: 8,
+                    deliveryZones: new[]
+                    {
+                firstZoneConfig,
+                secondZoneConfig
+                    }
+                ),
+                new SeededRandomSource(12345)
+            );
+        }
         #endregion
     }
 }
