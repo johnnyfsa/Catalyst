@@ -68,6 +68,63 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
         }
 
         [Test]
+        public void Constructor_WithoutMaximumTurns_HasNoTurnLimit()
+        {
+            var config =
+                new GameSessionConfig(
+                    initialHandSize: 5,
+                    maxHandSize: 8
+                );
+
+            Assert.That(
+                config.MaximumTurns,
+                Is.Null
+            );
+
+            Assert.That(
+                config.HasTurnLimit,
+                Is.False
+            );
+        }
+
+        [Test]
+        public void Constructor_WithMaximumTurns_StoresTurnLimit()
+        {
+            var config =
+                new GameSessionConfig(
+                    initialHandSize: 5,
+                    maxHandSize: 8,
+                    maximumTurns: 10
+                );
+
+            Assert.That(
+                config.MaximumTurns,
+                Is.EqualTo(10)
+            );
+
+            Assert.That(
+                config.HasTurnLimit,
+                Is.True
+            );
+        }
+
+        [TestCase(0)]
+        [TestCase(-1)]
+        public void Constructor_WithInvalidMaximumTurns_Throws(
+    int maximumTurns
+)
+        {
+            Assert.That(
+                () => new GameSessionConfig(
+                    initialHandSize: 5,
+                    maxHandSize: 8,
+                    maximumTurns: maximumTurns
+                ),
+                Throws.TypeOf<ArgumentOutOfRangeException>()
+            );
+        }
+
+        [Test]
         public void Constructor_StoresMultipleDeliveryZoneConfigurations()
         {
             CardDefinition oxygen =

@@ -15,7 +15,8 @@ namespace Catalyst.Cards.Runtime.Session
             int initialHeat = 0,
             int initialElectricity = 0,
             IEnumerable<CardDeliveryZoneConfig>
-                deliveryZones = null
+                deliveryZones = null,
+            int? maximumTurns = null
         )
         {
             if (initialHandSize <= 0)
@@ -54,10 +55,20 @@ namespace Catalyst.Cards.Runtime.Session
                 );
             }
 
+            if (maximumTurns.HasValue && maximumTurns.Value <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(maximumTurns),
+                    maximumTurns,
+                    "Maximum turns must be greater than zero when a turn limit is enabled."
+                );
+            }
+
             InitialHandSize = initialHandSize;
             MaxHandSize = maxHandSize;
             InitialHeat = initialHeat;
             InitialElectricity = initialElectricity;
+            MaximumTurns = maximumTurns;
 
             this.deliveryZones =
                 CopyDeliveryZones(deliveryZones);
@@ -70,6 +81,11 @@ namespace Catalyst.Cards.Runtime.Session
         public int InitialHeat { get; }
 
         public int InitialElectricity { get; }
+
+        public int? MaximumTurns { get; }
+
+        public bool HasTurnLimit =>
+            MaximumTurns.HasValue;
 
         public IReadOnlyList<CardDeliveryZoneConfig>
             DeliveryZones => deliveryZones;

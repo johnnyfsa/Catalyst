@@ -456,9 +456,40 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
             );
         }
 
+        [Test]
+        public void SessionWithoutMaximumTurns_HasNoTurnLimit()
+        {
+            GameSession session =
+                CreateSession();
+
+            Assert.That(session.MaximumTurns, Is.Null);
+            Assert.That(session.HasTurnLimit, Is.False);
+        }
+
+        [Test]
+        public void SessionWithMaximumTurns_ExposesTurnLimit()
+        {
+            GameSession session =
+                CreateSession(
+                    maximumTurns: 3
+                );
+
+            Assert.That(
+                session.MaximumTurns,
+                Is.EqualTo(3)
+            );
+
+            Assert.That(
+                session.HasTurnLimit,
+                Is.True
+            );
+        }
+
+
+
         #region Helpers
 
-        private GameSession CreateSession()
+        private GameSession CreateSession(int? maximumTurns = null)
         {
             var idSource =
                 new QueueIdSource(
@@ -496,7 +527,8 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
                 entries,
                 new GameSessionConfig(
                     initialHandSize: 1,
-                    maxHandSize: 8
+                    maxHandSize: 8,
+                    maximumTurns: maximumTurns
                 ),
                 new SeededRandomSource(12345)
             );

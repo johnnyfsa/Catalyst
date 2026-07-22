@@ -175,6 +175,56 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
         }
 
         [Test]
+        public void Build_WithoutMaximumTurns_CreatesSessionWithoutTurnLimit()
+        {
+            GameSession session =
+                BuildSession(
+                    cardCount: 12,
+                    seed: 12345
+                );
+
+            Assert.That(
+                session.MaximumTurns,
+                Is.Null
+            );
+
+            Assert.That(
+                session.HasTurnLimit,
+                Is.False
+            );
+        }
+
+        [Test]
+        public void Build_WithMaximumTurns_TransfersTurnLimitToSession()
+        {
+            GameSessionBuilder builder =
+                CreateBuilder(
+                    CreateSequentialIds(12)
+                );
+
+            GameSession session =
+                builder.Build(
+                    CreateEntries(12),
+                    new GameSessionConfig(
+                        initialHandSize: 8,
+                        maxHandSize: 8,
+                        maximumTurns: 10
+                    ),
+                    new SeededRandomSource(12345)
+                );
+
+            Assert.That(
+                session.MaximumTurns,
+                Is.EqualTo(10)
+            );
+
+            Assert.That(
+                session.HasTurnLimit,
+                Is.True
+            );
+        }
+
+        [Test]
         public void Build_DeliveryZonesStartEmpty()
         {
             GameSessionBuilder builder =

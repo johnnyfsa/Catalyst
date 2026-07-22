@@ -29,10 +29,11 @@ namespace Catalyst.Cards.Runtime.Session
             ReactionTableRuntime reactionTable,
             DiscardPileRuntime discardPile,
             IEnumerable<CardDeliveryZoneRuntime> deliveryZones,
+            MissionRuntime mission,
             TurnRuntime turn,
             ResourceCounterRuntime heat,
             ResourceCounterRuntime electricity,
-            MissionRuntime mission
+            int? maximumTurns
         )
         {
             if (sessionCards == null)
@@ -79,7 +80,15 @@ namespace Catalyst.Cards.Runtime.Session
             Mission = mission
                 ?? throw new ArgumentNullException(
                     nameof(mission)
-    );
+                );
+            if (maximumTurns.HasValue && maximumTurns.Value <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(maximumTurns),
+                    maximumTurns,
+                    "Maximum turns must be greater than zero when a turn limit is enabled."
+                );
+            }
 
             this.deliveryZones =
                 CopyDeliveryZones(deliveryZones);
@@ -97,6 +106,8 @@ namespace Catalyst.Cards.Runtime.Session
 
             readOnlySessionCards =
                 this.sessionCards.AsReadOnly();
+
+            MaximumTurns = maximumTurns;
         }
 
         public IReadOnlyList<CardInstance> SessionCards =>
@@ -133,6 +144,11 @@ namespace Catalyst.Cards.Runtime.Session
 
         public bool HasEnded =>
             State == GameSessionState.Ended;
+
+        public int? MaximumTurns { get; }
+
+        public bool HasTurnLimit =>
+            MaximumTurns.HasValue;
 
         public bool ContainsCard(Guid instanceId)
         {

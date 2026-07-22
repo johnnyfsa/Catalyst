@@ -109,18 +109,19 @@ namespace Catalyst.Cards.Runtime.Session
                 new TurnRuntime();
 
             GameSession session =
-                new GameSession(
-                    sessionCards,
-                    deck,
-                    hand,
-                    reactionTable,
-                    discardPile,
-                    deliveryZones,
-                    turn,
-                    heat,
-                    electricity,
-                    mission
-                );
+            new GameSession(
+            sessionCards,
+            deck,
+            hand,
+            reactionTable,
+            discardPile,
+            deliveryZones,
+            mission,
+            turn,
+            heat,
+            electricity,
+            config.MaximumTurns
+            );
 
             session.ValidateState();
 
