@@ -134,6 +134,46 @@ PrefabInstance:
       propertyPath: m_Name
       value: Card_Mini
       objectReference: {fileID: 0}
+    - target: {fileID: 2612045686804356420, guid: f8b18ff1e371ad443a9a07f8a80ff920, type: 3}
+      propertyPath: initialDefinition
+      value: 
+      objectReference: {fileID: 11400000, guid: 9a3d30c49fb4dfd49ab958d260494a6c, type: 2}
+    - target: {fileID: 6559501262913873541, guid: f8b18ff1e371ad443a9a07f8a80ff920, type: 3}
+      propertyPath: m_text
+      value: Oxigen
+      objectReference: {fileID: 0}
+    - target: {fileID: 6559501262913873541, guid: f8b18ff1e371ad443a9a07f8a80ff920, type: 3}
+      propertyPath: m_fontSize
+      value: 21.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6559501262913873541, guid: f8b18ff1e371ad443a9a07f8a80ff920, type: 3}
+      propertyPath: m_margin.w
+      value: 6.0765676
+      objectReference: {fileID: 0}
+    - target: {fileID: 6559501262913873541, guid: f8b18ff1e371ad443a9a07f8a80ff920, type: 3}
+      propertyPath: m_fontColor.g
+      value: 0.9764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 6559501262913873541, guid: f8b18ff1e371ad443a9a07f8a80ff920, type: 3}
+      propertyPath: m_fontColor.r
+      value: 0.91764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 6559501262913873541, guid: f8b18ff1e371ad443a9a07f8a80ff920, type: 3}
+      propertyPath: m_fontSizeMin
+      value: 13.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6559501262913873541, guid: f8b18ff1e371ad443a9a07f8a80ff920, type: 3}
+      propertyPath: m_enableAutoSizing
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6559501262913873541, guid: f8b18ff1e371ad443a9a07f8a80ff920, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4294965738
+      objectReference: {fileID: 0}
+    - target: {fileID: 6559501262913873541, guid: f8b18ff1e371ad443a9a07f8a80ff920, type: 3}
+      propertyPath: m_VerticalAlignment
+      value: 256
+      objectReference: {fileID: 0}
     - target: {fileID: 6839120544948841528, guid: f8b18ff1e371ad443a9a07f8a80ff920, type: 3}
       propertyPath: m_LocalPosition.x
       value: -775
