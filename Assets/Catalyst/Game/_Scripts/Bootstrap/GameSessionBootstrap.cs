@@ -11,6 +11,8 @@ using Catalyst.Cards.Runtime.Randomness;
 using Catalyst.Reactions.Definitions;
 using Catalyst.Cards.Runtime.Session;
 using Catalyst.Cards.Runtime.Turn;
+using Catalyst.Reactions.Runtime;
+using Catalyst.Reactions.Runtime.Resolution;
 using UnityEngine;
 
 namespace Catalyst.Game.Bootstrap
@@ -94,6 +96,12 @@ namespace Catalyst.Game.Bootstrap
             private set;
         }
 
+        public ReactionFlowService ReactionFlow
+        {
+            get;
+            private set;
+        }
+
         public IReadOnlyList<ReactionDefinition>
             AvailableReactions =>
                 reactionLibrary != null
@@ -120,6 +128,18 @@ namespace Catalyst.Game.Bootstrap
                     movementService,
                     drawService
                 );
+            ReactionFlow =
+    CreateReactionFlow(
+        movementService,
+        reactionLibrary.Reactions
+    );
+
+            if (reactionLibrary == null)
+            {
+                throw new InvalidOperationException(
+                    "A ReactionLibraryDefinition must be assigned."
+                );
+            }
 
             CardDeliveryZoneConfig[] deliveryZoneConfigs =
                 BuildDeliveryZoneConfigs();
@@ -435,6 +455,60 @@ namespace Catalyst.Game.Bootstrap
                 manualDiscardService,
                 endPhaseService,
                 cardDeliveryService
+            );
+        }
+
+        private static ReactionFlowService
+        CreateReactionFlow(
+            CardMovementService movementService,
+            IEnumerable<ReactionDefinition>
+                availableReactions
+        )
+        {
+            if (movementService == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(movementService)
+                );
+            }
+
+            if (availableReactions == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(availableReactions)
+                );
+            }
+
+            ReactionMatcherService matcherService =
+                new ReactionMatcherService();
+
+            ReactionResolutionPlanner planner =
+                new ReactionResolutionPlanner(
+                    matcherService
+                );
+
+            ReactionExecutionValidator executionValidator =
+                new ReactionExecutionValidator();
+
+            ICardInstanceIdSource productIdSource =
+                new GuidCardInstanceIdSource();
+
+            CardInstanceFactory productFactory =
+                new CardInstanceFactory(
+                    productIdSource
+                );
+
+            ReactionExecutionService executionService =
+                new ReactionExecutionService(
+                    executionValidator,
+                    productFactory,
+                    movementService
+                );
+
+            return new ReactionFlowService(
+                planner,
+                executionService,
+                availableReactions
             );
         }
 

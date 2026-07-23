@@ -10,16 +10,15 @@ namespace Catalyst.Reactions.Runtime.Resolution
     {
         private readonly ReactionResolutionPlanner planner;
         private readonly ReactionExecutionService executionService;
-
         private readonly ReadOnlyCollection
-            <ReactionDefinition> availableReactions;
+     <ReactionDefinition> availableReactions;
 
+        public IReadOnlyList<ReactionDefinition> AvailableReactions => availableReactions;
         public ReactionFlowService(
-            ReactionResolutionPlanner planner,
-            ReactionExecutionService executionService,
-            IEnumerable<ReactionDefinition>
-                availableReactions
-        )
+    ReactionResolutionPlanner planner,
+    ReactionExecutionService executionService,
+    IEnumerable<ReactionDefinition> availableReactions
+)
         {
             this.planner = planner
                 ?? throw new ArgumentNullException(
@@ -37,10 +36,6 @@ namespace Catalyst.Reactions.Runtime.Resolution
                 );
         }
 
-        public IReadOnlyList<ReactionDefinition>
-            AvailableReactions =>
-                availableReactions;
-
         public ReactionFlowResult TryResolve(
             GameSession session,
             ReactionDefinition reaction
@@ -51,6 +46,14 @@ namespace Catalyst.Reactions.Runtime.Resolution
                 return ReactionFlowResult.Fail(
                     ReactionResolutionFailure
                         .SessionIsNull
+                );
+            }
+
+            if (!ContainsReaction(reaction))
+            {
+                return ReactionFlowResult.Fail(
+                    ReactionResolutionFailure
+                        .ReactionUnavailable
                 );
             }
 
@@ -93,9 +96,10 @@ namespace Catalyst.Reactions.Runtime.Resolution
             );
         }
 
+        #region helpers
         private bool ContainsReaction(
-            ReactionDefinition reaction
-        )
+    ReactionDefinition reaction
+)
         {
             if (reaction == null)
             {
@@ -104,7 +108,7 @@ namespace Catalyst.Reactions.Runtime.Resolution
 
             foreach (
                 ReactionDefinition availableReaction
-                in availableReactions
+                in AvailableReactions
             )
             {
                 if (ReferenceEquals(
@@ -119,11 +123,9 @@ namespace Catalyst.Reactions.Runtime.Resolution
             return false;
         }
 
-        private static ReadOnlyCollection
-            <ReactionDefinition>
-            CopyAvailableReactions(
-                IEnumerable<ReactionDefinition> source
-            )
+        private static ReadOnlyCollection<ReactionDefinition> CopyAvailableReactions(
+        IEnumerable<ReactionDefinition> source
+    )
         {
             if (source == null)
             {
@@ -153,5 +155,7 @@ namespace Catalyst.Reactions.Runtime.Resolution
 
             return result.AsReadOnly();
         }
+
+        #endregion
     }
 }
