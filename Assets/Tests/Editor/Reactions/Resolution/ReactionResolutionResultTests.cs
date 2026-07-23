@@ -67,6 +67,11 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
     ReactionResolutionFailure
         .ReactantInstanceDoesNotMatchSessionCard
 )]
+
+        [TestCase(
+    ReactionResolutionFailure
+        .ReactionUnavailable
+)]
         public void Fail_PreservesExpectedFailure(
     ReactionResolutionFailure failure
 )

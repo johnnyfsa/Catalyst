@@ -6,6 +6,7 @@ using Catalyst.Cards.Definitions;
 using Catalyst.Cards.Runtime.Randomness;
 using Catalyst.Cards.Runtime.Session;
 using Catalyst.Game.Bootstrap;
+using Catalyst.Reactions.Definitions;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -13,8 +14,17 @@ namespace Catalyst.Tests.EditMode.Game.Bootstrap
 {
     public sealed class GameSessionBootstrapTests
     {
-        private const string DeckEntriesFieldName = "entries";
+        private const string DeckEntriesFieldName =
+    "entries";
 
+        private const string DeckDefinitionFieldName =
+            "deckDefinition";
+
+        private const string ReactionLibraryFieldName =
+            "reactionLibrary";
+
+        private const string ReactionsFieldName =
+            "reactions";
         private GameObject bootstrapObject;
         private GameSessionBootstrap bootstrap;
 
@@ -58,6 +68,103 @@ namespace Catalyst.Tests.EditMode.Game.Bootstrap
                     bootstrapObject
                 );
             }
+        }
+
+        [Test]
+        public void Awake_WithValidConfiguration_CreatesReactionFlow()
+        {
+            CardDefinition reactant =
+                CreateCardDefinition();
+
+            DeckDefinition deckDefinition =
+                CreateDeckDefinition(
+                    new DeckEntry(
+                        reactant,
+                        quantity: 1
+                    )
+                );
+
+            ReactionDefinition firstReaction =
+                CreateReactionDefinition();
+
+            ReactionDefinition secondReaction =
+                CreateReactionDefinition();
+
+            ReactionLibraryDefinition library =
+                CreateReactionLibrary(
+                    firstReaction,
+                    secondReaction
+                );
+
+            SetPrivateField(
+                bootstrap,
+                DeckDefinitionFieldName,
+                deckDefinition
+            );
+
+            SetPrivateField(
+                bootstrap,
+                ReactionLibraryFieldName,
+                library
+            );
+
+            SetPrivateField(
+                bootstrap,
+                "initialHandSize",
+                1
+            );
+
+            SetPrivateField(
+                bootstrap,
+                "maxHandSize",
+                1
+            );
+
+            SetPrivateField(
+                 bootstrap,
+                "useTurnLimit",
+                false
+            );
+
+            InvokeAwake();
+
+            Assert.That(
+                bootstrap.Session,
+                Is.Not.Null
+            );
+
+            Assert.That(
+                bootstrap.SessionFlow,
+                Is.Not.Null
+            );
+
+            Assert.That(
+                bootstrap.ReactionFlow,
+                Is.Not.Null
+            );
+
+            Assert.That(
+                bootstrap.AvailableReactions.Count,
+                Is.EqualTo(2)
+            );
+
+            Assert.That(
+                bootstrap.ReactionFlow
+                    .AvailableReactions.Count,
+                Is.EqualTo(2)
+            );
+
+            Assert.That(
+                bootstrap.ReactionFlow
+                    .AvailableReactions[0],
+                Is.SameAs(firstReaction)
+            );
+
+            Assert.That(
+                bootstrap.ReactionFlow
+                    .AvailableReactions[1],
+                Is.SameAs(secondReaction)
+            );
         }
 
         [Test]
@@ -345,8 +452,8 @@ namespace Catalyst.Tests.EditMode.Game.Bootstrap
         }
 
         private DeckDefinition CreateDeckDefinition(
-            params DeckEntry[] entries
-        )
+    params DeckEntry[] entries
+)
         {
             DeckDefinition definition =
                 ScriptableObject.CreateInstance
@@ -354,27 +461,97 @@ namespace Catalyst.Tests.EditMode.Game.Bootstrap
 
             createdObjects.Add(definition);
 
-            FieldInfo entriesField =
-                typeof(DeckDefinition).GetField(
-                    DeckEntriesFieldName,
-                    BindingFlags.Instance
-                    | BindingFlags.NonPublic
-                );
-
-            Assert.That(
-                entriesField,
-                Is.Not.Null,
-                $"Could not find the private field " +
-                $"'{DeckEntriesFieldName}' in " +
-                $"{nameof(DeckDefinition)}."
-            );
-
-            entriesField.SetValue(
+            SetPrivateField(
                 definition,
+                DeckEntriesFieldName,
                 new List<DeckEntry>(entries)
             );
 
             return definition;
         }
+
+        private ReactionDefinition CreateReactionDefinition()
+        {
+            ReactionDefinition definition =
+                ScriptableObject.CreateInstance
+                    <ReactionDefinition>();
+
+            createdObjects.Add(definition);
+
+            return definition;
+        }
+
+        private static void SetPrivateField(
+    object target,
+    string fieldName,
+    object value
+)
+        {
+            FieldInfo field =
+                target.GetType().GetField(
+                    fieldName,
+                    BindingFlags.Instance
+                    | BindingFlags.NonPublic
+                );
+
+            Assert.That(
+                field,
+                Is.Not.Null,
+                $"Could not find private field " +
+                $"'{fieldName}' in " +
+                $"{target.GetType().Name}."
+            );
+
+            field.SetValue(
+                target,
+                value
+            );
+        }
+
+        private ReactionLibraryDefinition
+    CreateReactionLibrary(
+        params ReactionDefinition[] reactions
+    )
+        {
+            ReactionLibraryDefinition definition =
+                ScriptableObject.CreateInstance
+                    <ReactionLibraryDefinition>();
+
+            createdObjects.Add(definition);
+
+            SetPrivateField(
+                definition,
+                ReactionsFieldName,
+                new List<ReactionDefinition>(
+                    reactions
+                )
+            );
+
+            return definition;
+        }
+
+        private void InvokeAwake()
+        {
+            MethodInfo method =
+                typeof(GameSessionBootstrap).GetMethod(
+                    "Awake",
+                    BindingFlags.Instance
+                    | BindingFlags.NonPublic
+                );
+
+            Assert.That(
+                method,
+                Is.Not.Null,
+                $"Could not find private method " +
+                $"'Awake' in " +
+                $"{nameof(GameSessionBootstrap)}."
+            );
+
+            method.Invoke(
+                bootstrap,
+                Array.Empty<object>()
+            );
+        }
     }
+
 }

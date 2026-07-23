@@ -22,6 +22,7 @@ namespace Catalyst.Reactions.Runtime.Resolution
         DuplicateCreatedProductInstance,
         CreatedProductIdAlreadyExists,
         HeatOverflow,
-        ElectricityOverflow
+        ElectricityOverflow,
+        ReactionUnavailable
     }
 }
