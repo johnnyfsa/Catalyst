@@ -202,7 +202,7 @@ namespace Catalyst.Cards.Runtime.Session
             EndReason = reason;
         }
 
-        internal void ValidateState()
+        public void ValidateState()
         {
             var zoneOccurrences =
                 new Dictionary<Guid, int>();

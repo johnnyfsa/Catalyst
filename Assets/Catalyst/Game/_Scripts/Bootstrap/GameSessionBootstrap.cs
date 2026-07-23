@@ -110,6 +110,28 @@ namespace Catalyst.Game.Bootstrap
 
         private void Awake()
         {
+            if (deckDefinition == null)
+            {
+                throw new InvalidOperationException(
+                    "A DeckDefinition must be assigned."
+                );
+            }
+
+            if (reactionLibrary == null)
+            {
+                throw new InvalidOperationException(
+                    "A ReactionLibraryDefinition must be assigned."
+                );
+            }
+
+            CardDeliveryZoneConfig[] deliveryZoneConfigs =
+                BuildDeliveryZoneConfigs();
+
+            int? configuredMaximumTurns =
+                useTurnLimit
+                    ? maximumTurns
+                    : null;
+
             CardMovementService movementService =
                 new CardMovementService();
 
@@ -128,40 +150,12 @@ namespace Catalyst.Game.Bootstrap
                     movementService,
                     drawService
                 );
+
             ReactionFlow =
-    CreateReactionFlow(
-        movementService,
-        reactionLibrary.Reactions
-    );
-
-            if (reactionLibrary == null)
-            {
-                throw new InvalidOperationException(
-                    "A ReactionLibraryDefinition must be assigned."
+                CreateReactionFlow(
+                    movementService,
+                    reactionLibrary.Reactions
                 );
-            }
-
-            CardDeliveryZoneConfig[] deliveryZoneConfigs =
-                BuildDeliveryZoneConfigs();
-
-            int? configuredMaximumTurns =
-                useTurnLimit
-                    ? maximumTurns
-                    : null;
-
-            if (deckDefinition == null)
-            {
-                throw new InvalidOperationException(
-                    "A DeckDefinition must be assigned."
-                );
-            }
-
-            if (reactionLibrary == null)
-            {
-                throw new InvalidOperationException(
-                    "A ReactionLibraryDefinition must be assigned."
-                );
-            }
 
             InitializeFromDeckDefinition(
                 sessionBuilder,
@@ -182,13 +176,15 @@ namespace Catalyst.Game.Bootstrap
                 )
             );
 
+            SessionFlow.Start(Session);
+
             Debug.Log(
                 $"Session initialized. " +
                 $"Cards: {Session.SessionCards.Count}, " +
                 $"Deck: {Session.Deck.Count}, " +
                 $"Hand: {Session.Hand.Count}, " +
                 $"Delivery zones: {Session.DeliveryZones.Count}, " +
-                $"Reactions: {AvailableReactions.Count}, " +
+                $"Reactions: {ReactionFlow.AvailableReactions.Count}, " +
                 $"Heat: {Session.Heat.Amount}, " +
                 $"Electricity: {Session.Electricity.Amount}, " +
                 $"Turn limit: {FormatTurnLimit(Session)}"
