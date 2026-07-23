@@ -8,6 +8,7 @@ using Catalyst.Cards.Runtime.Discard;
 using Catalyst.Cards.Runtime.Draw;
 using Catalyst.Cards.Runtime.Movement;
 using Catalyst.Cards.Runtime.Randomness;
+using Catalyst.Reactions.Definitions;
 using Catalyst.Cards.Runtime.Session;
 using Catalyst.Cards.Runtime.Turn;
 using UnityEngine;
@@ -45,6 +46,10 @@ namespace Catalyst.Game.Bootstrap
         [Header("Deck")]
         [SerializeField]
         private DeckDefinition deckDefinition;
+
+        [Header("Reactions")]
+        [SerializeField]
+        private ReactionLibraryDefinition reactionLibrary;
 
         [Header("Hand")]
         [SerializeField]
@@ -89,6 +94,12 @@ namespace Catalyst.Game.Bootstrap
             private set;
         }
 
+        public IReadOnlyList<ReactionDefinition>
+            AvailableReactions =>
+                reactionLibrary != null
+                    ? reactionLibrary.Reactions
+                    : Array.Empty<ReactionDefinition>();
+
         private void Awake()
         {
             CardMovementService movementService =
@@ -125,6 +136,13 @@ namespace Catalyst.Game.Bootstrap
                 );
             }
 
+            if (reactionLibrary == null)
+            {
+                throw new InvalidOperationException(
+                    "A ReactionLibraryDefinition must be assigned."
+                );
+            }
+
             InitializeFromDeckDefinition(
                 sessionBuilder,
                 deckDefinition,
@@ -150,6 +168,7 @@ namespace Catalyst.Game.Bootstrap
                 $"Deck: {Session.Deck.Count}, " +
                 $"Hand: {Session.Hand.Count}, " +
                 $"Delivery zones: {Session.DeliveryZones.Count}, " +
+                $"Reactions: {AvailableReactions.Count}, " +
                 $"Heat: {Session.Heat.Amount}, " +
                 $"Electricity: {Session.Electricity.Amount}, " +
                 $"Turn limit: {FormatTurnLimit(Session)}"

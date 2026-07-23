@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b0cf8c31f2005f468689bf97a7d328d, type: 3}
+  m_Name: Def_Sodium_Chloride_Formation
+  m_EditorClassIdentifier: 
+  reactionId: sodium_chlorine_formation
+  reactants:
+  - cardDefinition: {fileID: 11400000, guid: 2319faeb691ee93448b2e81c3bf73b56, type: 2}
+    quantity: 2
+  - cardDefinition: {fileID: 11400000, guid: 6ddb3e43e0f9e5a499bda2de1520343d, type: 2}
+    quantity: 1
+  products:
+  - cardDefinition: {fileID: 11400000, guid: 61da49749750d144d9a6f40c30cafb7c, type: 2}
+    quantity: 2
+  requiredHeat: 0
+  requiredElectricity: 0
+  producedHeat: 0
+  producedElectricity: 0

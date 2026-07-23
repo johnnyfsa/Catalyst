@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d94510e2e438d8418569d02e3493b58, type: 3}
+  m_Name: ReactionLibrary_GreatDrought
+  m_EditorClassIdentifier: 
+  reactions:
+  - {fileID: 11400000, guid: bb4697b77e71d0d4bb27aa1c259aa706, type: 2}
+  - {fileID: 11400000, guid: dbc2805d7a4e68b4c91556655d42182e, type: 2}
+  - {fileID: 11400000, guid: a80c03eb1e2979b4d8f7e6b5227cd569, type: 2}
+  - {fileID: 11400000, guid: f60d6dc0a0b270c49b761b0434f85974, type: 2}
+  - {fileID: 11400000, guid: a9b6f087c4be2f54299e7c00b526b21d, type: 2}
+  - {fileID: 11400000, guid: c9d896635da303144851b0a7064aa94a, type: 2}
+  - {fileID: 11400000, guid: 2c8f466f8c94bbc40a05354970177dad, type: 2}
