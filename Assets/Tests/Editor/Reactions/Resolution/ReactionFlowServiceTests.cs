@@ -68,7 +68,8 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
             Assert.That(
                 () => new ReactionFlowService(
                     null,
-                    executionService
+                    executionService,
+                    Array.Empty<ReactionDefinition>()
                 ),
                 Throws.TypeOf<ArgumentNullException>()
             );
@@ -83,9 +84,55 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
             Assert.That(
                 () => new ReactionFlowService(
                     planner,
+                    null,
+                    Array.Empty<ReactionDefinition>()
+                ),
+                Throws.TypeOf<ArgumentNullException>()
+            );
+        }
+
+        [Test]
+        public void Constructor_WithNullAvailableReactions_Throws()
+        {
+            ReactionResolutionPlanner planner =
+                CreatePlanner();
+
+            ReactionExecutionService executionService =
+                CreateExecutionService(
+                    CreateGuid(100)
+                );
+
+            Assert.That(
+                () => new ReactionFlowService(
+                    planner,
+                    executionService,
                     null
                 ),
                 Throws.TypeOf<ArgumentNullException>()
+            );
+        }
+
+        [Test]
+        public void Constructor_AvailableReactionsContainsNull_Throws()
+        {
+            ReactionResolutionPlanner planner =
+                CreatePlanner();
+
+            ReactionExecutionService executionService =
+                CreateExecutionService(
+                    CreateGuid(100)
+                );
+
+            Assert.That(
+                () => new ReactionFlowService(
+                    planner,
+                    executionService,
+                    new ReactionDefinition[]
+                    {
+                        null
+                    }
+                ),
+                Throws.TypeOf<ArgumentException>()
             );
         }
 
@@ -97,6 +144,7 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
 
             ReactionFlowService service =
                 CreateFlowService(
+                    reaction,
                     CreateGuid(100)
                 );
 
@@ -113,7 +161,7 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
         }
 
         [Test]
-        public void TryResolve_WithNullReaction_PropagatesPlanningFailure()
+        public void TryResolve_WithNullReaction_FailsAsUnavailable()
         {
             GameSession session =
                 BuildSessionWithReactantOnTable(
@@ -123,7 +171,12 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
 
             ReactionFlowService service =
                 CreateFlowService(
-                    CreateGuid(100)
+                    new SequenceIdSource(
+                        new[]
+                        {
+                            CreateGuid(100)
+                        }
+                    )
                 );
 
             SessionSnapshot snapshot =
@@ -137,7 +190,7 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
 
             AssertFailure(
                 result,
-                ReactionResolutionFailure.ReactionIsNull
+                ReactionResolutionFailure.ReactionUnavailable
             );
 
             AssertSessionUnchanged(
@@ -178,6 +231,7 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
 
             ReactionFlowService service =
                 CreateFlowService(
+                    reaction,
                     CreateGuid(100)
                 );
 
@@ -234,6 +288,7 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
 
             ReactionFlowService service =
                 CreateFlowService(
+                    reaction,
                     CreateGuid(100)
                 );
 
@@ -254,6 +309,129 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
             AssertSessionUnchanged(
                 session,
                 snapshot
+            );
+        }
+
+        [Test]
+        public void TryResolve_WithUnavailableReaction_FailsWithoutMutation()
+        {
+            GameSession session =
+                BuildSessionWithReactantOnTable(
+                    initialHeat: 0,
+                    initialElectricity: 0
+                );
+
+            ReactionDefinition availableReaction =
+                CreateValidReaction();
+
+            ReactionDefinition unavailableReaction =
+                reactionFactory.Create(
+                    reactionId: "unavailable",
+                    reactants:
+                        new[]
+                        {
+                            new ReactionCardAmount(
+                                reactantDefinition,
+                                quantity: 1
+                            )
+                        },
+                    products:
+                        new[]
+                        {
+                            new ReactionCardAmount(
+                                productDefinition,
+                                quantity: 1
+                            )
+                        }
+                );
+
+            ReactionFlowService service =
+                CreateFlowService(
+                    new SequenceIdSource(
+                        new[]
+                        {
+                            CreateGuid(100)
+                        }
+                    ),
+                    availableReaction
+                );
+
+            SessionSnapshot snapshot =
+                CaptureSnapshot(session);
+
+            ReactionFlowResult result =
+                service.TryResolve(
+                    session,
+                    unavailableReaction
+                );
+
+            AssertFailure(
+                result,
+                ReactionResolutionFailure
+                    .ReactionUnavailable
+            );
+
+            AssertSessionUnchanged(
+                session,
+                snapshot
+            );
+        }
+
+        [Test]
+        public void TryResolve_EquivalentButDifferentReactionAsset_FailsAsUnavailable()
+        {
+            GameSession session =
+                BuildSessionWithReactantOnTable(
+                    initialHeat: 0,
+                    initialElectricity: 0
+                );
+
+            ReactionDefinition registeredReaction =
+                CreateValidReaction();
+
+            ReactionDefinition equivalentReaction =
+                reactionFactory.Create(
+                    reactionId:
+                        registeredReaction.ReactionId,
+                    reactants:
+                        new[]
+                        {
+                            new ReactionCardAmount(
+                                reactantDefinition,
+                                quantity: 1
+                            )
+                        },
+                    products:
+                        new[]
+                        {
+                            new ReactionCardAmount(
+                                productDefinition,
+                                quantity: 1
+                            )
+                        }
+                );
+
+            ReactionFlowService service =
+                CreateFlowService(
+                    new SequenceIdSource(
+                        new[]
+                        {
+                            CreateGuid(100)
+                        }
+                    ),
+                    registeredReaction
+                );
+
+            ReactionFlowResult result =
+                service.TryResolve(
+                    session,
+                    equivalentReaction
+                );
+
+            AssertFailure(
+                result,
+                ReactionResolutionFailure
+                    .ReactionUnavailable
             );
         }
 
@@ -300,6 +478,7 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
 
             ReactionFlowService service =
                 CreateFlowService(
+                    reaction,
                     firstProductId,
                     secondProductId
                 );
@@ -432,7 +611,8 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
 
             ReactionFlowService service =
                 CreateFlowService(
-                    productIdSource
+                    productIdSource,
+                    reaction
                 );
 
             ReactionFlowResult result =
@@ -473,16 +653,19 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
         }
 
         private ReactionFlowService CreateFlowService(
+            ReactionDefinition availableReaction,
             params Guid[] productIds
         )
         {
             return CreateFlowService(
-                new SequenceIdSource(productIds)
+                new SequenceIdSource(productIds),
+                availableReaction
             );
         }
 
         private ReactionFlowService CreateFlowService(
-            ICardInstanceIdSource productIdSource
+            ICardInstanceIdSource productIdSource,
+            params ReactionDefinition[] availableReactions
         )
         {
             ReactionResolutionPlanner planner =
@@ -502,7 +685,8 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
 
             return new ReactionFlowService(
                 planner,
-                executionService
+                executionService,
+                availableReactions
             );
         }
 

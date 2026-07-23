@@ -42,6 +42,9 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
     ReactionResolutionFailure.ReactionIsNull
 )]
         [TestCase(
+    ReactionResolutionFailure.ReactionUnavailable
+)]
+        [TestCase(
     ReactionResolutionFailure.TableDoesNotMatch
 )]
         [TestCase(

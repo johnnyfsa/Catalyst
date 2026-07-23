@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Catalyst.Cards.Runtime.Session;
 using Catalyst.Reactions.Definitions;
 
@@ -9,9 +11,14 @@ namespace Catalyst.Reactions.Runtime.Resolution
         private readonly ReactionResolutionPlanner planner;
         private readonly ReactionExecutionService executionService;
 
+        private readonly ReadOnlyCollection
+            <ReactionDefinition> availableReactions;
+
         public ReactionFlowService(
             ReactionResolutionPlanner planner,
-            ReactionExecutionService executionService
+            ReactionExecutionService executionService,
+            IEnumerable<ReactionDefinition>
+                availableReactions
         )
         {
             this.planner = planner
@@ -23,7 +30,16 @@ namespace Catalyst.Reactions.Runtime.Resolution
                 ?? throw new ArgumentNullException(
                     nameof(executionService)
                 );
+
+            this.availableReactions =
+                CopyAvailableReactions(
+                    availableReactions
+                );
         }
+
+        public IReadOnlyList<ReactionDefinition>
+            AvailableReactions =>
+                availableReactions;
 
         public ReactionFlowResult TryResolve(
             GameSession session,
@@ -33,15 +49,24 @@ namespace Catalyst.Reactions.Runtime.Resolution
             if (session == null)
             {
                 return ReactionFlowResult.Fail(
-                    ReactionResolutionFailure.SessionIsNull
+                    ReactionResolutionFailure
+                        .SessionIsNull
+                );
+            }
+
+            if (!ContainsReaction(reaction))
+            {
+                return ReactionFlowResult.Fail(
+                    ReactionResolutionFailure
+                        .ReactionUnavailable
                 );
             }
 
             ReactionResolutionPlanResult planResult =
-            planner.TryCreatePlan(
-            reaction,
-            session.ReactionTable.Cards
-            );
+                planner.TryCreatePlan(
+                    reaction,
+                    session.ReactionTable.Cards
+                );
 
             if (!planResult.Succeeded)
             {
@@ -66,6 +91,67 @@ namespace Catalyst.Reactions.Runtime.Resolution
             return ReactionFlowResult.Success(
                 executionResult.CreatedProducts
             );
+        }
+
+        private bool ContainsReaction(
+            ReactionDefinition reaction
+        )
+        {
+            if (reaction == null)
+            {
+                return false;
+            }
+
+            foreach (
+                ReactionDefinition availableReaction
+                in availableReactions
+            )
+            {
+                if (ReferenceEquals(
+                    availableReaction,
+                    reaction
+                ))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static ReadOnlyCollection
+            <ReactionDefinition>
+            CopyAvailableReactions(
+                IEnumerable<ReactionDefinition> source
+            )
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(source)
+                );
+            }
+
+            var result =
+                new List<ReactionDefinition>();
+
+            foreach (
+                ReactionDefinition reaction
+                in source
+            )
+            {
+                if (reaction == null)
+                {
+                    throw new ArgumentException(
+                        "Available reaction collection cannot contain null entries.",
+                        nameof(source)
+                    );
+                }
+
+                result.Add(reaction);
+            }
+
+            return result.AsReadOnly();
         }
     }
 }
