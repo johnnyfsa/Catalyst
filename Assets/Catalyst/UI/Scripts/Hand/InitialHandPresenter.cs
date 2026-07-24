@@ -4,7 +4,7 @@ using Catalyst.Cards.Runtime.Session;
 using Catalyst.Game.Bootstrap;
 using UnityEngine;
 
-namespace Catalyst.Game.Presentation
+namespace Catalyst.UI.Presentation.Hand
 {
     public sealed class InitialHandPresenter : MonoBehaviour
     {

@@ -3,7 +3,7 @@ using Catalyst.Cards.Presentation;
 using Catalyst.Cards.Runtime;
 using UnityEngine;
 
-namespace Catalyst.Game.Presentation
+namespace Catalyst.UI.Presentation.Hand
 {
     public sealed class HandCardView : MonoBehaviour
     {
