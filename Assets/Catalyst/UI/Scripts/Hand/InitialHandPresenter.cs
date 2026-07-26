@@ -2,6 +2,7 @@ using System;
 using Catalyst.Cards.Runtime;
 using Catalyst.Cards.Runtime.Session;
 using Catalyst.Game.Bootstrap;
+using Catalyst.UI.Presentation.Inspection;
 using UnityEngine;
 
 namespace Catalyst.UI.Presentation.Hand
@@ -11,6 +12,10 @@ namespace Catalyst.UI.Presentation.Hand
         [Header("Runtime Source")]
         [SerializeField]
         private GameSessionBootstrap bootstrap;
+
+        [Header("Inspection")]
+        [SerializeField]
+        private CardInspectionPresenter inspectionPresenter;
 
         [Header("Hand Views")]
         [Tooltip(
@@ -25,7 +30,6 @@ namespace Catalyst.UI.Presentation.Hand
         {
             PresentInitialHand();
         }
-
 
         [ContextMenu("Present Initial Hand")]
         public void PresentInitialHand()
@@ -61,6 +65,22 @@ namespace Catalyst.UI.Presentation.Hand
                 HandCardView cardView =
                     cardViews[index];
 
+                HandCardInteractionView interactionView =
+                    cardView.GetComponent<HandCardInteractionView>();
+
+                if (interactionView == null)
+                {
+                    throw new InvalidOperationException(
+                        $"{nameof(InitialHandPresenter)} on '{name}' " +
+                        $"found no {nameof(HandCardInteractionView)} " +
+                        $"on hand card view at index {index}."
+                    );
+                }
+
+                interactionView.Initialize(
+                    inspectionPresenter
+                );
+
                 if (index < session.Hand.Cards.Count)
                 {
                     CardInstance card =
@@ -84,6 +104,14 @@ namespace Catalyst.UI.Presentation.Hand
                 throw new InvalidOperationException(
                     $"{nameof(InitialHandPresenter)} on '{name}' " +
                     $"has no {nameof(GameSessionBootstrap)} assigned."
+                );
+            }
+
+            if (inspectionPresenter == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(InitialHandPresenter)} on '{name}' " +
+                    $"has no {nameof(CardInspectionPresenter)} assigned."
                 );
             }
 
