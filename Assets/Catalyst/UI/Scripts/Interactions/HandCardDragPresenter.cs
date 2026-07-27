@@ -1,11 +1,13 @@
 using System;
 using Catalyst.Cards.Runtime;
+using Catalyst.UI.Presentation.Interaction;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Catalyst.UI.Presentation.Hand
 {
-    public sealed class HandCardDragPresenter : MonoBehaviour
+    public sealed class HandCardDragPresenter :
+        MonoBehaviour
     {
         [Header("Drag Layer")]
         [SerializeField]
@@ -23,8 +25,16 @@ namespace Catalyst.UI.Presentation.Hand
 
         private HandCardView draggedCardView;
 
+        private CardDragOrigin dragOrigin =
+            CardDragOrigin.None;
+
         public bool IsDragging =>
             draggedCardView != null;
+
+        public CardDragOrigin DragOrigin =>
+            IsDragging
+                ? dragOrigin
+                : CardDragOrigin.None;
 
         public bool TryGetDraggedCard(
             out CardInstance card
@@ -42,6 +52,14 @@ namespace Catalyst.UI.Presentation.Hand
 
             card = draggedCardView.BoundCard;
             return true;
+        }
+
+        public bool IsDraggingFrom(
+            CardDragOrigin origin
+        )
+        {
+            return IsDragging
+                && dragOrigin == origin;
         }
 
         public void SetInteractionAvailable(
@@ -63,7 +81,8 @@ namespace Catalyst.UI.Presentation.Hand
 
         public void BeginDrag(
             HandCardView sourceCardView,
-            PointerEventData eventData
+            PointerEventData eventData,
+            CardDragOrigin origin
         )
         {
             if (sourceCardView == null)
@@ -80,6 +99,14 @@ namespace Catalyst.UI.Presentation.Hand
                 );
             }
 
+            if (origin == CardDragOrigin.None)
+            {
+                throw new ArgumentException(
+                    "A card drag must have a valid origin.",
+                    nameof(origin)
+                );
+            }
+
             ValidateReferences();
 
             if (!sourceCardView.HasBoundCard)
@@ -90,6 +117,7 @@ namespace Catalyst.UI.Presentation.Hand
             CancelCurrentDrag();
 
             draggedCardView = sourceCardView;
+            dragOrigin = origin;
 
             dragProxyView.Bind(
                 sourceCardView.BoundCard
@@ -200,6 +228,7 @@ namespace Catalyst.UI.Presentation.Hand
         private void CancelCurrentDrag()
         {
             draggedCardView = null;
+            dragOrigin = CardDragOrigin.None;
 
             if (interactionOutline != null)
             {

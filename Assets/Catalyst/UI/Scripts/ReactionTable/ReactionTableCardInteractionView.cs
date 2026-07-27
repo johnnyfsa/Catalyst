@@ -1,13 +1,14 @@
 using System;
 using Catalyst.Cards.Runtime;
+using Catalyst.UI.Presentation.Hand;
 using Catalyst.UI.Presentation.Inspection;
 using Catalyst.UI.Presentation.Interaction;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Catalyst.UI.Presentation.Hand
+namespace Catalyst.UI.Presentation.ReactionTable
 {
-    public sealed class HandCardInteractionView :
+    public sealed class ReactionTableCardInteractionView :
         MonoBehaviour,
         IPointerClickHandler,
         IBeginDragHandler,
@@ -16,13 +17,17 @@ namespace Catalyst.UI.Presentation.Hand
     {
         [Header("Local Card")]
         [SerializeField]
-        private HandCardView handCardView;
+        private HandCardView cardView;
 
         [SerializeField]
         private GameObject selectionOutline;
 
-        private CardInspectionPresenter inspectionPresenter;
-        private HandCardDragPresenter dragPresenter;
+        private CardInspectionPresenter
+            inspectionPresenter;
+
+        private HandCardDragPresenter
+            dragPresenter;
+
         private bool dragStarted;
 
         public bool IsInitialized =>
@@ -56,13 +61,13 @@ namespace Catalyst.UI.Presentation.Hand
 
             ValidateReferences();
 
-            if (!handCardView.HasBoundCard)
+            if (!cardView.HasBoundCard)
             {
                 return;
             }
 
             CardInstance card =
-                handCardView.BoundCard;
+                cardView.BoundCard;
 
             inspectionPresenter.Open(
                 card,
@@ -76,7 +81,7 @@ namespace Catalyst.UI.Presentation.Hand
         {
             ValidateReferences();
 
-            if (!handCardView.HasBoundCard)
+            if (!cardView.HasBoundCard)
             {
                 return;
             }
@@ -86,9 +91,9 @@ namespace Catalyst.UI.Presentation.Hand
             inspectionPresenter.Close();
 
             dragPresenter.BeginDrag(
-                handCardView,
+                cardView,
                 eventData,
-                CardDragOrigin.Hand
+                CardDragOrigin.ReactionTable
             );
         }
 
@@ -102,7 +107,7 @@ namespace Catalyst.UI.Presentation.Hand
             }
 
             dragPresenter.ContinueDrag(
-                handCardView,
+                cardView,
                 eventData
             );
         }
@@ -117,7 +122,7 @@ namespace Catalyst.UI.Presentation.Hand
             }
 
             dragPresenter.EndDrag(
-                handCardView
+                cardView
             );
 
             dragStarted = false;
@@ -130,7 +135,7 @@ namespace Catalyst.UI.Presentation.Hand
             if (dragPresenter != null)
             {
                 dragPresenter.CancelDrag(
-                    handCardView
+                    cardView
                 );
             }
 
@@ -142,19 +147,30 @@ namespace Catalyst.UI.Presentation.Hand
 
         private void ValidateReferences()
         {
-            if (handCardView == null)
+            if (cardView == null)
             {
                 throw new InvalidOperationException(
-                    $"{nameof(HandCardInteractionView)} on '{name}' " +
-                    $"has no {nameof(HandCardView)} assigned."
+                    $"{nameof(ReactionTableCardInteractionView)} " +
+                    $"on '{name}' has no " +
+                    $"{nameof(HandCardView)} assigned."
+                );
+            }
+
+            if (selectionOutline == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(ReactionTableCardInteractionView)} " +
+                    $"on '{name}' has no selection outline " +
+                    "assigned."
                 );
             }
 
             if (inspectionPresenter == null)
             {
                 throw new InvalidOperationException(
-                    $"{nameof(HandCardInteractionView)} on '{name}' " +
-                    "has not been initialized with a " +
+                    $"{nameof(ReactionTableCardInteractionView)} " +
+                    $"on '{name}' has not been initialized " +
+                    $"with a " +
                     $"{nameof(CardInspectionPresenter)}."
                 );
             }
@@ -162,8 +178,9 @@ namespace Catalyst.UI.Presentation.Hand
             if (dragPresenter == null)
             {
                 throw new InvalidOperationException(
-                    $"{nameof(HandCardInteractionView)} on '{name}' " +
-                    "has not been initialized with a " +
+                    $"{nameof(ReactionTableCardInteractionView)} " +
+                    $"on '{name}' has not been initialized " +
+                    $"with a " +
                     $"{nameof(HandCardDragPresenter)}."
                 );
             }
@@ -172,9 +189,9 @@ namespace Catalyst.UI.Presentation.Hand
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            if (handCardView == null)
+            if (cardView == null)
             {
-                handCardView =
+                cardView =
                     GetComponent<HandCardView>();
             }
         }

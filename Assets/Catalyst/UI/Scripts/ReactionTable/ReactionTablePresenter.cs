@@ -3,6 +3,7 @@ using Catalyst.Cards.Runtime;
 using Catalyst.Cards.Runtime.Session;
 using Catalyst.Game.Bootstrap;
 using Catalyst.UI.Presentation.Hand;
+using Catalyst.UI.Presentation.Inspection;
 using UnityEngine;
 
 namespace Catalyst.UI.Presentation.ReactionTable
@@ -14,6 +15,14 @@ namespace Catalyst.UI.Presentation.ReactionTable
         [SerializeField]
         private GameSessionBootstrap bootstrap;
 
+        [Header("Shared Interaction")]
+        [SerializeField]
+        private CardInspectionPresenter
+            inspectionPresenter;
+
+        [SerializeField]
+        private HandCardDragPresenter dragPresenter;
+
         [Header("Reaction Table Views")]
         [Tooltip(
             "Assign the card views in the same visual order " +
@@ -23,11 +32,23 @@ namespace Catalyst.UI.Presentation.ReactionTable
         private HandCardView[] cardViews =
             Array.Empty<HandCardView>();
 
+        [Tooltip(
+            "Assign the interaction views in the same order " +
+            "as the corresponding card views."
+        )]
+        [SerializeField]
+        private ReactionTableCardInteractionView[]
+            interactionViews =
+                Array.Empty<
+                    ReactionTableCardInteractionView
+                >();
+
         public int VisualCapacity =>
             cardViews?.Length ?? 0;
 
         private void Start()
         {
+            InitializeInteractionViews();
             Refresh();
         }
 
@@ -101,14 +122,23 @@ namespace Catalyst.UI.Presentation.ReactionTable
                     cardView.gameObject.SetActive(false);
                 }
             }
+        }
 
-            // Temporary diagnostic if needed:
-            // Debug.Log(
-            //     $"{nameof(ReactionTablePresenter)} refreshed. " +
-            //     $"Runtime cards: {runtimeCardCount}, " +
-            //     $"Visual slots: {cardViews.Length}.",
-            //     this
-            // );
+        private void InitializeInteractionViews()
+        {
+            ValidateReferences();
+
+            for (
+                int index = 0;
+                index < interactionViews.Length;
+                index++
+            )
+            {
+                interactionViews[index].Initialize(
+                    inspectionPresenter,
+                    dragPresenter
+                );
+            }
         }
 
         private void ValidateReferences()
@@ -122,11 +152,52 @@ namespace Catalyst.UI.Presentation.ReactionTable
                 );
             }
 
+            if (inspectionPresenter == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(ReactionTablePresenter)} on " +
+                    $"'{name}' has no " +
+                    $"{nameof(CardInspectionPresenter)} assigned."
+                );
+            }
+
+            if (dragPresenter == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(ReactionTablePresenter)} on " +
+                    $"'{name}' has no " +
+                    $"{nameof(HandCardDragPresenter)} assigned."
+                );
+            }
+
             if (cardViews == null)
             {
                 throw new InvalidOperationException(
                     $"{nameof(ReactionTablePresenter)} on " +
                     $"'{name}' has a null card view collection."
+                );
+            }
+
+            if (interactionViews == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(ReactionTablePresenter)} on " +
+                    $"'{name}' has a null interaction view " +
+                    "collection."
+                );
+            }
+
+            if (
+                cardViews.Length
+                != interactionViews.Length
+            )
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(ReactionTablePresenter)} on " +
+                    $"'{name}' has {cardViews.Length} card " +
+                    $"views but {interactionViews.Length} " +
+                    "interaction views. Both collections " +
+                    "must follow the same slot order."
                 );
             }
 
@@ -136,33 +207,106 @@ namespace Catalyst.UI.Presentation.ReactionTable
                 index++
             )
             {
-                if (cardViews[index] == null)
+                ValidateCardView(index);
+                ValidateInteractionView(index);
+            }
+        }
+
+        private void ValidateCardView(
+            int index
+        )
+        {
+            HandCardView cardView =
+                cardViews[index];
+
+            if (cardView == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(ReactionTablePresenter)} on " +
+                    $"'{name}' has no card view assigned " +
+                    $"at index {index}."
+                );
+            }
+
+            for (
+                int comparisonIndex = index + 1;
+                comparisonIndex < cardViews.Length;
+                comparisonIndex++
+            )
+            {
+                if (ReferenceEquals(
+                    cardView,
+                    cardViews[comparisonIndex]
+                ))
                 {
                     throw new InvalidOperationException(
                         $"{nameof(ReactionTablePresenter)} on " +
-                        $"'{name}' has no card view assigned " +
-                        $"at index {index}."
+                        $"'{name}' contains the same card " +
+                        $"view at indices {index} and " +
+                        $"{comparisonIndex}."
                     );
                 }
+            }
+        }
 
-                for (
-                    int comparisonIndex = index + 1;
-                    comparisonIndex < cardViews.Length;
-                    comparisonIndex++
+        private void ValidateInteractionView(
+            int index
+        )
+        {
+            ReactionTableCardInteractionView
+                interactionView =
+                    interactionViews[index];
+
+            if (interactionView == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(ReactionTablePresenter)} on " +
+                    $"'{name}' has no interaction view " +
+                    $"assigned at index {index}."
+                );
+            }
+
+            HandCardView cardView =
+                cardViews[index];
+
+            bool belongsToSameCard =
+                interactionView.transform
+                    == cardView.transform
+                || interactionView.transform.IsChildOf(
+                    cardView.transform
                 )
+                || cardView.transform.IsChildOf(
+                    interactionView.transform
+                );
+
+            if (!belongsToSameCard)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(ReactionTablePresenter)} on " +
+                    $"'{name}' requires card view and " +
+                    $"interaction view at index {index} " +
+                    "to belong to the same card hierarchy."
+                );
+            }
+
+            for (
+                int comparisonIndex = index + 1;
+                comparisonIndex
+                    < interactionViews.Length;
+                comparisonIndex++
+            )
+            {
+                if (ReferenceEquals(
+                    interactionView,
+                    interactionViews[comparisonIndex]
+                ))
                 {
-                    if (ReferenceEquals(
-                        cardViews[index],
-                        cardViews[comparisonIndex]
-                    ))
-                    {
-                        throw new InvalidOperationException(
-                            $"{nameof(ReactionTablePresenter)} on " +
-                            $"'{name}' contains the same card " +
-                            $"view at indices {index} and " +
-                            $"{comparisonIndex}."
-                        );
-                    }
+                    throw new InvalidOperationException(
+                        $"{nameof(ReactionTablePresenter)} on " +
+                        $"'{name}' contains the same " +
+                        "interaction view at indices " +
+                        $"{index} and {comparisonIndex}."
+                    );
                 }
             }
         }
