@@ -1,4 +1,5 @@
 using System;
+using Catalyst.Cards.Runtime;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -17,10 +18,48 @@ namespace Catalyst.UI.Presentation.Hand
         [SerializeField]
         private HandCardView dragProxyView;
 
+        [SerializeField]
+        private GameObject interactionOutline;
+
         private HandCardView draggedCardView;
 
         public bool IsDragging =>
             draggedCardView != null;
+
+        public bool TryGetDraggedCard(
+            out CardInstance card
+        )
+        {
+            card = null;
+
+            if (
+                draggedCardView == null
+                || !draggedCardView.HasBoundCard
+            )
+            {
+                return false;
+            }
+
+            card = draggedCardView.BoundCard;
+            return true;
+        }
+
+        public void SetInteractionAvailable(
+            bool isAvailable
+        )
+        {
+            if (interactionOutline == null)
+            {
+                return;
+            }
+
+            bool shouldShow =
+                isAvailable && IsDragging;
+
+            interactionOutline.SetActive(
+                shouldShow
+            );
+        }
 
         public void BeginDrag(
             HandCardView sourceCardView,
@@ -59,6 +98,8 @@ namespace Catalyst.UI.Presentation.Hand
             dragProxyTransform.gameObject.SetActive(
                 true
             );
+
+            interactionOutline.SetActive(false);
 
             UpdateProxyPosition(
                 eventData
@@ -160,6 +201,11 @@ namespace Catalyst.UI.Presentation.Hand
         {
             draggedCardView = null;
 
+            if (interactionOutline != null)
+            {
+                interactionOutline.SetActive(false);
+            }
+
             if (dragProxyView != null)
             {
                 dragProxyView.Clear();
@@ -200,6 +246,14 @@ namespace Catalyst.UI.Presentation.Hand
                 );
             }
 
+            if (interactionOutline == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(HandCardDragPresenter)} on '{name}' " +
+                    "has no interaction outline assigned."
+                );
+            }
+
             bool proxyViewBelongsToProxy =
                 dragProxyView.transform
                     == dragProxyTransform
@@ -213,6 +267,22 @@ namespace Catalyst.UI.Presentation.Hand
                     $"{nameof(HandCardDragPresenter)} on '{name}' " +
                     $"requires its {nameof(HandCardView)} to be " +
                     "on the drag proxy or one of its children."
+                );
+            }
+
+            bool outlineBelongsToProxy =
+                interactionOutline.transform
+                    == dragProxyTransform
+                || interactionOutline.transform.IsChildOf(
+                    dragProxyTransform
+                );
+
+            if (!outlineBelongsToProxy)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(HandCardDragPresenter)} on '{name}' " +
+                    "requires its interaction outline to be " +
+                    "inside the drag proxy hierarchy."
                 );
             }
         }
