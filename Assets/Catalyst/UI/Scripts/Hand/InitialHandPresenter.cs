@@ -17,6 +17,10 @@ namespace Catalyst.UI.Presentation.Hand
         [SerializeField]
         private CardInspectionPresenter inspectionPresenter;
 
+        [Header("Drag")]
+        [SerializeField]
+        private HandCardDragPresenter dragPresenter;
+
         [Header("Hand Views")]
         [Tooltip(
             "Assign the hand card views in the same visual order " +
@@ -78,7 +82,8 @@ namespace Catalyst.UI.Presentation.Hand
                 }
 
                 interactionView.Initialize(
-                    inspectionPresenter
+                    inspectionPresenter,
+                    dragPresenter
                 );
 
                 if (index < session.Hand.Cards.Count)
@@ -112,6 +117,14 @@ namespace Catalyst.UI.Presentation.Hand
                 throw new InvalidOperationException(
                     $"{nameof(InitialHandPresenter)} on '{name}' " +
                     $"has no {nameof(CardInspectionPresenter)} assigned."
+                );
+            }
+
+            if (dragPresenter == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(InitialHandPresenter)} on '{name}' " +
+                    $"has no {nameof(HandCardDragPresenter)} assigned."
                 );
             }
 

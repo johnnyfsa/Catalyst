@@ -10,6 +10,7 @@ namespace Catalyst.UI.Presentation.Hand
         MonoBehaviour,
         IPointerClickHandler,
         IBeginDragHandler,
+        IDragHandler,
         IEndDragHandler
     {
         [Header("Local Card")]
@@ -20,18 +21,26 @@ namespace Catalyst.UI.Presentation.Hand
         private GameObject selectionOutline;
 
         private CardInspectionPresenter inspectionPresenter;
+        private HandCardDragPresenter dragPresenter;
         private bool dragStarted;
 
         public bool IsInitialized =>
-            inspectionPresenter != null;
+            inspectionPresenter != null
+            && dragPresenter != null;
 
         public void Initialize(
-            CardInspectionPresenter presenter
+            CardInspectionPresenter presenter,
+            HandCardDragPresenter cardDragPresenter
         )
         {
             inspectionPresenter = presenter
                 ?? throw new ArgumentNullException(
                     nameof(presenter)
+                );
+
+            dragPresenter = cardDragPresenter
+                ?? throw new ArgumentNullException(
+                    nameof(cardDragPresenter)
                 );
         }
 
@@ -64,24 +73,64 @@ namespace Catalyst.UI.Presentation.Hand
             PointerEventData eventData
         )
         {
+            ValidateReferences();
+
+            if (!handCardView.HasBoundCard)
+            {
+                return;
+            }
+
             dragStarted = true;
 
-            if (inspectionPresenter != null)
+            inspectionPresenter.Close();
+
+            dragPresenter.BeginDrag(
+                handCardView,
+                eventData
+            );
+        }
+
+        public void OnDrag(
+            PointerEventData eventData
+        )
+        {
+            if (!dragStarted)
             {
-                inspectionPresenter.Close();
+                return;
             }
+
+            dragPresenter.ContinueDrag(
+                handCardView,
+                eventData
+            );
         }
 
         public void OnEndDrag(
             PointerEventData eventData
         )
         {
+            if (!dragStarted)
+            {
+                return;
+            }
+
+            dragPresenter.EndDrag(
+                handCardView
+            );
+
             dragStarted = false;
         }
 
         private void OnDisable()
         {
             dragStarted = false;
+
+            if (dragPresenter != null)
+            {
+                dragPresenter.CancelDrag(
+                    handCardView
+                );
+            }
 
             if (selectionOutline != null)
             {
@@ -105,6 +154,15 @@ namespace Catalyst.UI.Presentation.Hand
                     $"{nameof(HandCardInteractionView)} on '{name}' " +
                     "has not been initialized with a " +
                     $"{nameof(CardInspectionPresenter)}."
+                );
+            }
+
+            if (dragPresenter == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(HandCardInteractionView)} on '{name}' " +
+                    "has not been initialized with a " +
+                    $"{nameof(HandCardDragPresenter)}."
                 );
             }
         }
