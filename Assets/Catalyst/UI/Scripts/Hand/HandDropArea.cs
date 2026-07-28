@@ -32,6 +32,10 @@ namespace Catalyst.UI.Presentation.Hand
         private ReactionTablePresenter
             reactionTablePresenter;
 
+        [SerializeField]
+        private ReactionAvailabilityPresenter
+            reactionAvailabilityPresenter;
+
         private readonly CardMovementService
             movementService =
                 new CardMovementService();
@@ -73,15 +77,15 @@ namespace Catalyst.UI.Presentation.Hand
             dragPresenter.SetInteractionAvailable(false);
 
             if (!dragPresenter.IsDraggingFrom(
-                CardDragOrigin.ReactionTable
-            ))
+                    CardDragOrigin.ReactionTable
+                ))
             {
                 return;
             }
 
             if (!dragPresenter.TryGetDraggedCard(
-                out CardInstance card
-            ))
+                    out CardInstance card
+                ))
             {
                 return;
             }
@@ -117,8 +121,9 @@ namespace Catalyst.UI.Presentation.Hand
                 return;
             }
 
-            reactionTablePresenter.Refresh();
             handPresenter.PresentInitialHand();
+            reactionTablePresenter.Refresh();
+            reactionAvailabilityPresenter.Refresh();
         }
 
         private void OnDisable()
@@ -163,6 +168,16 @@ namespace Catalyst.UI.Presentation.Hand
                 throw new InvalidOperationException(
                     $"{nameof(HandDropArea)} on '{name}' " +
                     $"has no {nameof(ReactionTablePresenter)} " +
+                    "assigned."
+                );
+            }
+
+            if (reactionAvailabilityPresenter == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(HandDropArea)} on '{name}' " +
+                    $"has no " +
+                    $"{nameof(ReactionAvailabilityPresenter)} " +
                     "assigned."
                 );
             }

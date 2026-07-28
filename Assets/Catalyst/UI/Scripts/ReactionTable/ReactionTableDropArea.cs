@@ -31,6 +31,10 @@ namespace Catalyst.UI.Presentation.ReactionTable
         private ReactionTablePresenter
             reactionTablePresenter;
 
+        [SerializeField]
+        private ReactionAvailabilityPresenter
+            reactionAvailabilityPresenter;
+
         private readonly CardMovementService
             movementService =
                 new CardMovementService();
@@ -69,8 +73,8 @@ namespace Catalyst.UI.Presentation.ReactionTable
             dragPresenter.SetInteractionAvailable(false);
 
             if (!dragPresenter.TryGetDraggedCard(
-                out CardInstance card
-            ))
+                    out CardInstance card
+                ))
             {
                 return;
             }
@@ -87,7 +91,7 @@ namespace Catalyst.UI.Presentation.ReactionTable
             }
 
             if (!reactionTablePresenter
-                .CanPresentAdditionalCard())
+                    .CanPresentAdditionalCard())
             {
                 return;
             }
@@ -114,6 +118,7 @@ namespace Catalyst.UI.Presentation.ReactionTable
 
             handPresenter.PresentInitialHand();
             reactionTablePresenter.Refresh();
+            reactionAvailabilityPresenter.Refresh();
         }
 
         private void OnDisable()
@@ -159,6 +164,16 @@ namespace Catalyst.UI.Presentation.ReactionTable
                     $"{nameof(ReactionTableDropArea)} on " +
                     $"'{name}' has no " +
                     $"{nameof(ReactionTablePresenter)} assigned."
+                );
+            }
+
+            if (reactionAvailabilityPresenter == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(ReactionTableDropArea)} on " +
+                    $"'{name}' has no " +
+                    $"{nameof(ReactionAvailabilityPresenter)} " +
+                    "assigned."
                 );
             }
         }
