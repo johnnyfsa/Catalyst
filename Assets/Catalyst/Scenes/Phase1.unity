@@ -2500,6 +2500,14 @@ PrefabInstance:
       propertyPath: m_RaycastTarget
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6516310277395174215, guid: 6a449979bdfa1704abe590ffebafeacb, type: 3}
+      propertyPath: resource
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6516310277395174215, guid: 6a449979bdfa1704abe590ffebafeacb, type: 3}
+      propertyPath: reactionAvailabilityPresenter
+      value: 
+      objectReference: {fileID: 8360304083609516396}
     - target: {fileID: 6538750171786959359, guid: 6a449979bdfa1704abe590ffebafeacb, type: 3}
       propertyPath: m_RaycastTarget
       value: 0
@@ -2516,6 +2524,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8606144506317148644, guid: 6a449979bdfa1704abe590ffebafeacb, type: 3}
+      propertyPath: reactionAvailabilityPresenter
+      value: 
+      objectReference: {fileID: 8360304083609516396}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

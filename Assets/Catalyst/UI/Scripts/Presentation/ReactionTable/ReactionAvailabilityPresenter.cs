@@ -62,6 +62,10 @@ namespace Catalyst.UI.Presentation.ReactionTable
 
         private ReactionDefinition matchedReaction;
 
+        private ReactionResourceSelection
+            selectedResource =
+                ReactionResourceSelection.None;
+
         public bool HasAvailableReaction =>
             candidateReactions.Count > 0;
 
@@ -73,6 +77,9 @@ namespace Catalyst.UI.Presentation.ReactionTable
 
         public IReadOnlyList<ReactionDefinition>
             CandidateReactions => candidateReactions;
+
+        public ReactionResourceSelection
+            SelectedResource => selectedResource;
 
         public PresentationState CurrentState
         {
@@ -116,6 +123,7 @@ namespace Catalyst.UI.Presentation.ReactionTable
                 );
             }
 
+            ClearExplicitSelection();
             EvaluateCandidates();
 
             bool isAvailable =
@@ -126,6 +134,75 @@ namespace Catalyst.UI.Presentation.ReactionTable
             );
 
             PresentSelectionState();
+
+            LogAvailability();
+        }
+
+        public void SelectResource(
+            ReactionResourceSelection resource
+        )
+        {
+            ValidateReferences();
+
+            if (
+                resource
+                == ReactionResourceSelection.None
+            )
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(resource),
+                    resource,
+                    "A concrete reaction resource must be selected."
+                );
+            }
+
+            if (
+                CurrentState
+                    != PresentationState
+                        .AwaitingResourceSelection
+                && CurrentState
+                    != PresentationState
+                        .ResolvedByResourceSelection
+                && CurrentState
+                    != PresentationState
+                        .InsufficientResources
+            )
+            {
+                return;
+            }
+
+            if (candidateReactions.Count <= 1)
+            {
+                return;
+            }
+
+            if (!IsSelectableResource(resource))
+            {
+                return;
+            }
+
+            ReactionDefinition resolvedReaction =
+                FindCandidateForResource(resource);
+
+            if (resolvedReaction == null)
+            {
+                Debug.LogWarning(
+                    $"{nameof(ReactionAvailabilityPresenter)} " +
+                    $"on '{name}' could not resolve a reaction " +
+                    $"for selected resource '{resource}'.",
+                    this
+                );
+
+                return;
+            }
+
+            selectedResource = resource;
+            matchedReaction = resolvedReaction;
+
+            PresentSelectedReaction(
+                resolvedReaction,
+                resource
+            );
 
             LogAvailability();
         }
@@ -227,34 +304,105 @@ namespace Catalyst.UI.Presentation.ReactionTable
                 reaction
             );
 
-            bool hasEnoughHeat =
-                bootstrap.Session
-                    .Heat
-                    .CanConsume(
-                        reaction.RequiredHeat
-                    );
+            bool canReact =
+                HasEnoughResources(reaction);
 
-            bool hasEnoughElectricity =
-                bootstrap.Session
-                    .Electricity
-                    .CanConsume(
-                        reaction
-                            .RequiredElectricity
-                    );
+            CanReact = canReact;
 
-            CanReact =
-                hasEnoughHeat
-                && hasEnoughElectricity;
-
-            CurrentState = CanReact
+            CurrentState = canReact
                 ? PresentationState
                     .ResolvedAutomatically
                 : PresentationState
                     .InsufficientResources;
 
-            PresentReactionButton(
-                CanReact
+            PresentReactionButton(canReact);
+        }
+
+        private void PresentAmbiguousReactions()
+        {
+            matchedReaction = null;
+            selectedResource =
+                ReactionResourceSelection.None;
+
+            CanReact = false;
+
+            bool heatIsCandidate =
+                IsSelectableResource(
+                    ReactionResourceSelection.Heat
+                );
+
+            bool electricityIsCandidate =
+                IsSelectableResource(
+                    ReactionResourceSelection
+                        .Electricity
+                );
+
+            if (heatIsCandidate)
+            {
+                heatEntry.SetOutlineState(
+                    ResourceEntryStyleView
+                        .OutlineState
+                        .Pulsing
+                );
+            }
+
+            if (electricityIsCandidate)
+            {
+                electricityEntry.SetOutlineState(
+                    ResourceEntryStyleView
+                        .OutlineState
+                        .Pulsing
+                );
+            }
+
+            CurrentState =
+                PresentationState
+                    .AwaitingResourceSelection;
+
+            PresentReactionButton(false);
+
+            if (
+                !heatIsCandidate
+                && !electricityIsCandidate
+            )
+            {
+                Debug.LogWarning(
+                    $"{nameof(ReactionAvailabilityPresenter)} " +
+                    $"on '{name}' detected " +
+                    $"{candidateReactions.Count} compatible " +
+                    "reactions, but none can currently be " +
+                    "distinguished by Heat or Electricity.",
+                    this
+                );
+            }
+        }
+
+        private void PresentSelectedReaction(
+            ReactionDefinition reaction,
+            ReactionResourceSelection resource
+        )
+        {
+            ResetResourceEntries();
+
+            SetResourceOutline(
+                resource,
+                ResourceEntryStyleView
+                    .OutlineState
+                    .Steady
             );
+
+            bool canReact =
+                HasEnoughResources(reaction);
+
+            CanReact = canReact;
+
+            CurrentState = canReact
+                ? PresentationState
+                    .ResolvedByResourceSelection
+                : PresentationState
+                    .InsufficientResources;
+
+            PresentReactionButton(canReact);
         }
 
         private void PresentRequiredResources(
@@ -275,22 +423,51 @@ namespace Catalyst.UI.Presentation.ReactionTable
                 > 0
             )
             {
-                electricityEntry
-                    .SetOutlineState(
-                        ResourceEntryStyleView
-                            .OutlineState
-                            .Steady
-                    );
+                electricityEntry.SetOutlineState(
+                    ResourceEntryStyleView
+                        .OutlineState
+                        .Steady
+                );
             }
         }
 
-        private void PresentAmbiguousReactions()
+        private bool HasEnoughResources(
+            ReactionDefinition reaction
+        )
         {
-            matchedReaction = null;
-            CanReact = false;
+            bool hasEnoughHeat =
+                bootstrap.Session
+                    .Heat
+                    .CanConsume(
+                        reaction.RequiredHeat
+                    );
 
-            bool heatIsCandidate = false;
-            bool electricityIsCandidate = false;
+            bool hasEnoughElectricity =
+                bootstrap.Session
+                    .Electricity
+                    .CanConsume(
+                        reaction.RequiredElectricity
+                    );
+
+            return hasEnoughHeat
+                && hasEnoughElectricity;
+        }
+
+        private bool IsSelectableResource(
+            ReactionResourceSelection resource
+        )
+        {
+            return FindCandidateForResource(
+                resource
+            ) != null;
+        }
+
+        private ReactionDefinition
+            FindCandidateForResource(
+                ReactionResourceSelection resource
+            )
+        {
+            ReactionDefinition result = null;
 
             foreach (
                 ReactionDefinition candidate
@@ -298,84 +475,100 @@ namespace Catalyst.UI.Presentation.ReactionTable
             )
             {
                 if (
-                    IsHeatSelectableCandidate(
-                        candidate
+                    !RequiresSelectedResource(
+                        candidate,
+                        resource
                     )
                 )
                 {
-                    heatIsCandidate = true;
+                    continue;
                 }
 
-                if (
-                    IsElectricitySelectableCandidate(
-                        candidate
-                    )
-                )
+                if (result != null)
                 {
-                    electricityIsCandidate = true;
+                    Debug.LogWarning(
+                        $"{nameof(ReactionAvailabilityPresenter)} " +
+                        $"on '{name}' found more than one " +
+                        $"candidate reaction for resource " +
+                        $"'{resource}'. The resource alone " +
+                        "cannot uniquely resolve the reaction.",
+                        this
+                    );
+
+                    return null;
                 }
+
+                result = candidate;
             }
 
-            if (heatIsCandidate)
-            {
-                heatEntry.SetOutlineState(
-                    ResourceEntryStyleView
-                        .OutlineState
-                        .Pulsing
-                );
-            }
+            return result;
+        }
 
-            if (electricityIsCandidate)
+        private static bool RequiresSelectedResource(
+            ReactionDefinition reaction,
+            ReactionResourceSelection resource
+        )
+        {
+            switch (resource)
             {
-                electricityEntry
-                    .SetOutlineState(
-                        ResourceEntryStyleView
-                            .OutlineState
-                            .Pulsing
+                case ReactionResourceSelection.Heat:
+                    return reaction.RequiredHeat > 0
+                        && reaction
+                            .RequiredElectricity == 0;
+
+                case ReactionResourceSelection
+                        .Electricity:
+                    return reaction
+                            .RequiredElectricity > 0
+                        && reaction.RequiredHeat == 0;
+
+                case ReactionResourceSelection.None:
+                    return false;
+
+                default:
+                    throw new ArgumentOutOfRangeException(
+                        nameof(resource),
+                        resource,
+                        "Unsupported reaction resource."
                     );
             }
+        }
 
-            CurrentState =
-                PresentationState
-                    .AwaitingResourceSelection;
-
-            PresentReactionButton(false);
-
-            if (
-                !heatIsCandidate
-                && !electricityIsCandidate
-            )
+        private void SetResourceOutline(
+            ReactionResourceSelection resource,
+            ResourceEntryStyleView.OutlineState state
+        )
+        {
+            switch (resource)
             {
-                Debug.LogWarning(
-                    $"{nameof(ReactionAvailabilityPresenter)} " +
-                    $"on '{name}' detected " +
-                    $"{candidateReactions.Count} compatible " +
-                    "reactions, but none can currently be " +
-                    "distinguished by an exclusive Heat or " +
-                    "Electricity requirement.",
-                    this
-                );
+                case ReactionResourceSelection.Heat:
+                    heatEntry.SetOutlineState(state);
+                    break;
+
+                case ReactionResourceSelection
+                        .Electricity:
+                    electricityEntry
+                        .SetOutlineState(state);
+                    break;
+
+                case ReactionResourceSelection.None:
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(
+                        nameof(resource),
+                        resource,
+                        "Unsupported reaction resource."
+                    );
             }
         }
 
-        private static bool
-            IsHeatSelectableCandidate(
-                ReactionDefinition reaction
-            )
+        private void ClearExplicitSelection()
         {
-            return reaction.RequiredHeat > 0
-                && reaction
-                    .RequiredElectricity == 0;
-        }
+            selectedResource =
+                ReactionResourceSelection.None;
 
-        private static bool
-            IsElectricitySelectableCandidate(
-                ReactionDefinition reaction
-            )
-        {
-            return reaction
-                    .RequiredElectricity > 0
-                && reaction.RequiredHeat == 0;
+            matchedReaction = null;
         }
 
         private void ResetResourceEntries()
@@ -402,13 +595,11 @@ namespace Catalyst.UI.Presentation.ReactionTable
 
             if (canReact)
             {
-                reactionButtonVisual
-                    .SetActive();
+                reactionButtonVisual.SetActive();
             }
             else
             {
-                reactionButtonVisual
-                    .SetInactive();
+                reactionButtonVisual.SetInactive();
             }
         }
 
@@ -427,19 +618,27 @@ namespace Catalyst.UI.Presentation.ReactionTable
 
         private void LogAvailability()
         {
-            if (
-                !logDetectedReaction
-                || candidateReactions.Count == 0
-            )
+            if (!logDetectedReaction)
             {
+                return;
+            }
+
+            if (candidateReactions.Count == 0)
+            {
+                Debug.Log(
+                    "No compatible reaction detected.",
+                    this
+                );
+
                 return;
             }
 
             if (matchedReaction != null)
             {
                 Debug.Log(
-                    $"Reaction detected: " +
+                    $"Resolved reaction: " +
                     $"{matchedReaction.name}. " +
+                    $"Selection: {selectedResource}. " +
                     $"State: {CurrentState}. " +
                     $"Can react: {CanReact}.",
                     this
@@ -476,9 +675,7 @@ namespace Catalyst.UI.Presentation.ReactionTable
                 }
 
                 builder.Append(
-                    candidateReactions[
-                        index
-                    ].name
+                    candidateReactions[index].name
                 );
             }
 
@@ -487,6 +684,12 @@ namespace Catalyst.UI.Presentation.ReactionTable
 
         private void OnDisable()
         {
+            selectedResource =
+                ReactionResourceSelection.None;
+
+            matchedReaction = null;
+            CanReact = false;
+
             if (heatEntry != null)
             {
                 heatEntry.SetOutlineState(
@@ -498,12 +701,11 @@ namespace Catalyst.UI.Presentation.ReactionTable
 
             if (electricityEntry != null)
             {
-                electricityEntry
-                    .SetOutlineState(
-                        ResourceEntryStyleView
-                            .OutlineState
-                            .Off
-                    );
+                electricityEntry.SetOutlineState(
+                    ResourceEntryStyleView
+                        .OutlineState
+                        .Off
+                );
             }
 
             if (reactionButton != null)
@@ -514,8 +716,7 @@ namespace Catalyst.UI.Presentation.ReactionTable
 
             if (reactionButtonVisual != null)
             {
-                reactionButtonVisual
-                    .SetInactive();
+                reactionButtonVisual.SetInactive();
             }
         }
 
