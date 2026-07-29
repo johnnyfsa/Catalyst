@@ -426,7 +426,7 @@ GameObject:
   - component: {fileID: 5039917235384305067}
   - component: {fileID: 955689339037118597}
   m_Layer: 0
-  m_Name: ReactionIcon
+  m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
