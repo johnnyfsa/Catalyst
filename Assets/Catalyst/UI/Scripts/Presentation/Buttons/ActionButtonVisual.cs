@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Catalyst.UI.Presentation.ReactionTable
 {
-    public sealed class TableActionButtonVisual : MonoBehaviour
+    public sealed class ActionButtonVisual : MonoBehaviour
     {
         public enum VisualState
         {

@@ -801,9 +801,25 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2784980487500070519}
     m_Modifications:
+    - target: {fileID: 2539156956655515081, guid: 650bffdf1abc9cb489f7fede3cc14f67, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5684392163075832990, guid: 650bffdf1abc9cb489f7fede3cc14f67, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6530699476060730012, guid: 650bffdf1abc9cb489f7fede3cc14f67, type: 3}
       propertyPath: m_Name
       value: HeatResourceEntry
+      objectReference: {fileID: 0}
+    - target: {fileID: 6598865225759049809, guid: 650bffdf1abc9cb489f7fede3cc14f67, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8107775690245124258, guid: 650bffdf1abc9cb489f7fede3cc14f67, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8212645021266179655, guid: 650bffdf1abc9cb489f7fede3cc14f67, type: 3}
       propertyPath: m_Pivot.x
@@ -916,6 +932,10 @@ PrefabInstance:
       value: 0.83137256
       objectReference: {fileID: 0}
     - target: {fileID: 2539156956655515081, guid: 650bffdf1abc9cb489f7fede3cc14f67, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2539156956655515081, guid: 650bffdf1abc9cb489f7fede3cc14f67, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4279741140
       objectReference: {fileID: 0}
@@ -940,6 +960,10 @@ PrefabInstance:
       value: 0.83137256
       objectReference: {fileID: 0}
     - target: {fileID: 5684392163075832990, guid: 650bffdf1abc9cb489f7fede3cc14f67, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5684392163075832990, guid: 650bffdf1abc9cb489f7fede3cc14f67, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4279741140
       objectReference: {fileID: 0}
@@ -947,10 +971,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: ElectricityResourceEntry
       objectReference: {fileID: 0}
+    - target: {fileID: 6598865225759049809, guid: 650bffdf1abc9cb489f7fede3cc14f67, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8107775690245124258, guid: 650bffdf1abc9cb489f7fede3cc14f67, type: 3}
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: f384bd259cd14c34a88481e18fe5cbd4, type: 3}
+    - target: {fileID: 8107775690245124258, guid: 650bffdf1abc9cb489f7fede3cc14f67, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8177511197322415121, guid: 650bffdf1abc9cb489f7fede3cc14f67, type: 3}
       propertyPath: initialStyle
       value: 
