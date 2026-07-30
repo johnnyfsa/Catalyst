@@ -57,14 +57,6 @@ namespace Catalyst.Reactions.Runtime.Resolution
                 );
             }
 
-            if (!ContainsReaction(reaction))
-            {
-                return ReactionFlowResult.Fail(
-                    ReactionResolutionFailure
-                        .ReactionUnavailable
-                );
-            }
-
             ReactionResolutionPlanResult planResult =
                 planner.TryCreatePlan(
                     reaction,
