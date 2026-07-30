@@ -360,7 +360,8 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
             ReactionResolutionPlan plan =
                 CreatePlan(
                     session.ReactionTable.Cards[0],
-                    productCount: 2
+                    productCount:
+                        session.ReactionTable.Capacity + 1
                 );
 
             ReactionExecutionValidationResult result =
@@ -373,6 +374,41 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                 result,
                 ReactionResolutionFailure
                     .InsufficientProductCapacity
+            );
+        }
+
+        [Test]
+        public void Validate_WhenProductsFitReactionTable_SucceedsEvenIfHandIsFull()
+        {
+            GameSession session =
+                BuildSessionWithReactantOnTable(
+                    initialHeat: 0,
+                    initialElectricity: 0,
+                    handCapacity: 1
+                );
+
+            ReactionResolutionPlan plan =
+                CreatePlan(
+                    session.ReactionTable.Cards[0],
+                    productCount: 2
+                );
+
+            ReactionExecutionValidationResult result =
+                validator.Validate(
+                    session,
+                    plan
+                );
+
+            Assert.That(
+                result.IsValid,
+                Is.True
+            );
+
+            Assert.That(
+                result.Failure,
+                Is.EqualTo(
+                    ReactionResolutionFailure.None
+                )
             );
         }
 

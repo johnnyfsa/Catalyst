@@ -507,8 +507,8 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
             );
 
             Assert.That(
-                session.ReactionTable.IsEmpty,
-                Is.True
+            session.ReactionTable.Count,
+            Is.EqualTo(2)
             );
 
             Assert.That(
@@ -517,9 +517,9 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
             );
 
             Assert.That(
-                session.Hand.Count,
-                Is.EqualTo(2)
-            );
+             session.Hand.IsEmpty,
+             Is.True
+                );
 
             Assert.That(
                 session.Heat.Amount,
@@ -547,9 +547,9 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                 );
 
                 Assert.That(
-                    session.Hand.Contains(product),
-                    Is.True
-                );
+    session.ReactionTable.Contains(product),
+    Is.True
+);
             }
 
             Guid[] createdIds =

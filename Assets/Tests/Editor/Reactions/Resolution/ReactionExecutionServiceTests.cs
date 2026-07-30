@@ -97,7 +97,7 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
         }
 
         [Test]
-        public void Execute_WithValidPlan_CreatesRegistersAndAddsProductsToHand()
+        public void Execute_WithValidPlan_CreatesRegistersAndAddsProductsToReactionTable()
         {
             GameSession session =
                 BuildSessionWithReactantOnTable(
@@ -141,7 +141,12 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
             );
 
             Assert.That(
-                session.Hand.Count,
+             session.Hand.Count,
+             Is.Zero
+            );
+
+            Assert.That(
+                session.ReactionTable.Count,
                 Is.EqualTo(2)
             );
 
@@ -163,9 +168,9 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                 );
 
                 Assert.That(
-                    session.Hand.Contains(product),
-                    Is.True
-                );
+                session.ReactionTable.Contains(product),
+                 Is.True
+                    );
 
                 bool found =
                     session.TryGetCard(
@@ -195,6 +200,67 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                         secondProductId
                     }
                 )
+            );
+        }
+
+
+        [Test]
+        public void Execute_WhenProductsExceedReactionTableCapacity_FailsWithoutMutation()
+        {
+            GameSession session =
+                BuildSessionWithReactantOnTable(
+                    initialHeat: 0,
+                    initialElectricity: 0,
+                    handCapacity: 1
+                );
+
+            ReactionResolutionPlan plan =
+                CreatePlan(
+                    session.ReactionTable.Cards[0],
+                    productCount:
+                        session.ReactionTable.Capacity
+                        + 1
+                );
+
+            Guid[] productIds =
+                Enumerable
+                    .Range(
+                        100,
+                        plan.TotalProductCount
+                    )
+                    .Select(CreateGuid)
+                    .ToArray();
+
+            ReactionExecutionService service =
+                CreateExecutionService(
+                    productIds
+                );
+
+            SessionSnapshot snapshot =
+                CaptureSnapshot(session);
+
+            ReactionExecutionResult result =
+                service.Execute(
+                    session,
+                    plan
+                );
+
+            Assert.That(
+                result.Succeeded,
+                Is.False
+            );
+
+            Assert.That(
+                result.Failure,
+                Is.EqualTo(
+                    ReactionResolutionFailure
+                        .InsufficientProductCapacity
+                )
+            );
+
+            AssertSessionUnchanged(
+                session,
+                snapshot
             );
         }
 
@@ -552,6 +618,27 @@ namespace Catalyst.Tests.EditMode.Reactions.Resolution
                     session.SessionCards.Count
                 )
             );
+
+            Assert.That(
+            session.Hand.IsEmpty,
+            Is.True
+            );
+
+            Assert.That(
+                session.ReactionTable.Count,
+                Is.EqualTo(2)
+            );
+
+            foreach (
+                CardInstance product
+                in result.CreatedProducts
+            )
+            {
+                Assert.That(
+                    session.ReactionTable.Contains(product),
+                    Is.True
+                );
+            }
         }
 
         [Test]

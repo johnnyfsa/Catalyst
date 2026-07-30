@@ -46,10 +46,9 @@ namespace Catalyst.Reactions.Runtime.Resolution
             {
                 return resourceValidation;
             }
-
             if (!HasProductCapacity(
                     session,
-                    plan.TotalProductCount
+                    plan
                 ))
             {
                 return ReactionExecutionValidationResult.Invalid(
@@ -147,15 +146,17 @@ namespace Catalyst.Reactions.Runtime.Resolution
         }
 
         private static bool HasProductCapacity(
-            GameSession session,
-            int productCount
-        )
+    GameSession session,
+    ReactionResolutionPlan plan
+)
         {
-            int remainingCapacity =
-                session.Hand.Capacity
-                - session.Hand.Count;
+            int resultingCardCount =
+                session.ReactionTable.Count
+                - plan.ConsumedReactants.Count
+                + plan.TotalProductCount;
 
-            return productCount <= remainingCapacity;
+            return resultingCardCount
+                <= session.ReactionTable.Capacity;
         }
     }
 }

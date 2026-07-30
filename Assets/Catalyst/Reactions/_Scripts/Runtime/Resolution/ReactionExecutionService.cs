@@ -212,7 +212,7 @@ namespace Catalyst.Reactions.Runtime.Resolution
                 plan
             );
 
-            RegisterAndAddProducts(
+            RegisterAndAddProductsToReactionTable(
                 session,
                 createdProducts
             );
@@ -279,10 +279,11 @@ namespace Catalyst.Reactions.Runtime.Resolution
             }
         }
 
-        private static void RegisterAndAddProducts(
-            GameSession session,
-            IReadOnlyList<CardInstance> createdProducts
-        )
+        private static void
+    RegisterAndAddProductsToReactionTable(
+        GameSession session,
+        IReadOnlyList<CardInstance> createdProducts
+    )
         {
             foreach (
                 CardInstance product
@@ -294,12 +295,14 @@ namespace Catalyst.Reactions.Runtime.Resolution
                 );
 
                 bool added =
-                    session.Hand.TryAdd(product);
+                    session.ReactionTable.TryAdd(
+                        product
+                    );
 
                 if (!added)
                 {
                     throw new InvalidOperationException(
-                        "A validated reaction product could not be added to the hand."
+                        "A validated reaction product could not be added to the reaction table."
                     );
                 }
             }
