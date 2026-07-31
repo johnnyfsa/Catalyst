@@ -36,6 +36,23 @@ namespace Catalyst.UI.Presentation.Hand
                 ? dragOrigin
                 : CardDragOrigin.None;
 
+        private bool interactionLocked;
+
+        public bool InteractionLocked =>
+            interactionLocked;
+
+        public void SetInteractionLocked(
+            bool locked
+        )
+        {
+            interactionLocked = locked;
+
+            if (locked)
+            {
+                CancelCurrentDrag();
+            }
+        }
+
         public bool TryGetDraggedCard(
             out CardInstance card
         )
@@ -66,6 +83,12 @@ namespace Catalyst.UI.Presentation.Hand
             bool isAvailable
         )
         {
+
+            if (interactionLocked)
+            {
+                interactionOutline?.SetActive(false);
+                return;
+            }
             if (interactionOutline == null)
             {
                 return;
@@ -85,6 +108,11 @@ namespace Catalyst.UI.Presentation.Hand
             CardDragOrigin origin
         )
         {
+            if (interactionLocked)
+            {
+                return;
+            }
+
             if (sourceCardView == null)
             {
                 throw new ArgumentNullException(
@@ -139,6 +167,11 @@ namespace Catalyst.UI.Presentation.Hand
             PointerEventData eventData
         )
         {
+
+            if (interactionLocked)
+            {
+                return;
+            }
             if (sourceCardView == null)
             {
                 throw new ArgumentNullException(

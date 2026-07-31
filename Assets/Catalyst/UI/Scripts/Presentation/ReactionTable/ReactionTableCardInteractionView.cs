@@ -30,6 +30,34 @@ namespace Catalyst.UI.Presentation.ReactionTable
 
         private bool dragStarted;
 
+        private bool interactionLocked;
+
+        public void SetInteractionLocked(
+            bool locked
+        )
+        {
+            interactionLocked = locked;
+
+            if (!locked)
+            {
+                return;
+            }
+
+            dragStarted = false;
+
+            if (dragPresenter != null)
+            {
+                dragPresenter.CancelDrag(
+                    cardView
+                );
+            }
+
+            if (selectionOutline != null)
+            {
+                selectionOutline.SetActive(false);
+            }
+        }
+
         public bool IsInitialized =>
             inspectionPresenter != null
             && dragPresenter != null;
@@ -54,12 +82,17 @@ namespace Catalyst.UI.Presentation.ReactionTable
             PointerEventData eventData
         )
         {
+
             if (dragStarted)
             {
                 return;
             }
 
             ValidateReferences();
+            if (interactionLocked)
+            {
+                return;
+            }
 
             if (!cardView.HasBoundCard)
             {
@@ -79,6 +112,10 @@ namespace Catalyst.UI.Presentation.ReactionTable
             PointerEventData eventData
         )
         {
+            if (interactionLocked)
+            {
+                return;
+            }
             ValidateReferences();
 
             if (!cardView.HasBoundCard)
@@ -101,6 +138,10 @@ namespace Catalyst.UI.Presentation.ReactionTable
             PointerEventData eventData
         )
         {
+            if (interactionLocked)
+            {
+                return;
+            }
             if (!dragStarted)
             {
                 return;

@@ -46,6 +46,8 @@ namespace Catalyst.UI.Presentation.ReactionTable
         public int VisualCapacity =>
             cardViews?.Length ?? 0;
 
+        private bool interactionLocked;
+
         private void Start()
         {
             InitializeInteractionViews();
@@ -137,6 +139,9 @@ namespace Catalyst.UI.Presentation.ReactionTable
                 interactionViews[index].Initialize(
                     inspectionPresenter,
                     dragPresenter
+                );
+                interactionViews[index].SetInteractionLocked(
+                    interactionLocked
                 );
             }
         }
@@ -307,6 +312,32 @@ namespace Catalyst.UI.Presentation.ReactionTable
                         "interaction view at indices " +
                         $"{index} and {comparisonIndex}."
                     );
+                }
+            }
+        }
+        public void SetInteractionLocked(
+    bool locked
+)
+        {
+            interactionLocked = locked;
+
+            if (interactionViews == null)
+            {
+                return;
+            }
+
+            foreach (
+                ReactionTableCardInteractionView
+                    interactionView
+                in interactionViews
+            )
+            {
+                if (interactionView != null)
+                {
+                    interactionView
+                        .SetInteractionLocked(
+                            locked
+                        );
                 }
             }
         }

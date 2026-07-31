@@ -93,6 +93,28 @@ namespace Catalyst.UI.Presentation.ReactionTable
             private set;
         }
 
+        private bool interactionLocked;
+
+        public bool InteractionLocked =>
+            interactionLocked;
+
+        public void SetInteractionLocked(
+            bool locked
+        )
+        {
+            interactionLocked = locked;
+
+            if (locked)
+            {
+                reactionButton.interactable = false;
+                reactionButtonVisual.SetInactive();
+            }
+            else
+            {
+                Refresh();
+            }
+        }
+
         private void Start()
         {
             Refresh();
@@ -143,6 +165,10 @@ namespace Catalyst.UI.Presentation.ReactionTable
         )
         {
             ValidateReferences();
+            if (interactionLocked)
+            {
+                return;
+            }
 
             if (
                 resource
@@ -587,13 +613,16 @@ namespace Catalyst.UI.Presentation.ReactionTable
         }
 
         private void PresentReactionButton(
-            bool canReact
-        )
+    bool canReact
+)
         {
-            reactionButton.interactable =
-                canReact;
+            bool shouldEnable =
+                canReact && !interactionLocked;
 
-            if (canReact)
+            reactionButton.interactable =
+                shouldEnable;
+
+            if (shouldEnable)
             {
                 reactionButtonVisual.SetActive();
             }

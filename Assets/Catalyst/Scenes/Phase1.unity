@@ -3050,6 +3050,21 @@ MonoBehaviour:
   countersPresenter: {fileID: 2071323672}
   reactionButton: {fileID: 1696283744}
   tableAnimationOverlay: {fileID: 1198010423}
+  dragPresenter: {fileID: 1514875159}
+  handPresenter: {fileID: 1845664308}
+  reactionTableDropArea: {fileID: 8360304083609516398}
+  handDropArea: {fileID: 1845664310}
+--- !u!114 &8360304083609516398 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5383821226951129609, guid: 9f69a5214e6ffb546a47060a7f060801, type: 3}
+  m_PrefabInstance: {fileID: 8360304083609516394}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 073c2048f480c10409c00d19f86f94f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

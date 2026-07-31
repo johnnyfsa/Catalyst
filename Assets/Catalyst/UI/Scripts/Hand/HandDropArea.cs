@@ -40,11 +40,31 @@ namespace Catalyst.UI.Presentation.Hand
             movementService =
                 new CardMovementService();
 
-        public void OnPointerEnter(
-            PointerEventData eventData
+        private bool interactionLocked;
+
+        public void SetInteractionLocked(
+            bool locked
         )
         {
+            interactionLocked = locked;
+
+            if (dragPresenter != null)
+            {
+                dragPresenter.SetInteractionAvailable(false);
+            }
+        }
+
+        public void OnPointerEnter(
+    PointerEventData eventData
+)
+        {
             ValidateReferences();
+
+            if (interactionLocked)
+            {
+                dragPresenter.SetInteractionAvailable(false);
+                return;
+            }
 
             bool isCardComingFromReactionTable =
                 dragPresenter.IsDraggingFrom(
@@ -75,6 +95,10 @@ namespace Catalyst.UI.Presentation.Hand
             ValidateReferences();
 
             dragPresenter.SetInteractionAvailable(false);
+            if (interactionLocked)
+            {
+                return;
+            }
 
             if (!dragPresenter.IsDraggingFrom(
                     CardDragOrigin.ReactionTable

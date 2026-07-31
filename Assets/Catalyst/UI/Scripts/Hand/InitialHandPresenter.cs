@@ -30,6 +30,8 @@ namespace Catalyst.UI.Presentation.Hand
         private HandCardView[] cardViews =
             Array.Empty<HandCardView>();
 
+        private bool interactionLocked;
+
         private void Start()
         {
             PresentInitialHand();
@@ -84,6 +86,9 @@ namespace Catalyst.UI.Presentation.Hand
                 interactionView.Initialize(
                     inspectionPresenter,
                     dragPresenter
+                );
+                interactionView.SetInteractionLocked(
+                    interactionLocked
                 );
 
                 if (index < session.Hand.Cards.Count)
@@ -167,6 +172,41 @@ namespace Catalyst.UI.Presentation.Hand
                             $"{index} and {comparisonIndex}."
                         );
                     }
+                }
+            }
+        }
+        public void SetInteractionLocked(
+    bool locked
+)
+        {
+            interactionLocked = locked;
+
+            if (cardViews == null)
+            {
+                return;
+            }
+
+            foreach (
+                HandCardView cardView
+                in cardViews
+            )
+            {
+                if (cardView == null)
+                {
+                    continue;
+                }
+
+                HandCardInteractionView interactionView =
+                    cardView.GetComponent<
+                        HandCardInteractionView
+                    >();
+
+                if (interactionView != null)
+                {
+                    interactionView
+                        .SetInteractionLocked(
+                            locked
+                        );
                 }
             }
         }

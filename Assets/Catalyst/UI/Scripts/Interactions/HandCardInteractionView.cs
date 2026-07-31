@@ -25,6 +25,34 @@ namespace Catalyst.UI.Presentation.Hand
         private HandCardDragPresenter dragPresenter;
         private bool dragStarted;
 
+        private bool interactionLocked;
+
+        public void SetInteractionLocked(
+            bool locked
+        )
+        {
+            interactionLocked = locked;
+
+            if (!locked)
+            {
+                return;
+            }
+
+            dragStarted = false;
+
+            if (dragPresenter != null)
+            {
+                dragPresenter.CancelDrag(
+                    handCardView
+                );
+            }
+
+            if (selectionOutline != null)
+            {
+                selectionOutline.SetActive(false);
+            }
+        }
+
         public bool IsInitialized =>
             inspectionPresenter != null
             && dragPresenter != null;
@@ -49,12 +77,18 @@ namespace Catalyst.UI.Presentation.Hand
             PointerEventData eventData
         )
         {
+
             if (dragStarted)
             {
                 return;
             }
 
             ValidateReferences();
+
+            if (interactionLocked)
+            {
+                return;
+            }
 
             if (!handCardView.HasBoundCard)
             {
@@ -74,6 +108,10 @@ namespace Catalyst.UI.Presentation.Hand
             PointerEventData eventData
         )
         {
+            if (interactionLocked)
+            {
+                return;
+            }
             ValidateReferences();
 
             if (!handCardView.HasBoundCard)
@@ -96,6 +134,10 @@ namespace Catalyst.UI.Presentation.Hand
             PointerEventData eventData
         )
         {
+            if (interactionLocked)
+            {
+                return;
+            }
             if (!dragStarted)
             {
                 return;

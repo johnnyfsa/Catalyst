@@ -39,10 +39,29 @@ namespace Catalyst.UI.Presentation.ReactionTable
             movementService =
                 new CardMovementService();
 
+        private bool interactionLocked;
+
+        public void SetInteractionLocked(
+            bool locked
+        )
+        {
+            interactionLocked = locked;
+
+            if (dragPresenter != null)
+            {
+                dragPresenter
+                    .SetInteractionAvailable(false);
+            }
+        }
+
         public void OnPointerEnter(
             PointerEventData eventData
         )
         {
+            if (interactionLocked)
+            {
+                return;
+            }
             if (!dragPresenter.IsDragging)
             {
                 return;
@@ -68,8 +87,15 @@ namespace Catalyst.UI.Presentation.ReactionTable
             PointerEventData eventData
         )
         {
-            ValidateReferences();
 
+            ValidateReferences();
+            if (interactionLocked)
+            {
+                dragPresenter
+                    .SetInteractionAvailable(false);
+
+                return;
+            }
             dragPresenter.SetInteractionAvailable(false);
 
             if (!dragPresenter.TryGetDraggedCard(

@@ -2,6 +2,7 @@ using System;
 using Catalyst.Game.Bootstrap;
 using Catalyst.Reactions.Definitions;
 using Catalyst.Reactions.Runtime.Resolution;
+using Catalyst.UI.Presentation.Hand;
 using Catalyst.UI.Presentation.Session;
 using UnityEngine;
 using UnityEngine.UI;
@@ -37,6 +38,19 @@ namespace Catalyst.UI.Presentation.ReactionTable
         [SerializeField]
         private TableAnimationOverlayView
             tableAnimationOverlay;
+        [Header("Interaction Lock")]
+        [SerializeField]
+        private HandCardDragPresenter dragPresenter;
+
+        [SerializeField]
+        private InitialHandPresenter handPresenter;
+
+        [SerializeField]
+        private ReactionTableDropArea
+            reactionTableDropArea;
+
+        [SerializeField]
+        private HandDropArea handDropArea;
 
         private bool isExecuting;
 
@@ -80,6 +94,10 @@ namespace Catalyst.UI.Presentation.ReactionTable
                 tableAnimationOverlay
                     .SequenceCompleted -=
                         HandleSequenceCompleted;
+            }
+            if (isExecuting)
+            {
+                SetInteractionsLocked(false);
             }
 
             pendingReaction = null;
@@ -134,7 +152,7 @@ namespace Catalyst.UI.Presentation.ReactionTable
             pendingReaction = resolvedReaction;
             isExecuting = true;
 
-            reactionButton.interactable = false;
+            SetInteractionsLocked(true);
 
             tableAnimationOverlay.PlayFadeIn();
         }
@@ -217,9 +235,8 @@ namespace Catalyst.UI.Presentation.ReactionTable
             pendingReaction = null;
             isExecuting = false;
 
-            reactionAvailabilityPresenter.Refresh();
+            SetInteractionsLocked(false);
         }
-
         private void RefreshAffectedPresenters()
         {
             reactionTablePresenter.Refresh();
@@ -289,6 +306,65 @@ namespace Catalyst.UI.Presentation.ReactionTable
                     "assigned."
                 );
             }
+            if (handPresenter == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(ReactionExecutionPresenter)} " +
+                    $"on '{name}' has no " +
+                    $"{nameof(HandCardDragPresenter)} " +
+                    "assigned."
+                );
+            }
+            if (reactionTableDropArea == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(ReactionExecutionPresenter)} " +
+                    $"on '{name}' has no " +
+                    $"{nameof(ReactionTableDropArea)} " +
+                    "assigned."
+                );
+            }
+
+            if (handDropArea == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(ReactionExecutionPresenter)} " +
+                    $"on '{name}' has no " +
+                    $"{nameof(HandDropArea)} " +
+                    "assigned."
+                );
+            }
+        }
+        private void SetInteractionsLocked(
+    bool locked
+)
+        {
+            dragPresenter.SetInteractionLocked(
+                locked
+            );
+
+            handPresenter.SetInteractionLocked(
+                locked
+            );
+
+            reactionTablePresenter
+                .SetInteractionLocked(
+                    locked
+                );
+
+            reactionTableDropArea
+                .SetInteractionLocked(
+                    locked
+                );
+
+            handDropArea.SetInteractionLocked(
+                locked
+            );
+
+            reactionAvailabilityPresenter
+                .SetInteractionLocked(
+                    locked
+                );
         }
     }
 }
