@@ -11,13 +11,11 @@ namespace Catalyst.UI.Presentation.ReactionTable
 
         public void PlayFadeIn()
         {
-            animator.ResetTrigger(HideTrigger);
             animator.SetTrigger(ShowTrigger);
         }
 
         public void PlayFadeOut()
         {
-            animator.ResetTrigger(ShowTrigger);
             animator.SetTrigger(HideTrigger);
         }
     }

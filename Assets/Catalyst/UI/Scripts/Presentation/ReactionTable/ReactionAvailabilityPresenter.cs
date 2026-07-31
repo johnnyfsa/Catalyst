@@ -281,7 +281,7 @@ namespace Catalyst.UI.Presentation.ReactionTable
                 return;
             }
 
-            PresentAmbiguousReactions();
+            PresentMultipleCandidates();
         }
 
         private void PresentNoMatch()
@@ -810,6 +810,54 @@ namespace Catalyst.UI.Presentation.ReactionTable
                     $"{nameof(ActionButtonVisual)} assigned."
                 );
             }
+        }
+        private bool CanExecuteCandidate(ReactionDefinition reaction)
+        {
+            return reaction != null
+                && HasEnoughResources(reaction);
+        }
+
+        private void PresentMultipleCandidates()
+        {
+            ReactionDefinition onlyExecutableReaction =
+                FindOnlyExecutableCandidate();
+
+            if (onlyExecutableReaction != null)
+            {
+                PresentSingleReaction(
+                    onlyExecutableReaction
+                );
+
+                return;
+            }
+
+            PresentAmbiguousReactions();
+        }
+
+        private ReactionDefinition
+    FindOnlyExecutableCandidate()
+        {
+            ReactionDefinition result = null;
+
+            foreach (
+                ReactionDefinition candidate
+                in candidateReactions
+            )
+            {
+                if (!HasEnoughResources(candidate))
+                {
+                    continue;
+                }
+
+                if (result != null)
+                {
+                    return null;
+                }
+
+                result = candidate;
+            }
+
+            return result;
         }
     }
 }

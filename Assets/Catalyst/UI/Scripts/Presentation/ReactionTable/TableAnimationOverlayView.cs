@@ -24,7 +24,10 @@ namespace Catalyst.UI.Presentation.ReactionTable
         {
             animator.ResetTrigger(ShowTrigger);
             animator.SetTrigger(HideTrigger);
-
+            Debug.Log(
+        "TableAnimationOverlayView: PlayFadeOut",
+        this
+    );
             screenReactionFlashView.PlayFadeOut();
         }
 
@@ -37,6 +40,10 @@ namespace Catalyst.UI.Presentation.ReactionTable
         // Chamado por Animation Event no final do FadeIn da mesa.
         public void OnReactionMoment()
         {
+            Debug.Log(
+        "TableAnimationOverlayView: OnReactionMoment",
+        this
+    );
             ReactionMomentReached?.Invoke();
         }
 

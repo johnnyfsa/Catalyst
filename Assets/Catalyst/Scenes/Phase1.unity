@@ -1293,6 +1293,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d74e7b7b5135634e84cecf17c4c6227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1343902706 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8877526219998712749, guid: 9f69a5214e6ffb546a47060a7f060801, type: 3}
+  m_PrefabInstance: {fileID: 8360304083609516394}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1358788688 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5106835110045940224, guid: 401366a84816a8d48ba9986e4739c852, type: 3}
@@ -1994,7 +1999,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8969434421485094744, guid: 9f69a5214e6ffb546a47060a7f060801, type: 3}
   m_PrefabInstance: {fileID: 8360304083609516394}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1343902706}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 144c4fb6e75e7f8488b8855b324b4eed, type: 3}
@@ -2023,6 +2028,29 @@ MonoBehaviour:
   objectiveTitle: PRODUCE WATER
   objectiveDescription: Deliver water to the reservoir.
   objectiveIcon: {fileID: 21300000, guid: 33bc8eb9406b74f43a325ac9b87b0ad5, type: 3}
+--- !u!1 &2071323671 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6554821334030494625, guid: 6a449979bdfa1704abe590ffebafeacb, type: 3}
+  m_PrefabInstance: {fileID: 7082587666754683605}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2071323672
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2071323671}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15ac89736b4fd1e4a96159bae1f2d66c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bootstrap: {fileID: 845730860}
+  remainingCardsAmountText: {fileID: 8242911459284613204}
+  heatView: {fileID: 7082587666754683606}
+  heatStyle: {fileID: 11400000, guid: 90653fcfe596cfd41b2d2570b4f68185, type: 2}
+  electricityView: {fileID: 7082587666754683607}
+  electricityStyle: {fileID: 11400000, guid: 66387931167932d4eb5f0e223291718d, type: 2}
 --- !u!1001 &1124185822212047759
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2515,7 +2543,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6554821334030494625, guid: 6a449979bdfa1704abe590ffebafeacb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2071323672}
   m_SourcePrefab: {fileID: 100100000, guid: 6a449979bdfa1704abe590ffebafeacb, type: 3}
 --- !u!114 &7082587666754683606 stripped
 MonoBehaviour:
@@ -2978,6 +3009,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8877526219998712749, guid: 9f69a5214e6ffb546a47060a7f060801, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8360304083609516397}
     - targetCorrespondingSourceObject: {fileID: 6361652589259120360, guid: 9f69a5214e6ffb546a47060a7f060801, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1198010423}
@@ -2992,12 +3026,30 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1879507844358730358, guid: 9f69a5214e6ffb546a47060a7f060801, type: 3}
   m_PrefabInstance: {fileID: 8360304083609516394}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1343902706}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c886d23c16648fd46ac13ba3d7269dd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8360304083609516397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1343902706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfb23b675043eb54199acab912eddead, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bootstrap: {fileID: 845730860}
+  reactionAvailabilityPresenter: {fileID: 8360304083609516396}
+  reactionTablePresenter: {fileID: 1902360159}
+  countersPresenter: {fileID: 2071323672}
+  reactionButton: {fileID: 1696283744}
+  tableAnimationOverlay: {fileID: 1198010423}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
