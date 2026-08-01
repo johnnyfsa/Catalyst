@@ -608,60 +608,6 @@ MonoBehaviour:
   blendDistance: 0
   weight: 1
   priority: 0
---- !u!1 &539684802
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 539684803}
-  - component: {fileID: 539684804}
-  m_Layer: 5
-  m_Name: InitialSessionCountersPresenter
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &539684803
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 539684802}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1478294329}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &539684804
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 539684802}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15ac89736b4fd1e4a96159bae1f2d66c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bootstrap: {fileID: 845730860}
-  remainingCardsAmountText: {fileID: 8242911459284613204}
-  heatView: {fileID: 7082587666754683606}
-  heatStyle: {fileID: 11400000, guid: 90653fcfe596cfd41b2d2570b4f68185, type: 2}
-  electricityView: {fileID: 7082587666754683607}
-  electricityStyle: {fileID: 11400000, guid: 66387931167932d4eb5f0e223291718d, type: 2}
 --- !u!1 &561407177
 GameObject:
   m_ObjectHideFlags: 0
@@ -788,6 +734,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1671128848557410719, guid: d5b900a70cc79d940b4ae63ca35354c3, type: 3}
   m_PrefabInstance: {fileID: 2881029096314295111}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &722848472 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5571606804468627953, guid: d5b900a70cc79d940b4ae63ca35354c3, type: 3}
+  m_PrefabInstance: {fileID: 2881029096314295111}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 722848470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ca66a55cd390fd49b6444f065f300b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &802350430 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7864649015511142802, guid: 5b5fe92dc6d03d54bbe68ba1b7977c95, type: 3}
@@ -912,7 +869,7 @@ MonoBehaviour:
   - acceptedDefinition: {fileID: 11400000, guid: 62de5a9c413b6d742bb3412a315930e5, type: 2}
     requiredAmount: 8
   useTurnLimit: 1
-  maximumTurns: 12
+  maximumTurns: 3
   randomSeed: 12345
 --- !u!4 &845730861
 Transform:
@@ -1084,6 +1041,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 992162953}
   m_CullTransparentMesh: 1
+--- !u!1 &1051303748 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1766212435337763376, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
+  m_PrefabInstance: {fileID: 1390104844}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1067868982
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1550,7 +1512,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1766212435337763376, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1857564778}
   m_SourcePrefab: {fileID: 100100000, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
 --- !u!224 &1390104845 stripped
 RectTransform:
@@ -1619,6 +1584,7 @@ MonoBehaviour:
   handPresenter: {fileID: 1845664308}
   reactionTablePresenter: {fileID: 1902360159}
   reactionAvailabilityPresenter: {fileID: 8360304083609516396}
+  turnActionButtonPresenter: {fileID: 1857564778}
 --- !u!1 &1478294325
 GameObject:
   m_ObjectHideFlags: 0
@@ -1713,7 +1679,6 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 539684803}
   - {fileID: 992162954}
   - {fileID: 509137029}
   - {fileID: 561407178}
@@ -2052,6 +2017,49 @@ MonoBehaviour:
   handPresenter: {fileID: 1845664308}
   reactionTablePresenter: {fileID: 1902360159}
   reactionAvailabilityPresenter: {fileID: 8360304083609516396}
+--- !u!114 &1857564778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051303748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0a2ec4f70560454785ed03be068b750, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bootstrap: {fileID: 845730860}
+  turnButton: {fileID: 1857564780}
+  buttonVisual: {fileID: 1857564779}
+  handPresenter: {fileID: 1845664308}
+  countersPresenter: {fileID: 2071323672}
+  reactionTablePresenter: {fileID: 1902360159}
+  reactionAvailabilityPresenter: {fileID: 8360304083609516396}
+  turnCounterPresenter: {fileID: 1997688600}
+  remainingTurnsPresenter: {fileID: 722848472}
+--- !u!114 &1857564779 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6608150633632876131, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
+  m_PrefabInstance: {fileID: 1390104844}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051303748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b1b5218812ea9642b199aa314c7bf1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1857564780 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8670266212844930249, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
+  m_PrefabInstance: {fileID: 1390104844}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051303748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1880261918 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 511969427906627001, guid: d5b900a70cc79d940b4ae63ca35354c3, type: 3}
@@ -2097,6 +2105,17 @@ MonoBehaviour:
   objectiveTitle: PRODUCE WATER
   objectiveDescription: Deliver water to the reservoir.
   objectiveIcon: {fileID: 21300000, guid: 33bc8eb9406b74f43a325ac9b87b0ad5, type: 3}
+--- !u!114 &1997688600 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1824156564582512257, guid: c08f24c59220d19419ff95b2abd04a5e, type: 3}
+  m_PrefabInstance: {fileID: 88809067}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9728ca572a07df49a8afae7690a9a18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2071323671 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6554821334030494625, guid: 6a449979bdfa1704abe590ffebafeacb, type: 3}
@@ -3124,6 +3143,7 @@ MonoBehaviour:
   reactionTableDropArea: {fileID: 8360304083609516398}
   handDropArea: {fileID: 1845664310}
   discardDropArea: {fileID: 1465631010}
+  turnActionButtonPresenter: {fileID: 1857564778}
 --- !u!114 &8360304083609516398 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5383821226951129609, guid: 9f69a5214e6ffb546a47060a7f060801, type: 3}

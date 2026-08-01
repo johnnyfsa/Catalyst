@@ -80,14 +80,6 @@ namespace Catalyst.Cards.Runtime.Session
                     session.Hand
                 );
 
-            if (result.Outcome ==
-                DrawPhaseOutcome.DeckOut)
-            {
-                session.End(
-                    GameSessionEndReason.DeckOut
-                );
-            }
-
             session.ValidateState();
 
             return result;

@@ -148,7 +148,12 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
 
             Assert.That(
                 nextDraw.Outcome,
-                Is.EqualTo(DrawPhaseOutcome.CardDrawn)
+                Is.EqualTo(DrawPhaseOutcome.HandFull)
+            );
+
+            Assert.That(
+                nextDraw.DrawnCardCount,
+                Is.EqualTo(1)
             );
 
             Assert.That(hand.Count, Is.EqualTo(2));

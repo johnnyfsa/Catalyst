@@ -4,6 +4,7 @@ using Catalyst.Cards.Runtime.Turn;
 using Catalyst.Game.Bootstrap;
 using Catalyst.UI.Presentation.Hand;
 using Catalyst.UI.Presentation.ReactionTable;
+using Catalyst.UI.Presentation.Session;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,6 +27,10 @@ namespace Catalyst.UI.Presentation.Turn
         [Header("Visual Refresh")]
         [SerializeField]
         private InitialHandPresenter handPresenter;
+
+        [SerializeField]
+        private InitialSessionCountersPresenter
+            countersPresenter;
 
         [SerializeField]
         private ReactionTablePresenter
@@ -144,7 +149,55 @@ namespace Catalyst.UI.Presentation.Turn
                 return;
             }
 
+            ResolveStartedDrawPhase(
+                session
+            );
+
             RefreshAfterSuccess();
+        }
+
+        private void ResolveStartedDrawPhase(
+            GameSession session
+        )
+        {
+            if (!session.IsRunning)
+            {
+                return;
+            }
+
+            if (
+                session.Turn.CurrentPhase
+                != GamePhase.Draw
+            )
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(TurnActionButtonPresenter)} " +
+                    $"on '{name}' expected a successful turn " +
+                    "advance to leave the running session in " +
+                    $"the Draw phase, but found " +
+                    $"'{session.Turn.CurrentPhase}'."
+                );
+            }
+
+            DrawPhaseResult drawResult =
+                bootstrap.SessionFlow
+                    .ResolveDrawPhase(
+                        session
+                    );
+
+            if (
+                drawResult.Outcome
+                == DrawPhaseOutcome.DeckOut
+            )
+            {
+                Debug.LogWarning(
+                    $"{nameof(TurnActionButtonPresenter)} " +
+                    $"on '{name}' resolved the new Draw phase " +
+                    "with DeckOut after drawing " +
+                    $"{drawResult.DrawnCardCount} card(s).",
+                    this
+                );
+            }
         }
 
         private bool CanAdvanceTurn()
@@ -190,6 +243,9 @@ namespace Catalyst.UI.Presentation.Turn
         private void RefreshAfterSuccess()
         {
             handPresenter.PresentInitialHand();
+
+            countersPresenter
+                .PresentInitialCounters();
 
             reactionTablePresenter.Refresh();
 
@@ -238,6 +294,16 @@ namespace Catalyst.UI.Presentation.Turn
                     $"{nameof(TurnActionButtonPresenter)} " +
                     $"on '{name}' has no " +
                     $"{nameof(InitialHandPresenter)} assigned."
+                );
+            }
+
+            if (countersPresenter == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(TurnActionButtonPresenter)} " +
+                    $"on '{name}' has no " +
+                    $"{nameof(InitialSessionCountersPresenter)} " +
+                    "assigned."
                 );
             }
 

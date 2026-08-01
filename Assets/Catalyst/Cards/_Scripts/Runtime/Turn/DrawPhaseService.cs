@@ -26,17 +26,23 @@ namespace Catalyst.Cards.Runtime.Turn
         {
             if (turn == null)
             {
-                throw new ArgumentNullException(nameof(turn));
+                throw new ArgumentNullException(
+                    nameof(turn)
+                );
             }
 
             if (deck == null)
             {
-                throw new ArgumentNullException(nameof(deck));
+                throw new ArgumentNullException(
+                    nameof(deck)
+                );
             }
 
             if (hand == null)
             {
-                throw new ArgumentNullException(nameof(hand));
+                throw new ArgumentNullException(
+                    nameof(hand)
+                );
             }
 
             if (!turn.HasStarted)
@@ -53,31 +59,61 @@ namespace Catalyst.Cards.Runtime.Turn
                 );
             }
 
-            CardDrawResult drawResult =
-                drawService.TryDraw(deck, hand);
+            int drawnCardCount = 0;
 
-            switch (drawResult.Failure)
+            while (!hand.IsFull)
             {
-                case CardDrawFailure.None:
-                    turn.AdvancePhase();
-
-                    return DrawPhaseResult.CardDrawn(
-                        drawResult.DrawnCard
+                CardDrawResult drawResult =
+                    drawService.TryDraw(
+                        deck,
+                        hand
                     );
 
-                case CardDrawFailure.HandFull:
-                    turn.AdvancePhase();
+                switch (drawResult.Failure)
+                {
+                    case CardDrawFailure.None:
+                        drawnCardCount++;
+                        break;
 
-                    return DrawPhaseResult.HandFull();
+                    case CardDrawFailure.DeckEmpty:
+                        return DrawPhaseResult.DeckOut(
+                            drawnCardCount
+                        );
 
-                case CardDrawFailure.DeckEmpty:
-                    return DrawPhaseResult.DeckOut();
+                    case CardDrawFailure.HandFull:
+                        /*
+                         * Defensive handling.
+                         *
+                         * The while condition should normally
+                         * prevent this result, but the service
+                         * still treats it as successful phase
+                         * completion if the hand reports full.
+                         */
+                        if (!hand.IsFull)
+                        {
+                            throw new InvalidOperationException(
+                                "The card draw service reported a full hand, but the hand runtime is not full."
+                            );
+                        }
 
-                default:
-                    throw new InvalidOperationException(
-                        $"The draw phase failed unexpectedly with '{drawResult.Failure}'."
-                    );
+                        turn.AdvancePhase();
+
+                        return DrawPhaseResult.HandFull(
+                            drawnCardCount
+                        );
+
+                    default:
+                        throw new InvalidOperationException(
+                            $"The draw phase failed unexpectedly with '{drawResult.Failure}'."
+                        );
+                }
             }
+
+            turn.AdvancePhase();
+
+            return DrawPhaseResult.HandFull(
+                drawnCardCount
+            );
         }
     }
 }
