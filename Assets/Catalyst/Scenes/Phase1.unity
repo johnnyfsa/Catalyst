@@ -869,7 +869,7 @@ MonoBehaviour:
   - acceptedDefinition: {fileID: 11400000, guid: 62de5a9c413b6d742bb3412a315930e5, type: 2}
     requiredAmount: 8
   useTurnLimit: 1
-  maximumTurns: 3
+  maximumTurns: 12
   randomSeed: 12345
 --- !u!4 &845730861
 Transform:
