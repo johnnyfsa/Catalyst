@@ -4,6 +4,7 @@ using Catalyst.Reactions.Definitions;
 using Catalyst.Reactions.Runtime.Resolution;
 using Catalyst.UI.Presentation.Hand;
 using Catalyst.UI.Presentation.Session;
+using Catalyst.UI.Presentation.Discard;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -51,6 +52,9 @@ namespace Catalyst.UI.Presentation.ReactionTable
 
         [SerializeField]
         private HandDropArea handDropArea;
+
+        [SerializeField]
+        private DiscardDropArea discardDropArea;
 
         private bool isExecuting;
 
@@ -306,12 +310,22 @@ namespace Catalyst.UI.Presentation.ReactionTable
                     "assigned."
                 );
             }
-            if (handPresenter == null)
+            if (dragPresenter == null)
             {
                 throw new InvalidOperationException(
                     $"{nameof(ReactionExecutionPresenter)} " +
                     $"on '{name}' has no " +
                     $"{nameof(HandCardDragPresenter)} " +
+                    "assigned."
+                );
+            }
+
+            if (handPresenter == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(ReactionExecutionPresenter)} " +
+                    $"on '{name}' has no " +
+                    $"{nameof(InitialHandPresenter)} " +
                     "assigned."
                 );
             }
@@ -332,6 +346,14 @@ namespace Catalyst.UI.Presentation.ReactionTable
                     $"on '{name}' has no " +
                     $"{nameof(HandDropArea)} " +
                     "assigned."
+                );
+            }
+            if (discardDropArea == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(ReactionExecutionPresenter)} " +
+                    $"on '{name}' has no " +
+                    $"{nameof(DiscardDropArea)} assigned."
                 );
             }
         }
@@ -358,6 +380,10 @@ namespace Catalyst.UI.Presentation.ReactionTable
                 );
 
             handDropArea.SetInteractionLocked(
+                locked
+            );
+
+            discardDropArea.SetInteractionLocked(
                 locked
             );
 

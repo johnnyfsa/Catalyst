@@ -23,6 +23,18 @@ namespace Catalyst.UI.Presentation.Hand
         [SerializeField]
         private GameObject interactionOutline;
 
+        [Header("Drag Proxy Appearance")]
+        [SerializeField]
+        private CanvasGroup dragProxyCanvasGroup;
+
+        [SerializeField]
+        [Range(0f, 1f)]
+        private float defaultProxyAlpha = 1f;
+
+        [SerializeField]
+        [Range(0f, 1f)]
+        private float discardHoverProxyAlpha = 0.35f;
+
         private HandCardView draggedCardView;
 
         private CardDragOrigin dragOrigin =
@@ -102,6 +114,21 @@ namespace Catalyst.UI.Presentation.Hand
             );
         }
 
+        public void SetDiscardHoverVisual(
+    bool isHoveringDiscard
+)
+        {
+            if (dragProxyCanvasGroup == null)
+            {
+                return;
+            }
+
+            dragProxyCanvasGroup.alpha =
+                isHoveringDiscard
+                    ? discardHoverProxyAlpha
+                    : defaultProxyAlpha;
+        }
+
         public void BeginDrag(
             HandCardView sourceCardView,
             PointerEventData eventData,
@@ -154,6 +181,12 @@ namespace Catalyst.UI.Presentation.Hand
             dragProxyTransform.gameObject.SetActive(
                 true
             );
+
+            if (dragProxyCanvasGroup != null)
+            {
+                dragProxyCanvasGroup.alpha =
+                    defaultProxyAlpha;
+            }
 
             interactionOutline.SetActive(false);
 
@@ -345,6 +378,14 @@ namespace Catalyst.UI.Presentation.Hand
                     $"{nameof(HandCardDragPresenter)} on '{name}' " +
                     "requires its interaction outline to be " +
                     "inside the drag proxy hierarchy."
+                );
+            }
+
+            if (dragProxyCanvasGroup == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(HandCardDragPresenter)} on '{name}' " +
+                    "has no drag proxy CanvasGroup assigned."
                 );
             }
         }

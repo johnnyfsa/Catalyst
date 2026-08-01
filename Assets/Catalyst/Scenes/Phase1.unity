@@ -267,6 +267,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerBoard
       objectReference: {fileID: 0}
+    - target: {fileID: 4891017769755226582, guid: e87a7d0089f682a42ad08041bd1fad88, type: 3}
+      propertyPath: m_FillAmount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5144314851702020439, guid: e87a7d0089f682a42ad08041bd1fad88, type: 3}
+      propertyPath: readySymbolAlpha
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5544053490037123626, guid: e87a7d0089f682a42ad08041bd1fad88, type: 3}
       propertyPath: bootstrap
       value: 
@@ -366,6 +374,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 472333640583967798, guid: e87a7d0089f682a42ad08041bd1fad88, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1845664310}
+    - targetCorrespondingSourceObject: {fileID: 1016838717986701657, guid: e87a7d0089f682a42ad08041bd1fad88, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1465631010}
   m_SourcePrefab: {fileID: 100100000, guid: e87a7d0089f682a42ad08041bd1fad88, type: 3}
 --- !u!224 &135320454 stripped
 RectTransform:
@@ -403,6 +414,11 @@ MonoBehaviour:
   objectiveDescriptionText: {fileID: 1371325035}
   objectiveProgressText: {fileID: 1358788688}
   objectiveIconImage: {fileID: 838296013}
+--- !u!1 &436892414 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 123620665375978738, guid: f8b18ff1e371ad443a9a07f8a80ff920, type: 3}
+  m_PrefabInstance: {fileID: 1225334136}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &460561813 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2330153187569660725, guid: 5b5fe92dc6d03d54bbe68ba1b7977c95, type: 3}
@@ -424,6 +440,18 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 922840151342744092, guid: 6a449979bdfa1704abe590ffebafeacb, type: 3}
   m_PrefabInstance: {fileID: 7082587666754683605}
   m_PrefabAsset: {fileID: 0}
+--- !u!225 &500271167
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 436892414}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &509137028
 GameObject:
   m_ObjectHideFlags: 0
@@ -1275,7 +1303,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 123620665375978738, guid: f8b18ff1e371ad443a9a07f8a80ff920, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 500271167}
   m_SourcePrefab: {fileID: 100100000, guid: f8b18ff1e371ad443a9a07f8a80ff920, type: 3}
 --- !u!224 &1225334137 stripped
 RectTransform:
@@ -1553,6 +1584,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1465631005 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1016838717986701657, guid: e87a7d0089f682a42ad08041bd1fad88, type: 3}
+  m_PrefabInstance: {fileID: 135320453}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1465631007 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5144314851702020439, guid: e87a7d0089f682a42ad08041bd1fad88, type: 3}
+  m_PrefabInstance: {fileID: 135320453}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1465631005}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76ef27cb616e9a349a3a86316c122bad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1465631010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1465631005}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5205117be5b3bc74db4a5ce08cf09e7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bootstrap: {fileID: 845730860}
+  dragPresenter: {fileID: 1514875159}
+  discardAreaView: {fileID: 1465631007}
+  chargeDuration: 0.75
+  handPresenter: {fileID: 1845664308}
+  reactionTablePresenter: {fileID: 1902360159}
+  reactionAvailabilityPresenter: {fileID: 8360304083609516396}
 --- !u!1 &1478294325
 GameObject:
   m_ObjectHideFlags: 0
@@ -1724,6 +1790,9 @@ MonoBehaviour:
   dragProxyTransform: {fileID: 1225334137}
   dragProxyView: {fileID: 1225334138}
   interactionOutline: {fileID: 193937641}
+  dragProxyCanvasGroup: {fileID: 500271167}
+  defaultProxyAlpha: 1
+  discardHoverProxyAlpha: 0.107
 --- !u!1 &1569808993 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 472333640583967798, guid: e87a7d0089f682a42ad08041bd1fad88, type: 3}
@@ -3054,6 +3123,7 @@ MonoBehaviour:
   handPresenter: {fileID: 1845664308}
   reactionTableDropArea: {fileID: 8360304083609516398}
   handDropArea: {fileID: 1845664310}
+  discardDropArea: {fileID: 1465631010}
 --- !u!114 &8360304083609516398 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5383821226951129609, guid: 9f69a5214e6ffb546a47060a7f060801, type: 3}

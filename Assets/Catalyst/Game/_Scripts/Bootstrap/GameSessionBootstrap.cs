@@ -189,6 +189,16 @@ namespace Catalyst.Game.Bootstrap
                 $"Electricity: {Session.Electricity.Amount}, " +
                 $"Turn limit: {FormatTurnLimit(Session)}"
             );
+            DrawPhaseResult initialDrawResult =
+    SessionFlow.ResolveDrawPhase(
+        Session
+    );
+
+            Debug.Log(
+                $"Initial draw resolved. " +
+                $"Outcome: {initialDrawResult.Outcome}. " +
+                $"Phase: {Session.Turn.CurrentPhase}."
+            );
         }
 
         internal GameSession InitializeFromDeckDefinition(
