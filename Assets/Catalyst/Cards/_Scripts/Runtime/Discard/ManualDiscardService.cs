@@ -20,7 +20,7 @@ namespace Catalyst.Cards.Runtime.Discard
 
         public ManualDiscardResult TryDiscard(
             CardInstance card,
-            HandRuntime hand,
+            CardZoneRuntime source,
             DiscardPileRuntime discardPile
         )
         {
@@ -31,10 +31,10 @@ namespace Catalyst.Cards.Runtime.Discard
                 );
             }
 
-            if (hand == null)
+            if (source == null)
             {
                 return ManualDiscardResult.Fail(
-                    ManualDiscardFailure.NullHand
+                    ManualDiscardFailure.NullSource
                 );
             }
 
@@ -45,17 +45,24 @@ namespace Catalyst.Cards.Runtime.Discard
                 );
             }
 
-            if (!hand.Contains(card))
+            if (!IsSupportedSource(source))
             {
                 return ManualDiscardResult.Fail(
-                    ManualDiscardFailure.CardNotInHand
+                    ManualDiscardFailure.UnsupportedSource
+                );
+            }
+
+            if (!source.Contains(card))
+            {
+                return ManualDiscardResult.Fail(
+                    ManualDiscardFailure.CardNotInSource
                 );
             }
 
             CardMovementResult movementResult =
                 movementService.TryMove(
                     card,
-                    hand,
+                    source,
                     discardPile
                 );
 
@@ -68,6 +75,14 @@ namespace Catalyst.Cards.Runtime.Discard
             }
 
             return ManualDiscardResult.Success(card);
+        }
+
+        private static bool IsSupportedSource(
+            CardZoneRuntime source
+        )
+        {
+            return source is HandRuntime
+                || source is ReactionTableRuntime;
         }
     }
 }

@@ -168,7 +168,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Discard
         }
 
         [Test]
-        public void TryDiscard_WithCardNotInHand_DoesNotChangeZones()
+        public void TryDiscard_WithCardNotInSource_DoesNotChangeZones()
         {
             HandRuntime hand = new HandRuntime();
             DiscardPileRuntime discardPile =
@@ -188,12 +188,106 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Discard
             Assert.That(
                 result.Failure,
                 Is.EqualTo(
-                    ManualDiscardFailure.CardNotInHand
+                    ManualDiscardFailure.CardNotInSource
                 )
             );
 
             Assert.That(hand.IsEmpty, Is.True);
             Assert.That(discardPile.IsEmpty, Is.True);
+        }
+
+        [Test]
+        public void TryDiscard_WithCardInReactionTable_MovesCardToDiscardPile()
+        {
+            ReactionTableRuntime reactionTable =
+                new ReactionTableRuntime();
+
+            DiscardPileRuntime discardPile =
+                new DiscardPileRuntime();
+
+            CardInstance card = CreateCard();
+
+            bool added =
+                reactionTable.TryAdd(card);
+
+            Assert.That(added, Is.True);
+
+            ManualDiscardResult result =
+                discardService.TryDiscard(
+                    card,
+                    reactionTable,
+                    discardPile
+                );
+
+            Assert.That(result.Succeeded, Is.True);
+
+            Assert.That(
+                result.Failure,
+                Is.EqualTo(ManualDiscardFailure.None)
+            );
+
+            Assert.That(
+                result.DiscardedCard,
+                Is.SameAs(card)
+            );
+
+            Assert.That(
+                reactionTable.Contains(card),
+                Is.False
+            );
+
+            Assert.That(
+                reactionTable.IsEmpty,
+                Is.True
+            );
+
+            Assert.That(
+                discardPile.Count,
+                Is.EqualTo(1)
+            );
+
+            Assert.That(
+                discardPile.Cards[0],
+                Is.SameAs(card)
+            );
+        }
+
+        [Test]
+        public void TryDiscard_WithCardNotInReactionTable_DoesNotChangeZones()
+        {
+            ReactionTableRuntime reactionTable =
+                new ReactionTableRuntime();
+
+            DiscardPileRuntime discardPile =
+                new DiscardPileRuntime();
+
+            CardInstance card = CreateCard();
+
+            ManualDiscardResult result =
+                discardService.TryDiscard(
+                    card,
+                    reactionTable,
+                    discardPile
+                );
+
+            Assert.That(result.Succeeded, Is.False);
+
+            Assert.That(
+                result.Failure,
+                Is.EqualTo(
+                    ManualDiscardFailure.CardNotInSource
+                )
+            );
+
+            Assert.That(
+                reactionTable.IsEmpty,
+                Is.True
+            );
+
+            Assert.That(
+                discardPile.IsEmpty,
+                Is.True
+            );
         }
 
         [Test]
@@ -226,7 +320,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Discard
             Assert.That(
                 secondResult.Failure,
                 Is.EqualTo(
-                    ManualDiscardFailure.CardNotInHand
+                    ManualDiscardFailure.CardNotInSource
                 )
             );
 
@@ -252,7 +346,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Discard
         }
 
         [Test]
-        public void TryDiscard_WithNullHand_ReturnsExplicitFailure()
+        public void TryDiscard_WithNullSource_ReturnsExplicitFailure()
         {
             ManualDiscardResult result =
                 discardService.TryDiscard(
@@ -265,8 +359,51 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Discard
 
             Assert.That(
                 result.Failure,
-                Is.EqualTo(ManualDiscardFailure.NullHand)
+                Is.EqualTo(
+                    ManualDiscardFailure.NullSource
+                )
             );
+        }
+
+        [Test]
+        public void TryDiscard_FromReactionTableTwice_SecondAttemptFails()
+        {
+            ReactionTableRuntime reactionTable =
+                new ReactionTableRuntime();
+
+            DiscardPileRuntime discardPile =
+                new DiscardPileRuntime();
+
+            CardInstance card = CreateCard();
+
+            reactionTable.TryAdd(card);
+
+            ManualDiscardResult firstResult =
+                discardService.TryDiscard(
+                    card,
+                    reactionTable,
+                    discardPile
+                );
+
+            ManualDiscardResult secondResult =
+                discardService.TryDiscard(
+                    card,
+                    reactionTable,
+                    discardPile
+                );
+
+            Assert.That(firstResult.Succeeded, Is.True);
+            Assert.That(secondResult.Succeeded, Is.False);
+
+            Assert.That(
+                secondResult.Failure,
+                Is.EqualTo(
+                    ManualDiscardFailure.CardNotInSource
+                )
+            );
+
+            Assert.That(reactionTable.IsEmpty, Is.True);
+            Assert.That(discardPile.Count, Is.EqualTo(1));
         }
 
         [Test]

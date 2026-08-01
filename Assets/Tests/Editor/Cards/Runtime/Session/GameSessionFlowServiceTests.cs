@@ -153,6 +153,194 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
         }
 
         [Test]
+        public void TryDiscard_FromHand_MovesCardToDiscardPile()
+        {
+            GameSession session =
+                CreateRunningSessionInMainPhase();
+
+            CardInstance card =
+                session.Hand.Cards[0];
+
+            int sessionCardCount =
+                session.SessionCards.Count;
+
+            ManualDiscardResult result =
+                flowService.TryDiscard(
+                    session,
+                    card,
+                    session.Hand
+                );
+
+            Assert.That(result.Succeeded, Is.True);
+            Assert.That(session.Hand.Contains(card), Is.False);
+            Assert.That(session.DiscardPile.Contains(card), Is.True);
+
+            Assert.That(
+                session.SessionCards.Count,
+                Is.EqualTo(sessionCardCount)
+            );
+
+            Assert.That(
+                session.ContainsCard(card.InstanceId),
+                Is.True
+            );
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void TryDiscard_FromReactionTable_MovesCardToDiscardPile()
+        {
+            GameSession session =
+                CreateRunningSessionInMainPhase();
+
+            CardInstance card =
+                session.Hand.Cards[0];
+
+            CardMovementResult preparationResult =
+                movementService.TryMove(
+                    card,
+                    session.Hand,
+                    session.ReactionTable
+                );
+
+            Assert.That(
+                preparationResult.Succeeded,
+                Is.True
+            );
+
+            int sessionCardCount =
+                session.SessionCards.Count;
+
+            ManualDiscardResult result =
+                flowService.TryDiscard(
+                    session,
+                    card,
+                    session.ReactionTable
+                );
+
+            Assert.That(result.Succeeded, Is.True);
+
+            Assert.That(
+                session.ReactionTable.Contains(card),
+                Is.False
+            );
+
+            Assert.That(
+                session.DiscardPile.Contains(card),
+                Is.True
+            );
+
+            Assert.That(
+                session.SessionCards.Count,
+                Is.EqualTo(sessionCardCount)
+            );
+
+            Assert.That(
+                session.ContainsCard(card.InstanceId),
+                Is.True
+            );
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void TryDiscard_WithForeignHand_ReturnsExplicitFailure()
+        {
+            GameSession session =
+                CreateRunningSessionInMainPhase();
+
+            HandRuntime foreignHand =
+                new HandRuntime();
+
+            CardInstance card =
+                session.Hand.Cards[0];
+
+            ManualDiscardResult result =
+                flowService.TryDiscard(
+                    session,
+                    card,
+                    foreignHand
+                );
+
+            Assert.That(result.Succeeded, Is.False);
+
+            Assert.That(
+                result.Failure,
+                Is.EqualTo(
+                    ManualDiscardFailure.UnsupportedSource
+                )
+            );
+
+            Assert.That(
+                session.Hand.Contains(card),
+                Is.True
+            );
+
+            Assert.That(
+                session.DiscardPile.IsEmpty,
+                Is.True
+            );
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void TryDiscard_WithCardAbsentFromOwnedSource_FailsWithoutMutation()
+        {
+            GameSession session =
+                CreateRunningSessionInMainPhase();
+
+            CardInstance card =
+                session.Hand.Cards[0];
+
+            ManualDiscardResult result =
+                flowService.TryDiscard(
+                    session,
+                    card,
+                    session.ReactionTable
+                );
+
+            Assert.That(result.Succeeded, Is.False);
+
+            Assert.That(
+                result.Failure,
+                Is.EqualTo(
+                    ManualDiscardFailure.CardNotInSource
+                )
+            );
+
+            Assert.That(
+                session.Hand.Contains(card),
+                Is.True
+            );
+
+            Assert.That(
+                session.ReactionTable.IsEmpty,
+                Is.True
+            );
+
+            Assert.That(
+                session.DiscardPile.IsEmpty,
+                Is.True
+            );
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
         public void TryDeliverCard_WithForeignZone_ReturnsExplicitFailure()
         {
             GameSession session =
@@ -1263,7 +1451,8 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
             ManualDiscardResult discardResult =
                 flowService.TryDiscard(
                     session,
-                    discardedCard
+                    discardedCard,
+                    session.Hand
                 );
 
             Assert.That(discardResult.Succeeded, Is.True);
@@ -1641,7 +1830,8 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
                 ManualDiscardResult discardResult =
                     flowService.TryDiscard(
                         session,
-                        card
+                        card,
+                        session.Hand
                     );
 
                 Assert.That(

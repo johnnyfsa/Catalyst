@@ -115,15 +115,18 @@ namespace Catalyst.Cards.Runtime.Session
             return result;
         }
         /// <summary>
-        /// Attempts to manually discard a card from the hand to the discard pile for the given game session. This can only be done during the main phase. If the session is not running or if it is not the main phase, an exception will be thrown.
+        /// Attempts to manually discard a card from a supported
+        /// session zone to the discard pile. Manual discard is
+        /// only available during the Main phase.
         /// </summary>
         /// <param name="session"></param>
         /// <param name="card"></param>
+        /// <param name="source"></param>
         /// <returns>ManualDiscardResult</returns>
-        /// <exception cref="InvalidOperationException"></exception>
         public ManualDiscardResult TryDiscard(
     GameSession session,
-    CardInstance card
+    CardInstance card,
+    CardZoneRuntime source
 )
         {
             EnsureSessionIsRunning(session);
@@ -136,10 +139,20 @@ namespace Catalyst.Cards.Runtime.Session
                 );
             }
 
+            if (!IsOwnedDiscardSource(
+                    session,
+                    source
+                ))
+            {
+                return ManualDiscardResult.Fail(
+                    ManualDiscardFailure.UnsupportedSource
+                );
+            }
+
             ManualDiscardResult result =
                 manualDiscardService.TryDiscard(
                     card,
-                    session.Hand,
+                    source,
                     session.DiscardPile
                 );
 
@@ -263,6 +276,21 @@ namespace Catalyst.Cards.Runtime.Session
             return session.HasTurnLimit
                 && completedTurnNumber >=
                     session.MaximumTurns.Value;
+        }
+
+        private static bool IsOwnedDiscardSource(
+    GameSession session,
+    CardZoneRuntime source
+)
+        {
+            return ReferenceEquals(
+                    source,
+                    session.Hand
+                )
+                || ReferenceEquals(
+                    source,
+                    session.ReactionTable
+                );
         }
         #endregion
 

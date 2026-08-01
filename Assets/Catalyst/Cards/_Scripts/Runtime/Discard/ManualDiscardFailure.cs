@@ -4,9 +4,10 @@ namespace Catalyst.Cards.Runtime.Discard
     {
         None = 0,
         NullCard = 1,
-        NullHand = 2,
+        NullSource = 2,
         NullDiscardPile = 3,
-        CardNotInHand = 4,
-        MovementFailed = 5
+        CardNotInSource = 4,
+        MovementFailed = 5,
+        UnsupportedSource = 6
     }
 }
