@@ -7,6 +7,7 @@ using Catalyst.UI.Presentation.Hand;
 using Catalyst.UI.Presentation.Interaction;
 using Catalyst.Cards.Runtime.Discard;
 using Catalyst.UI.Presentation.ReactionTable;
+using Catalyst.UI.Presentation.Turn;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -53,6 +54,10 @@ namespace Catalyst.UI.Presentation.Discard
         [SerializeField]
         private ReactionAvailabilityPresenter
             reactionAvailabilityPresenter;
+
+        [SerializeField]
+        private TurnActionButtonPresenter
+        turnActionButtonPresenter;
 
         private CardInstance trackedCard;
 
@@ -419,11 +424,17 @@ namespace Catalyst.UI.Presentation.Discard
                     "assigned."
                 );
             }
+            if (turnActionButtonPresenter == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(DiscardDropArea)} on " +
+                    $"'{name}' has no " +
+                    $"{nameof(TurnActionButtonPresenter)} assigned."
+                );
+            }
         }
 
-        private void RefreshAfterDiscard(
-    CardDragOrigin origin
-)
+        private void RefreshAfterDiscard(CardDragOrigin origin)
         {
             switch (origin)
             {
@@ -449,6 +460,7 @@ namespace Catalyst.UI.Presentation.Discard
                         "Unsupported discard origin."
                     );
             }
+            turnActionButtonPresenter.Refresh();
         }
     }
 }

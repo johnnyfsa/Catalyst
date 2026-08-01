@@ -247,6 +247,38 @@ namespace Catalyst.Cards.Runtime.Session
             return result;
         }
 
+        public TurnAdvanceResult TryAdvanceTurn(
+    GameSession session
+)
+        {
+            EnsureSessionIsRunning(session);
+
+            MainPhaseEndResult mainResult =
+                TryEndMainPhase(session);
+
+            if (!mainResult.Succeeded)
+            {
+                return TurnAdvanceResult.MainPhaseFailed(
+                    mainResult.Failure
+                );
+            }
+
+            EndPhaseResult endResult =
+                ResolveEndPhase(session);
+
+            if (!endResult.Succeeded)
+            {
+                return TurnAdvanceResult.EndPhaseFailed(
+                    endResult.Failure
+                );
+            }
+
+            return TurnAdvanceResult.Success(
+                endResult.CompletedTurnNumber,
+                endResult.StartedTurnNumber
+            );
+        }
+
 
         #region helpers
         private static void EnsureSessionIsRunning(

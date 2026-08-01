@@ -98,6 +98,159 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
         }
 
         [Test]
+        public void TryEnd_WithFiveCardsInHandAndTwoOnTable_ReturnsAllCardsAndAdvancesToEnd()
+        {
+            TurnRuntime turn = CreateMainPhaseTurn();
+            HandRuntime hand = new HandRuntime(8);
+            ReactionTableRuntime reactionTable =
+                new ReactionTableRuntime();
+
+            FillHand(hand, 7);
+
+            CardInstance firstTableCard =
+                hand.Cards[5];
+
+            CardInstance secondTableCard =
+                hand.Cards[6];
+
+            CardMovementService movementService =
+                new CardMovementService();
+
+            Assert.That(
+                movementService.TryMove(
+                    firstTableCard,
+                    hand,
+                    reactionTable
+                ).Succeeded,
+                Is.True
+            );
+
+            Assert.That(
+                movementService.TryMove(
+                    secondTableCard,
+                    hand,
+                    reactionTable
+                ).Succeeded,
+                Is.True
+            );
+
+            Assert.That(hand.Count, Is.EqualTo(5));
+            Assert.That(reactionTable.Count, Is.EqualTo(2));
+
+            MainPhaseEndResult result =
+                mainPhaseService.TryEnd(
+                    turn,
+                    hand,
+                    reactionTable
+                );
+
+            Assert.That(result.Succeeded, Is.True);
+
+            Assert.That(
+                result.Failure,
+                Is.EqualTo(MainPhaseEndFailure.None)
+            );
+
+            Assert.That(hand.Count, Is.EqualTo(7));
+            Assert.That(reactionTable.IsEmpty, Is.True);
+
+            Assert.That(
+                hand.Contains(firstTableCard),
+                Is.True
+            );
+
+            Assert.That(
+                hand.Contains(secondTableCard),
+                Is.True
+            );
+
+            Assert.That(
+                turn.CurrentPhase,
+                Is.EqualTo(GamePhase.End)
+            );
+
+            Assert.That(turn.TurnNumber, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void TryEnd_WithSixCardsInHandAndTwoOnTable_FailsWithoutMutation()
+        {
+            TurnRuntime turn = CreateMainPhaseTurn();
+            HandRuntime hand = new HandRuntime(8);
+            ReactionTableRuntime reactionTable =
+                new ReactionTableRuntime();
+
+            FillHand(hand, 8);
+
+            CardInstance firstTableCard =
+                hand.Cards[6];
+
+            CardInstance secondTableCard =
+                hand.Cards[7];
+
+            CardMovementService movementService =
+                new CardMovementService();
+
+            Assert.That(
+                movementService.TryMove(
+                    firstTableCard,
+                    hand,
+                    reactionTable
+                ).Succeeded,
+                Is.True
+            );
+
+            Assert.That(
+                movementService.TryMove(
+                    secondTableCard,
+                    hand,
+                    reactionTable
+                ).Succeeded,
+                Is.True
+            );
+
+            Assert.That(hand.Count, Is.EqualTo(6));
+            Assert.That(reactionTable.Count, Is.EqualTo(2));
+
+            CardInstance[] originalHand =
+                CopyCards(hand);
+
+            CardInstance[] originalTable =
+                CopyCards(reactionTable);
+
+            MainPhaseEndResult result =
+                mainPhaseService.TryEnd(
+                    turn,
+                    hand,
+                    reactionTable
+                );
+
+            Assert.That(result.Succeeded, Is.False);
+
+            Assert.That(
+                result.Failure,
+                Is.EqualTo(MainPhaseEndFailure.HandFull)
+            );
+
+            Assert.That(
+                hand.Cards,
+                Is.EqualTo(originalHand)
+            );
+
+            Assert.That(
+                reactionTable.Cards,
+                Is.EqualTo(originalTable)
+            );
+
+            Assert.That(
+                turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Main)
+            );
+
+            Assert.That(turn.TurnNumber, Is.EqualTo(1));
+        }
+
+        [Test]
         public void TryEnd_WithEmptyHand_AdvancesToEnd()
         {
             TurnRuntime turn = CreateMainPhaseTurn();
@@ -342,6 +495,26 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Turn
         CreateEmptyReactionTable()
         {
             return new ReactionTableRuntime();
+        }
+
+        private static CardInstance[] CopyCards(
+    CardZoneRuntime zone
+)
+        {
+            CardInstance[] cards =
+                new CardInstance[zone.Count];
+
+            for (
+                int index = 0;
+                index < zone.Count;
+                index++
+            )
+            {
+                cards[index] =
+                    zone.Cards[index];
+            }
+
+            return cards;
         }
         #endregion
     }

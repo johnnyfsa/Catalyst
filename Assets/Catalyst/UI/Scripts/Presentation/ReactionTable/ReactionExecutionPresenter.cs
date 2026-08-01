@@ -5,6 +5,7 @@ using Catalyst.Reactions.Runtime.Resolution;
 using Catalyst.UI.Presentation.Hand;
 using Catalyst.UI.Presentation.Session;
 using Catalyst.UI.Presentation.Discard;
+using Catalyst.UI.Presentation.Turn;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -55,6 +56,10 @@ namespace Catalyst.UI.Presentation.ReactionTable
 
         [SerializeField]
         private DiscardDropArea discardDropArea;
+
+        [SerializeField]
+        private TurnActionButtonPresenter
+    turnActionButtonPresenter;
 
         private bool isExecuting;
 
@@ -243,6 +248,8 @@ namespace Catalyst.UI.Presentation.ReactionTable
         }
         private void RefreshAffectedPresenters()
         {
+            handPresenter.PresentInitialHand();
+
             reactionTablePresenter.Refresh();
 
             countersPresenter
@@ -250,6 +257,8 @@ namespace Catalyst.UI.Presentation.ReactionTable
 
             reactionAvailabilityPresenter
                 .Refresh();
+
+            turnActionButtonPresenter.Refresh();
         }
 
         private void ValidateReferences()
@@ -356,6 +365,14 @@ namespace Catalyst.UI.Presentation.ReactionTable
                     $"{nameof(DiscardDropArea)} assigned."
                 );
             }
+            if (turnActionButtonPresenter == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(ReactionExecutionPresenter)} " +
+                    $"on '{name}' has no " +
+                    $"{nameof(TurnActionButtonPresenter)} assigned."
+                );
+            }
         }
         private void SetInteractionsLocked(
     bool locked
@@ -389,6 +406,9 @@ namespace Catalyst.UI.Presentation.ReactionTable
 
             reactionAvailabilityPresenter
                 .SetInteractionLocked(
+                    locked
+                );
+            turnActionButtonPresenter.SetInteractionLocked(
                     locked
                 );
         }

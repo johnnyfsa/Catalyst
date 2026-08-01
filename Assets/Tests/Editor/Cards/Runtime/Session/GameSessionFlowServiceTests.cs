@@ -251,6 +251,243 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
         }
 
         [Test]
+        public void TryAdvanceTurn_WithValidMainPhase_EndsTurnAndEntersDraw()
+        {
+            GameSession session =
+                CreateSession(
+                    handCapacity: 8,
+                    initialHandSize: 5,
+                    remainingDeckCards: 2
+                );
+
+            GameSessionFlowService flowService =
+                CreateFlowService();
+
+            flowService.Start(session);
+
+            DrawPhaseResult drawResult =
+                flowService.ResolveDrawPhase(session);
+
+            Assert.That(
+                drawResult.Outcome,
+                Is.EqualTo(DrawPhaseOutcome.CardDrawn)
+            );
+
+            Assert.That(session.Hand.Count, Is.EqualTo(6));
+
+            CardInstance tableCard =
+                session.Hand.Cards[5];
+
+            CardMovementResult preparationResult =
+                movementService.TryMove(
+                    tableCard,
+                    session.Hand,
+                    session.ReactionTable
+                );
+
+            Assert.That(
+                preparationResult.Succeeded,
+                Is.True
+            );
+
+            Assert.That(session.Hand.Count, Is.EqualTo(5));
+            Assert.That(session.ReactionTable.Count, Is.EqualTo(1));
+            Assert.That(session.Turn.TurnNumber, Is.EqualTo(1));
+
+            TurnAdvanceResult result =
+                flowService.TryAdvanceTurn(session);
+
+            Assert.That(result.Succeeded, Is.True);
+
+            Assert.That(
+                result.Failure,
+                Is.EqualTo(TurnAdvanceFailure.None)
+            );
+
+            Assert.That(
+                result.MainPhaseFailure,
+                Is.EqualTo(MainPhaseEndFailure.None)
+            );
+
+            Assert.That(
+                result.EndPhaseFailure,
+                Is.EqualTo(EndPhaseFailure.None)
+            );
+
+            Assert.That(
+                result.CompletedTurnNumber,
+                Is.EqualTo(1)
+            );
+
+            Assert.That(
+                result.StartedTurnNumber,
+                Is.EqualTo(2)
+            );
+
+            Assert.That(session.Hand.Count, Is.EqualTo(6));
+            Assert.That(session.Hand.Contains(tableCard), Is.True);
+            Assert.That(session.ReactionTable.IsEmpty, Is.True);
+
+            Assert.That(
+                session.Turn.TurnNumber,
+                Is.EqualTo(2)
+            );
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Draw)
+            );
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void TryAdvanceTurn_WhenProjectedHandIsFull_FailsWithoutAdvancingTurn()
+        {
+            GameSession session =
+                CreateSession(
+                    handCapacity: 8,
+                    initialHandSize: 7,
+                    remainingDeckCards: 1
+                );
+
+            GameSessionFlowService flowService =
+                CreateFlowService();
+
+            flowService.Start(session);
+            flowService.ResolveDrawPhase(session);
+
+            CardInstance firstTableCard =
+                session.Hand.Cards[6];
+
+            CardInstance secondTableCard =
+                session.Hand.Cards[7];
+
+            CardMovementService preparationMovementService =
+                new CardMovementService();
+
+            Assert.That(
+                preparationMovementService.TryMove(
+                    firstTableCard,
+                    session.Hand,
+                    session.ReactionTable
+                ).Succeeded,
+                Is.True
+            );
+
+            Assert.That(
+                preparationMovementService.TryMove(
+                    secondTableCard,
+                    session.Hand,
+                    session.ReactionTable
+                ).Succeeded,
+                Is.True
+            );
+
+            Assert.That(session.Hand.Count, Is.EqualTo(6));
+            Assert.That(session.ReactionTable.Count, Is.EqualTo(2));
+
+            CardInstance[] originalHand =
+                CopyCards(session.Hand);
+
+            CardInstance[] originalTable =
+                CopyCards(session.ReactionTable);
+
+            TurnAdvanceResult result =
+                flowService.TryAdvanceTurn(session);
+
+            Assert.That(result.Succeeded, Is.False);
+
+            Assert.That(
+                result.Failure,
+                Is.EqualTo(
+                    TurnAdvanceFailure.MainPhaseCouldNotEnd
+                )
+            );
+
+            Assert.That(
+                result.MainPhaseFailure,
+                Is.EqualTo(MainPhaseEndFailure.HandFull)
+            );
+
+            Assert.That(
+                result.EndPhaseFailure,
+                Is.EqualTo(EndPhaseFailure.None)
+            );
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Main)
+            );
+
+            Assert.That(
+                session.Turn.TurnNumber,
+                Is.EqualTo(1)
+            );
+
+            Assert.That(
+                session.Hand.Cards,
+                Is.EqualTo(originalHand)
+            );
+
+            Assert.That(
+                session.ReactionTable.Cards,
+                Is.EqualTo(originalTable)
+            );
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void TryAdvanceTurn_OnSuccess_DoesNotResolveNewDrawPhase()
+        {
+            GameSession session =
+                CreateSession(
+                    handCapacity: 8,
+                    initialHandSize: 5,
+                    remainingDeckCards: 3
+                );
+
+            GameSessionFlowService flowService =
+                CreateFlowService();
+
+            flowService.Start(session);
+            flowService.ResolveDrawPhase(session);
+
+            int deckCountBeforeAdvance =
+                session.Deck.Count;
+
+            int handCountBeforeAdvance =
+                session.Hand.Count;
+
+            TurnAdvanceResult result =
+                flowService.TryAdvanceTurn(session);
+
+            Assert.That(result.Succeeded, Is.True);
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Draw)
+            );
+
+            Assert.That(
+                session.Deck.Count,
+                Is.EqualTo(deckCountBeforeAdvance)
+            );
+
+            Assert.That(
+                session.Hand.Count,
+                Is.EqualTo(handCountBeforeAdvance)
+            );
+        }
+
+        [Test]
         public void TryDiscard_WithForeignHand_ReturnsExplicitFailure()
         {
             GameSession session =
@@ -333,6 +570,249 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
                 session.DiscardPile.IsEmpty,
                 Is.True
             );
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void TryEndMainPhase_WithFiveInHandAndTwoOnTable_Succeeds()
+        {
+            GameSession session =
+                CreateSession(
+                    handCapacity: 8,
+                    initialHandSize: 7,
+                    remainingDeckCards: 1
+                );
+
+            GameSessionFlowService flowService =
+                CreateFlowService();
+
+            flowService.Start(session);
+            flowService.ResolveDrawPhase(session);
+
+            CardMovementService movementService =
+                new CardMovementService();
+
+            CardInstance firstTableCard =
+                session.Hand.Cards[6];
+
+            CardInstance secondTableCard =
+                session.Hand.Cards[7];
+
+            Assert.That(
+                movementService.TryMove(
+                    firstTableCard,
+                    session.Hand,
+                    session.ReactionTable
+                ).Succeeded,
+                Is.True
+            );
+
+            Assert.That(
+                movementService.TryMove(
+                    secondTableCard,
+                    session.Hand,
+                    session.ReactionTable
+                ).Succeeded,
+                Is.True
+            );
+
+            Assert.That(session.Hand.Count, Is.EqualTo(6));
+            Assert.That(session.ReactionTable.Count, Is.EqualTo(2));
+
+            CardInstance discardedCard =
+                session.Hand.Cards[0];
+
+            ManualDiscardResult discardResult =
+                flowService.TryDiscard(
+                    session,
+                    discardedCard,
+                    session.Hand
+                );
+
+            Assert.That(discardResult.Succeeded, Is.True);
+            Assert.That(session.Hand.Count, Is.EqualTo(5));
+
+            MainPhaseEndResult result =
+                flowService.TryEndMainPhase(session);
+
+            Assert.That(result.Succeeded, Is.True);
+            Assert.That(session.Hand.Count, Is.EqualTo(7));
+            Assert.That(session.ReactionTable.IsEmpty, Is.True);
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.End)
+            );
+
+            Assert.That(session.Turn.TurnNumber, Is.EqualTo(1));
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void TryEndMainPhase_WithSixInHandAndTwoOnTable_FailsWithoutMutation()
+        {
+            GameSession session =
+                CreateSession(
+                    handCapacity: 8,
+                    initialHandSize: 7,
+                    remainingDeckCards: 1
+                );
+
+            GameSessionFlowService flowService =
+                CreateFlowService();
+
+            flowService.Start(session);
+            flowService.ResolveDrawPhase(session);
+
+            CardMovementService movementService =
+                new CardMovementService();
+
+            CardInstance firstTableCard =
+                session.Hand.Cards[6];
+
+            CardInstance secondTableCard =
+                session.Hand.Cards[7];
+
+            Assert.That(
+                movementService.TryMove(
+                    firstTableCard,
+                    session.Hand,
+                    session.ReactionTable
+                ).Succeeded,
+                Is.True
+            );
+
+            Assert.That(
+                movementService.TryMove(
+                    secondTableCard,
+                    session.Hand,
+                    session.ReactionTable
+                ).Succeeded,
+                Is.True
+            );
+
+            Assert.That(session.Hand.Count, Is.EqualTo(6));
+            Assert.That(session.ReactionTable.Count, Is.EqualTo(2));
+
+            CardInstance[] originalHand =
+                CopyCards(session.Hand);
+
+            CardInstance[] originalTable =
+                CopyCards(session.ReactionTable);
+
+            MainPhaseEndResult result =
+                flowService.TryEndMainPhase(session);
+
+            Assert.That(result.Succeeded, Is.False);
+
+            Assert.That(
+                result.Failure,
+                Is.EqualTo(MainPhaseEndFailure.HandFull)
+            );
+
+            Assert.That(
+                session.Hand.Cards,
+                Is.EqualTo(originalHand)
+            );
+
+            Assert.That(
+                session.ReactionTable.Cards,
+                Is.EqualTo(originalTable)
+            );
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Main)
+            );
+
+            Assert.That(session.Turn.TurnNumber, Is.EqualTo(1));
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void TryEndMainPhase_WithSevenInHandAndEmptyTable_Succeeds()
+        {
+            GameSession session =
+                CreateSession(
+                    handCapacity: 8,
+                    initialHandSize: 6,
+                    remainingDeckCards: 1
+                );
+
+            GameSessionFlowService flowService =
+                CreateFlowService();
+
+            flowService.Start(session);
+            flowService.ResolveDrawPhase(session);
+
+            Assert.That(session.Hand.Count, Is.EqualTo(7));
+            Assert.That(session.ReactionTable.IsEmpty, Is.True);
+
+            MainPhaseEndResult result =
+                flowService.TryEndMainPhase(session);
+
+            Assert.That(result.Succeeded, Is.True);
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.End)
+            );
+
+            Assert.That(session.Turn.TurnNumber, Is.EqualTo(1));
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void TryEndMainPhase_WithFullHandAndEmptyTable_Fails()
+        {
+            GameSession session =
+                CreateSession(
+                    handCapacity: 8,
+                    initialHandSize: 7,
+                    remainingDeckCards: 1
+                );
+
+            GameSessionFlowService flowService =
+                CreateFlowService();
+
+            flowService.Start(session);
+            flowService.ResolveDrawPhase(session);
+
+            Assert.That(session.Hand.Count, Is.EqualTo(8));
+            Assert.That(session.ReactionTable.IsEmpty, Is.True);
+
+            MainPhaseEndResult result =
+                flowService.TryEndMainPhase(session);
+
+            Assert.That(result.Succeeded, Is.False);
+
+            Assert.That(
+                result.Failure,
+                Is.EqualTo(MainPhaseEndFailure.HandFull)
+            );
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Main)
+            );
+
+            Assert.That(session.Turn.TurnNumber, Is.EqualTo(1));
 
             Assert.That(
                 () => session.ValidateState(),
