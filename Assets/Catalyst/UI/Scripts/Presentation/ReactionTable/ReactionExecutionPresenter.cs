@@ -244,7 +244,13 @@ namespace Catalyst.UI.Presentation.ReactionTable
             pendingReaction = null;
             isExecuting = false;
 
-            SetInteractionsLocked(false);
+            bool shouldRemainLocked =
+            bootstrap.Session == null
+            || !bootstrap.Session.IsRunning;
+
+            SetInteractionsLocked(
+                shouldRemainLocked
+            );
         }
         private void RefreshAffectedPresenters()
         {

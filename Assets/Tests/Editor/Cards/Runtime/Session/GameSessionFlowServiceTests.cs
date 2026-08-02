@@ -467,6 +467,288 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
         }
 
         [Test]
+        public void TryAdvanceTurn_BeforeMaximumTurn_StartsNextPlayableTurn()
+        {
+            GameSession session =
+                CreateSession(
+                    handCapacity: 4,
+                    initialHandSize: 1,
+                    remainingDeckCards: 8,
+                    maximumTurns: 3
+                );
+
+            GameSessionFlowService flowService =
+                CreateFlowService();
+
+            flowService.Start(session);
+
+            DrawPhaseResult drawResult =
+                flowService.ResolveDrawPhase(
+                    session
+                );
+
+            Assert.That(
+                drawResult.Outcome,
+                Is.EqualTo(
+                    DrawPhaseOutcome.HandFull
+                )
+            );
+
+            PrepareMainPhaseForTurnAdvance(
+                session,
+                flowService
+            );
+
+            TurnAdvanceResult result =
+                flowService.TryAdvanceTurn(
+                    session
+                );
+
+            Assert.That(result.Succeeded, Is.True);
+
+            Assert.That(
+                result.CompletedTurnNumber,
+                Is.EqualTo(1)
+            );
+
+            Assert.That(
+                result.StartedTurnNumber,
+                Is.EqualTo(2)
+            );
+
+            Assert.That(session.IsRunning, Is.True);
+            Assert.That(session.HasEnded, Is.False);
+
+            Assert.That(
+                session.EndReason,
+                Is.EqualTo(GameSessionEndReason.None)
+            );
+
+            Assert.That(
+                session.Turn.TurnNumber,
+                Is.EqualTo(2)
+            );
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Draw)
+            );
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void TryAdvanceTurn_OnMaximumTurn_EndsSession()
+        {
+            GameSession session =
+                CreateSession(
+                    handCapacity: 4,
+                    initialHandSize: 1,
+                    remainingDeckCards: 12,
+                    maximumTurns: 3
+                );
+
+            GameSessionFlowService flowService =
+                CreateFlowService();
+
+            flowService.Start(session);
+
+            AdvanceRunningSessionToMainPhase(
+                session,
+                flowService,
+                targetTurn: 3
+            );
+
+            PrepareMainPhaseForTurnAdvance(
+                session,
+                flowService
+            );
+
+            TurnAdvanceResult result =
+                flowService.TryAdvanceTurn(
+                    session
+                );
+
+            Assert.That(result.Succeeded, Is.True);
+
+            Assert.That(
+                result.CompletedTurnNumber,
+                Is.EqualTo(3)
+            );
+
+            Assert.That(
+                session.State,
+                Is.EqualTo(GameSessionState.Ended)
+            );
+
+            Assert.That(session.HasEnded, Is.True);
+            Assert.That(session.IsRunning, Is.False);
+
+            Assert.That(
+                session.EndReason,
+                Is.EqualTo(
+                    GameSessionEndReason.MaxTurnsReached
+                )
+            );
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void TryAdvanceTurn_OnMaximumTurn_PreventsNextDrawResolution()
+        {
+            GameSession session =
+                CreateSession(
+                    handCapacity: 4,
+                    initialHandSize: 1,
+                    remainingDeckCards: 6,
+                    maximumTurns: 1
+                );
+
+            GameSessionFlowService flowService =
+                CreateFlowService();
+
+            flowService.Start(session);
+
+            DrawPhaseResult drawResult =
+                flowService.ResolveDrawPhase(
+                    session
+                );
+
+            Assert.That(
+                drawResult.Outcome,
+                Is.EqualTo(
+                    DrawPhaseOutcome.HandFull
+                )
+            );
+
+            PrepareMainPhaseForTurnAdvance(
+                session,
+                flowService
+            );
+
+            int handCountBeforeAdvance =
+                session.Hand.Count;
+
+            int deckCountBeforeAdvance =
+                session.Deck.Count;
+
+            TurnAdvanceResult result =
+                flowService.TryAdvanceTurn(
+                    session
+                );
+
+            Assert.That(result.Succeeded, Is.True);
+            Assert.That(session.HasEnded, Is.True);
+
+            Assert.That(
+                () => flowService.ResolveDrawPhase(
+                    session
+                ),
+                Throws.TypeOf<
+                    InvalidOperationException
+                >()
+            );
+
+            Assert.That(
+                session.Hand.Count,
+                Is.EqualTo(handCountBeforeAdvance)
+            );
+
+            Assert.That(
+                session.Deck.Count,
+                Is.EqualTo(deckCountBeforeAdvance)
+            );
+
+            Assert.That(
+                session.EndReason,
+                Is.EqualTo(
+                    GameSessionEndReason.MaxTurnsReached
+                )
+            );
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void SessionEndedByTurnLimit_PreservesOriginalReasonAfterRejectedOperation()
+        {
+            GameSession session =
+                CreateSession(
+                    handCapacity: 4,
+                    initialHandSize: 1,
+                    remainingDeckCards: 6,
+                    maximumTurns: 1
+                );
+
+            GameSessionFlowService flowService =
+                CreateFlowService();
+
+            flowService.Start(session);
+
+            DrawPhaseResult drawResult =
+                flowService.ResolveDrawPhase(
+                    session
+                );
+
+            Assert.That(
+                drawResult.Outcome,
+                Is.EqualTo(
+                    DrawPhaseOutcome.HandFull
+                )
+            );
+
+            PrepareMainPhaseForTurnAdvance(
+                session,
+                flowService
+            );
+
+            TurnAdvanceResult result =
+                flowService.TryAdvanceTurn(
+                    session
+                );
+
+            Assert.That(result.Succeeded, Is.True);
+
+            Assert.That(
+                session.EndReason,
+                Is.EqualTo(
+                    GameSessionEndReason.MaxTurnsReached
+                )
+            );
+
+            Assert.That(
+                () => flowService.TryAdvanceTurn(
+                    session
+                ),
+                Throws.TypeOf<
+                    InvalidOperationException
+                >()
+            );
+
+            Assert.That(
+                session.EndReason,
+                Is.EqualTo(
+                    GameSessionEndReason.MaxTurnsReached
+                )
+            );
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
         public void TryAdvanceTurn_OnSuccess_DoesNotResolveNewDrawPhase()
         {
             GameSession session =
@@ -1893,7 +2175,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
         }
 
         [Test]
-        public void ResolveDrawPhase_WithPartialDeck_PropagatesDeckOutWithoutEndingSession()
+        public void ResolveDrawPhase_WithPartialDeck_EndsSessionWithDeckOut()
         {
             GameSession session =
                 CreateSession(
@@ -1914,49 +2196,21 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
                 flowService.ResolveDrawPhase(session);
 
             Assert.That(
-                result.Outcome,
-                Is.EqualTo(DrawPhaseOutcome.DeckOut)
-            );
-
-            Assert.That(
-                result.DrawnCardCount,
-                Is.EqualTo(2)
-            );
-
-            Assert.That(session.Hand.Count, Is.EqualTo(7));
-            Assert.That(session.Deck.IsEmpty, Is.True);
-
-            Assert.That(session.IsRunning, Is.True);
-            Assert.That(session.HasEnded, Is.False);
-
-            Assert.That(
                 session.State,
-                Is.EqualTo(GameSessionState.Running)
+                Is.EqualTo(GameSessionState.Ended)
             );
+
+            Assert.That(session.IsRunning, Is.False);
+            Assert.That(session.HasEnded, Is.True);
 
             Assert.That(
                 session.EndReason,
-                Is.EqualTo(GameSessionEndReason.None)
-            );
-
-            Assert.That(
-                session.Turn.CurrentPhase,
-                Is.EqualTo(GamePhase.Draw)
-            );
-
-            Assert.That(
-                session.SessionCards.Count,
-                Is.EqualTo(originalSessionCardCount)
-            );
-
-            Assert.That(
-                () => session.ValidateState(),
-                Throws.Nothing
+                Is.EqualTo(GameSessionEndReason.DeckOut)
             );
         }
 
         [Test]
-        public void ResolveDrawPhase_WithEmptyDeck_PropagatesDeckOutWithoutEndingSession()
+        public void ResolveDrawPhase_WithEmptyDeck_EndsSessionWithDeckOut()
         {
             GameSession session =
                 CreateSession(
@@ -1983,9 +2237,50 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
                 Is.EqualTo(0)
             );
 
-            Assert.That(session.Hand.Count, Is.EqualTo(7));
-            Assert.That(session.Deck.IsEmpty, Is.True);
+            Assert.That(
+                session.State,
+                Is.EqualTo(GameSessionState.Ended)
+            );
 
+            Assert.That(session.IsRunning, Is.False);
+            Assert.That(session.HasEnded, Is.True);
+
+            Assert.That(
+                session.EndReason,
+                Is.EqualTo(GameSessionEndReason.DeckOut)
+            );
+        }
+
+        [Test]
+        public void ResolveDrawPhase_WhenLastDeckCardFillsHand_KeepsSessionRunning()
+        {
+            GameSession session =
+                CreateSession(
+                    handCapacity: 8,
+                    initialHandSize: 7,
+                    remainingDeckCards: 1
+                );
+
+            GameSessionFlowService flowService =
+                CreateFlowService();
+
+            flowService.Start(session);
+
+            DrawPhaseResult result =
+                flowService.ResolveDrawPhase(session);
+
+            Assert.That(
+                result.Outcome,
+                Is.EqualTo(DrawPhaseOutcome.HandFull)
+            );
+
+            Assert.That(
+                result.DrawnCardCount,
+                Is.EqualTo(1)
+            );
+
+            Assert.That(session.Hand.Count, Is.EqualTo(8));
+            Assert.That(session.Deck.IsEmpty, Is.True);
             Assert.That(session.IsRunning, Is.True);
             Assert.That(session.HasEnded, Is.False);
 
@@ -1996,7 +2291,56 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
 
             Assert.That(
                 session.Turn.CurrentPhase,
-                Is.EqualTo(GamePhase.Draw)
+                Is.EqualTo(GamePhase.Main)
+            );
+
+            Assert.That(
+                () => session.ValidateState(),
+                Throws.Nothing
+            );
+        }
+
+        [Test]
+        public void ResolveDrawPhase_WithFullHandAndEmptyDeck_KeepsSessionRunning()
+        {
+            GameSession session =
+                CreateSession(
+                    handCapacity: 8,
+                    initialHandSize: 8,
+                    remainingDeckCards: 0
+                );
+
+            GameSessionFlowService flowService =
+                CreateFlowService();
+
+            flowService.Start(session);
+
+            DrawPhaseResult result =
+                flowService.ResolveDrawPhase(session);
+
+            Assert.That(
+                result.Outcome,
+                Is.EqualTo(DrawPhaseOutcome.HandFull)
+            );
+
+            Assert.That(
+                result.DrawnCardCount,
+                Is.EqualTo(0)
+            );
+
+            Assert.That(session.Hand.Count, Is.EqualTo(8));
+            Assert.That(session.Deck.IsEmpty, Is.True);
+            Assert.That(session.IsRunning, Is.True);
+            Assert.That(session.HasEnded, Is.False);
+
+            Assert.That(
+                session.EndReason,
+                Is.EqualTo(GameSessionEndReason.None)
+            );
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Main)
             );
 
             Assert.That(
@@ -2950,6 +3294,125 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
                     }
                 ),
                 new SeededRandomSource(12345)
+            );
+        }
+        private void PrepareMainPhaseForTurnAdvance(
+    GameSession session,
+    GameSessionFlowService flowService
+)
+        {
+            Assert.That(
+                session.State,
+                Is.EqualTo(GameSessionState.Running)
+            );
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Main)
+            );
+
+            while (session.Hand.IsFull)
+            {
+                CardInstance card =
+                    session.Hand.Cards[0];
+
+                ManualDiscardResult discardResult =
+                    flowService.TryDiscard(
+                        session,
+                        card,
+                        session.Hand
+                    );
+
+                Assert.That(
+                    discardResult.Succeeded,
+                    Is.True
+                );
+            }
+        }
+
+        private void AdvanceRunningSessionToMainPhase(
+    GameSession session,
+    GameSessionFlowService flowService,
+    int targetTurn
+)
+        {
+            if (targetTurn <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(targetTurn)
+                );
+            }
+
+            if (
+                session.Turn.CurrentPhase
+                == GamePhase.Draw
+            )
+            {
+                DrawPhaseResult initialDraw =
+                    flowService.ResolveDrawPhase(
+                        session
+                    );
+
+                Assert.That(
+                    initialDraw.Outcome,
+                    Is.EqualTo(
+                        DrawPhaseOutcome.HandFull
+                    )
+                );
+            }
+
+            while (
+                session.IsRunning
+                && session.Turn.TurnNumber
+                    < targetTurn
+            )
+            {
+                PrepareMainPhaseForTurnAdvance(
+                    session,
+                    flowService
+                );
+
+                TurnAdvanceResult advanceResult =
+                    flowService.TryAdvanceTurn(
+                        session
+                    );
+
+                Assert.That(
+                    advanceResult.Succeeded,
+                    Is.True
+                );
+
+                Assert.That(
+                    session.IsRunning,
+                    Is.True
+                );
+
+                Assert.That(
+                    session.Turn.CurrentPhase,
+                    Is.EqualTo(GamePhase.Draw)
+                );
+
+                DrawPhaseResult drawResult =
+                    flowService.ResolveDrawPhase(
+                        session
+                    );
+
+                Assert.That(
+                    drawResult.Outcome,
+                    Is.EqualTo(
+                        DrawPhaseOutcome.HandFull
+                    )
+                );
+            }
+
+            Assert.That(
+                session.Turn.TurnNumber,
+                Is.EqualTo(targetTurn)
+            );
+
+            Assert.That(
+                session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Main)
             );
         }
 

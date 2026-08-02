@@ -48,6 +48,11 @@ namespace Catalyst.UI.Presentation.Turn
         private InitialRemainingTurnsPresenter
             remainingTurnsPresenter;
 
+        [Header("Session End")]
+        [SerializeField]
+        private GameSessionEndPresenter
+        sessionEndPresenter;
+
         private bool interactionLocked;
 
         public bool InteractionLocked =>
@@ -150,10 +155,13 @@ namespace Catalyst.UI.Presentation.Turn
             }
 
             ResolveStartedDrawPhase(
-                session
-            );
+                 session
+             );
 
             RefreshAfterSuccess();
+
+            sessionEndPresenter
+                .ApplyIfSessionEnded();
         }
 
         private void ResolveStartedDrawPhase(
@@ -343,6 +351,15 @@ namespace Catalyst.UI.Presentation.Turn
                     $"on '{name}' has no " +
                     $"{nameof(InitialRemainingTurnsPresenter)} " +
                     "assigned."
+                );
+            }
+
+            if (sessionEndPresenter == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(TurnActionButtonPresenter)} " +
+                    $"on '{name}' has no " +
+                    $"{nameof(GameSessionEndPresenter)} assigned."
                 );
             }
         }

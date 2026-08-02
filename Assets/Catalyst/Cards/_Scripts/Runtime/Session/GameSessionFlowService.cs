@@ -68,8 +68,8 @@ namespace Catalyst.Cards.Runtime.Session
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
         public DrawPhaseResult ResolveDrawPhase(
-            GameSession session
-        )
+    GameSession session
+)
         {
             EnsureSessionIsRunning(session);
 
@@ -79,6 +79,16 @@ namespace Catalyst.Cards.Runtime.Session
                     session.Deck,
                     session.Hand
                 );
+
+            if (
+                result.Outcome
+                == DrawPhaseOutcome.DeckOut
+            )
+            {
+                session.End(
+                    GameSessionEndReason.DeckOut
+                );
+            }
 
             session.ValidateState();
 
