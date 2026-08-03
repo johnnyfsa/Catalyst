@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd5fb25e6a7aa6b458009b66f3da1a20, type: 3}
+  m_Name: GameResultLibrary_GreatDrought
+  m_EditorClassIdentifier: 
+  definitions:
+  - {fileID: 11400000, guid: 69db0a8467f469e46b4d2a5c2d2f816b, type: 2}
+  - {fileID: 11400000, guid: 300f6254871871748a592d9d99feb810, type: 2}
+  - {fileID: 11400000, guid: 650d5c5950e4f174aaf683c90fb78ac7, type: 2}

@@ -6,7 +6,8 @@
         "UnityEditor.TestRunner",
         "Catalyst.Cards",
         "Catalyst.Reactions",
-        "Catalyst.Game"
+        "Catalyst.Game",
+        "Catalyst.UI"
     ],
     "includePlatforms": [
         "Editor"
