@@ -461,7 +461,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 509137029}
-  - component: {fileID: 509137030}
   m_Layer: 5
   m_Name: GameHUD
   m_TagString: Untagged
@@ -481,6 +480,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 928447157}
   - {fileID: 88809068}
   - {fileID: 1696283734}
   - {fileID: 1390104845}
@@ -499,28 +499,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &509137030
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 509137028}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98f876bc1b0126a4c95caa1e7c63b7be, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bootstrap: {fileID: 845730860}
-  inspectionPresenter: {fileID: 460561814}
-  dragPresenter: {fileID: 1514875159}
-  handPresenter: {fileID: 1845664308}
-  reactionTablePresenter: {fileID: 1902360159}
-  handDropArea: {fileID: 1845664310}
-  reactionTableDropArea: {fileID: 8360304083609516398}
-  discardDropArea: {fileID: 1465631010}
-  reactionAvailabilityPresenter: {fileID: 8360304083609516396}
-  turnActionButtonPresenter: {fileID: 1857564778}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -989,6 +967,64 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &928447156
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 928447157}
+  - component: {fileID: 928447158}
+  m_Layer: 5
+  m_Name: SessionEndPresenter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &928447157
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 928447156}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 509137029}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &928447158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 928447156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98f876bc1b0126a4c95caa1e7c63b7be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bootstrap: {fileID: 845730860}
+  inspectionPresenter: {fileID: 460561814}
+  dragPresenter: {fileID: 1514875159}
+  handPresenter: {fileID: 1845664308}
+  reactionTablePresenter: {fileID: 1902360159}
+  handDropArea: {fileID: 1845664310}
+  reactionTableDropArea: {fileID: 8360304083609516398}
+  discardDropArea: {fileID: 1465631010}
+  reactionAvailabilityPresenter: {fileID: 8360304083609516396}
+  turnActionButtonPresenter: {fileID: 1857564778}
 --- !u!1 &992162953
 GameObject:
   m_ObjectHideFlags: 0
@@ -2061,7 +2097,7 @@ MonoBehaviour:
   reactionAvailabilityPresenter: {fileID: 8360304083609516396}
   turnCounterPresenter: {fileID: 1997688600}
   remainingTurnsPresenter: {fileID: 722848472}
-  sessionEndPresenter: {fileID: 509137030}
+  sessionEndPresenter: {fileID: 928447158}
 --- !u!114 &1857564779 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6608150633632876131, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
@@ -2423,6 +2459,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 509137029}
     m_Modifications:
+    - target: {fileID: 510419093034961075, guid: b8146385a59fd014ca9a4a0be75bfa4f, type: 3}
+      propertyPath: bootstrap
+      value: 
+      objectReference: {fileID: 845730860}
+    - target: {fileID: 510419093034961075, guid: b8146385a59fd014ca9a4a0be75bfa4f, type: 3}
+      propertyPath: dragPresenter
+      value: 
+      objectReference: {fileID: 1514875159}
+    - target: {fileID: 510419093034961075, guid: b8146385a59fd014ca9a4a0be75bfa4f, type: 3}
+      propertyPath: handPresenter
+      value: 
+      objectReference: {fileID: 1845664308}
+    - target: {fileID: 510419093034961075, guid: b8146385a59fd014ca9a4a0be75bfa4f, type: 3}
+      propertyPath: objectivePresenter
+      value: 
+      objectReference: {fileID: 1937225849}
+    - target: {fileID: 510419093034961075, guid: b8146385a59fd014ca9a4a0be75bfa4f, type: 3}
+      propertyPath: sessionEndPresenter
+      value: 
+      objectReference: {fileID: 928447158}
+    - target: {fileID: 7106553937164290811, guid: b8146385a59fd014ca9a4a0be75bfa4f, type: 3}
+      propertyPath: bootstrap
+      value: 
+      objectReference: {fileID: 845730860}
     - target: {fileID: 8942019972285965583, guid: b8146385a59fd014ca9a4a0be75bfa4f, type: 3}
       propertyPath: m_Name
       value: WaterTank
@@ -2453,11 +2513,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8987428330692629173, guid: b8146385a59fd014ca9a4a0be75bfa4f, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 230.104
+      value: 284.21
       objectReference: {fileID: 0}
     - target: {fileID: 8987428330692629173, guid: b8146385a59fd014ca9a4a0be75bfa4f, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 261.95996
+      value: 330.592
       objectReference: {fileID: 0}
     - target: {fileID: 8987428330692629173, guid: b8146385a59fd014ca9a4a0be75bfa4f, type: 3}
       propertyPath: m_LocalPosition.x

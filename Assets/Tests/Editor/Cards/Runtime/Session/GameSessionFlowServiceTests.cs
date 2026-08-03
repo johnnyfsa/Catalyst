@@ -1622,7 +1622,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Session
             Assert.That(
                 result.Failure,
                 Is.EqualTo(
-                    CardDeliveryFailure.CardNotInHand
+                    CardDeliveryFailure.CardNotInSource
                 )
             );
 

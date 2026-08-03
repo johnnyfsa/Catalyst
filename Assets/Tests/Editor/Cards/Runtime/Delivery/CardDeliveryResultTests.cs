@@ -25,7 +25,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Delivery
         {
             CardDeliveryResult result =
                 CardDeliveryResult.Fail(
-                    CardDeliveryFailure.CardNotInHand
+                    CardDeliveryFailure.CardNotInSource
                 );
 
             Assert.That(result.Succeeded, Is.False);
@@ -33,7 +33,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Delivery
             Assert.That(
                 result.Failure,
                 Is.EqualTo(
-                    CardDeliveryFailure.CardNotInHand
+                    CardDeliveryFailure.CardNotInSource
                 )
             );
         }

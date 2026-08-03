@@ -20,14 +20,14 @@ namespace Catalyst.Cards.Runtime.Delivery
 
         public CardDeliveryResult TryDeliver(
             CardInstance card,
-            HandRuntime hand,
+            CardZoneRuntime source,
             CardDeliveryZoneRuntime deliveryZone
         )
         {
             CardDeliveryResult validationResult =
                 Validate(
                     card,
-                    hand,
+                    source,
                     deliveryZone
                 );
 
@@ -39,7 +39,7 @@ namespace Catalyst.Cards.Runtime.Delivery
             CardMovementResult movementResult =
                 movementService.TryMove(
                     card,
-                    hand,
+                    source,
                     deliveryZone
                 );
 
@@ -54,10 +54,10 @@ namespace Catalyst.Cards.Runtime.Delivery
         }
 
         private static CardDeliveryResult Validate(
-    CardInstance card,
-    HandRuntime hand,
-    CardDeliveryZoneRuntime deliveryZone
-)
+            CardInstance card,
+            CardZoneRuntime source,
+            CardDeliveryZoneRuntime deliveryZone
+        )
         {
             if (card == null)
             {
@@ -66,10 +66,10 @@ namespace Catalyst.Cards.Runtime.Delivery
                 );
             }
 
-            if (hand == null)
+            if (source == null)
             {
                 return CardDeliveryResult.Fail(
-                    CardDeliveryFailure.NullHand
+                    CardDeliveryFailure.NullSource
                 );
             }
 
@@ -80,10 +80,13 @@ namespace Catalyst.Cards.Runtime.Delivery
                 );
             }
 
-            if (!ContainsExactInstance(hand, card))
+            if (!ContainsExactInstance(
+                    source,
+                    card
+                ))
             {
                 return CardDeliveryResult.Fail(
-                    CardDeliveryFailure.CardNotInHand
+                    CardDeliveryFailure.CardNotInSource
                 );
             }
 
@@ -99,11 +102,14 @@ namespace Catalyst.Cards.Runtime.Delivery
         }
 
         private static bool ContainsExactInstance(
-            HandRuntime hand,
+            CardZoneRuntime source,
             CardInstance card
         )
         {
-            foreach (CardInstance containedCard in hand.Cards)
+            foreach (
+                CardInstance containedCard
+                in source.Cards
+            )
             {
                 if (ReferenceEquals(
                     containedCard,
@@ -125,13 +131,18 @@ namespace Catalyst.Cards.Runtime.Delivery
             {
                 case CardMovementFailure.CardNotInSource:
                     return CardDeliveryResult.Fail(
-                        CardDeliveryFailure.CardNotInHand
+                        CardDeliveryFailure.CardNotInSource
                     );
 
-                case CardMovementFailure.DestinationCannotReceiveCard:
-                case CardMovementFailure.DestinationRejectedCard:
+                case CardMovementFailure
+                    .DestinationCannotReceiveCard:
+
+                case CardMovementFailure
+                    .DestinationRejectedCard:
+
                 case CardMovementFailure
                     .DestinationAlreadyContainsCard:
+
                     return CardDeliveryResult.Fail(
                         CardDeliveryFailure
                             .DeliveryZoneRejectedCard

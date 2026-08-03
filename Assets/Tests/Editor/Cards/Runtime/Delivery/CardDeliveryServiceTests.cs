@@ -74,7 +74,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Delivery
             CardDeliveryResult result =
                 deliveryService.TryDeliver(
                     card: null,
-                    hand,
+                    source: hand,
                     deliveryZone
                 );
 
@@ -88,7 +88,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Delivery
         }
 
         [Test]
-        public void TryDeliver_WithNullHand_ReturnsExplicitFailure()
+        public void TryDeliver_WithNullSource_ReturnsExplicitFailure()
         {
             CardInstance card =
                 CreateCard(acceptedDefinition);
@@ -99,13 +99,13 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Delivery
             CardDeliveryResult result =
                 deliveryService.TryDeliver(
                     card,
-                    hand: null,
+                    source: null,
                     deliveryZone
                 );
 
             AssertFailedWith(
                 result,
-                CardDeliveryFailure.NullHand
+                CardDeliveryFailure.NullSource
             );
 
             Assert.That(deliveryZone.IsEmpty, Is.True);
@@ -142,7 +142,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Delivery
         }
 
         [Test]
-        public void TryDeliver_WithCardNotInHand_ReturnsExplicitFailure()
+        public void TryDeliver_WithCardNotInSource_ReturnsExplicitFailure()
         {
             HandRuntime hand =
                 new HandRuntime();
@@ -162,7 +162,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Delivery
 
             AssertFailedWith(
                 result,
-                CardDeliveryFailure.CardNotInHand
+                CardDeliveryFailure.CardNotInSource
             );
 
             Assert.That(hand.IsEmpty, Is.True);
@@ -170,7 +170,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Delivery
         }
 
         [Test]
-        public void TryDeliver_WithDifferentObjectUsingContainedId_ReturnsCardNotInHand()
+        public void TryDeliver_WithDifferentObjectUsingContainedId_ReturnsCardNotInSource()
         {
             HandRuntime hand =
                 new HandRuntime();
@@ -207,7 +207,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Delivery
 
             AssertFailedWith(
                 result,
-                CardDeliveryFailure.CardNotInHand
+                CardDeliveryFailure.CardNotInSource
             );
 
             Assert.That(hand.Count, Is.EqualTo(1));
@@ -574,7 +574,87 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Delivery
         }
 
         [Test]
-        public void TryDeliver_SameCardTwice_ReturnsCardNotInHand()
+        public void TryDeliver_FromReactionTable_MovesAcceptedCardToDeliveryZone()
+        {
+            ReactionTableRuntime reactionTable =
+                new ReactionTableRuntime();
+
+            CardInstance card =
+                CreateCard(acceptedDefinition);
+
+            Assert.That(
+                reactionTable.TryAdd(card),
+                Is.True
+            );
+
+            CardDeliveryZoneRuntime deliveryZone =
+                CreateDeliveryZone();
+
+            CardDeliveryResult result =
+                deliveryService.TryDeliver(
+                    card,
+                    reactionTable,
+                    deliveryZone
+                );
+
+            Assert.That(result.Succeeded, Is.True);
+
+            Assert.That(
+                result.Failure,
+                Is.EqualTo(CardDeliveryFailure.None)
+            );
+
+            Assert.That(
+                reactionTable.Contains(card),
+                Is.False
+            );
+
+            Assert.That(
+                reactionTable.IsEmpty,
+                Is.True
+            );
+
+            Assert.That(
+                deliveryZone.Contains(card),
+                Is.True
+            );
+
+            Assert.That(
+                deliveryZone.CurrentAmount,
+                Is.EqualTo(1)
+            );
+        }
+
+        [Test]
+        public void TryDeliver_FromGenericSource_WithMissingCard_ReturnsCardNotInSource()
+        {
+            ReactionTableRuntime reactionTable =
+                new ReactionTableRuntime();
+
+            CardInstance card =
+                CreateCard(acceptedDefinition);
+
+            CardDeliveryZoneRuntime deliveryZone =
+                CreateDeliveryZone();
+
+            CardDeliveryResult result =
+                deliveryService.TryDeliver(
+                    card,
+                    reactionTable,
+                    deliveryZone
+                );
+
+            AssertFailedWith(
+                result,
+                CardDeliveryFailure.CardNotInSource
+            );
+
+            Assert.That(reactionTable.IsEmpty, Is.True);
+            Assert.That(deliveryZone.IsEmpty, Is.True);
+        }
+
+        [Test]
+        public void TryDeliver_SameCardTwice_ReturnsCardNotInSource()
         {
             HandRuntime hand =
                 new HandRuntime();
@@ -610,7 +690,7 @@ namespace Catalyst.Tests.EditMode.Cards.Runtime.Delivery
 
             AssertFailedWith(
                 secondResult,
-                CardDeliveryFailure.CardNotInHand
+                CardDeliveryFailure.CardNotInSource
             );
 
             Assert.That(deliveryZone.Count, Is.EqualTo(1));

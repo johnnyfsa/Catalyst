@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Catalyst.UI.Presentation.Objectives
 {
-    public sealed class InitialObjectivePresenter :
+    public sealed class SessionObjectivePresenter :
         MonoBehaviour
     {
         [Header("Runtime Source")]
@@ -36,6 +36,13 @@ namespace Catalyst.UI.Presentation.Objectives
         [SerializeField]
         private Sprite objectiveIcon;
 
+
+
+        private CardDeliveryZoneRuntime deliveryObjective;
+
+        public CardDeliveryZoneRuntime DeliveryObjective =>
+            deliveryObjective;
+
         private void Start()
         {
             PresentInitialObjective();
@@ -49,21 +56,21 @@ namespace Catalyst.UI.Presentation.Objectives
             if (bootstrap.Session == null)
             {
                 throw new InvalidOperationException(
-                    $"{nameof(InitialObjectivePresenter)} on '{name}' " +
+                    $"{nameof(SessionObjectivePresenter)} on '{name}' " +
                     "cannot present the objective because the bootstrap " +
                     "has not initialized a session."
                 );
             }
 
-            CardDeliveryZoneRuntime objective =
+            deliveryObjective =
                 FindDeliveryObjective();
 
             objectiveEntryView.Bind(
                 objectiveTitle,
                 objectiveDescription,
                 objectiveIcon,
-                objective.CurrentAmount,
-                objective.RequiredAmount
+                deliveryObjective.CurrentAmount,
+                deliveryObjective.RequiredAmount
             );
         }
 
@@ -85,7 +92,7 @@ namespace Catalyst.UI.Presentation.Objectives
             }
 
             throw new InvalidOperationException(
-                $"{nameof(InitialObjectivePresenter)} on '{name}' " +
+                $"{nameof(SessionObjectivePresenter)} on '{name}' " +
                 $"could not find a delivery objective accepting " +
                 $"'{acceptedDefinition.name}'."
             );
@@ -96,7 +103,7 @@ namespace Catalyst.UI.Presentation.Objectives
             if (bootstrap == null)
             {
                 throw new InvalidOperationException(
-                    $"{nameof(InitialObjectivePresenter)} on '{name}' " +
+                    $"{nameof(SessionObjectivePresenter)} on '{name}' " +
                     $"has no {nameof(GameSessionBootstrap)} assigned."
                 );
             }
@@ -104,7 +111,7 @@ namespace Catalyst.UI.Presentation.Objectives
             if (acceptedDefinition == null)
             {
                 throw new InvalidOperationException(
-                    $"{nameof(InitialObjectivePresenter)} on '{name}' " +
+                    $"{nameof(SessionObjectivePresenter)} on '{name}' " +
                     "has no accepted card definition assigned."
                 );
             }
@@ -112,10 +119,42 @@ namespace Catalyst.UI.Presentation.Objectives
             if (objectiveEntryView == null)
             {
                 throw new InvalidOperationException(
-                    $"{nameof(InitialObjectivePresenter)} on '{name}' " +
+                    $"{nameof(SessionObjectivePresenter)} on '{name}' " +
                     $"has no {nameof(ObjectiveEntryView)} assigned."
                 );
             }
+        }
+
+        public void RefreshProgress()
+        {
+            ValidateReferences();
+
+            if (deliveryObjective == null)
+            {
+                deliveryObjective =
+                    FindDeliveryObjective();
+            }
+
+            objectiveEntryView.SetProgress(
+                deliveryObjective.CurrentAmount,
+                deliveryObjective.RequiredAmount
+            );
+        }
+
+        public void Refresh()
+        {
+            ValidateReferences();
+
+            if (deliveryObjective == null)
+            {
+                deliveryObjective =
+                    FindDeliveryObjective();
+            }
+
+            objectiveEntryView.SetProgress(
+                deliveryObjective.CurrentAmount,
+                deliveryObjective.RequiredAmount
+            );
         }
     }
 }
