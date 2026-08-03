@@ -229,10 +229,23 @@ namespace Catalyst.Cards.Runtime.Session
                 );
             }
 
+            CardZoneRuntime source =
+                ResolveDeliverySource(
+                    session,
+                    card
+                );
+
+            if (source == null)
+            {
+                return CardDeliveryResult.Fail(
+                    CardDeliveryFailure.CardNotInSource
+                );
+            }
+
             CardDeliveryResult result =
                 cardDeliveryService.TryDeliver(
                     card,
-                    session.Hand,
+                    source,
                     deliveryZone
                 );
 
@@ -325,6 +338,59 @@ namespace Catalyst.Cards.Runtime.Session
                     source,
                     session.ReactionTable
                 );
+        }
+        private static CardZoneRuntime ResolveDeliverySource(
+    GameSession session,
+    CardInstance card
+)
+        {
+            if (ContainsExactInstance(
+                    session.Hand,
+                    card
+                ))
+            {
+                return session.Hand;
+            }
+
+            if (ContainsExactInstance(
+                    session.ReactionTable,
+                    card
+                ))
+            {
+                return session.ReactionTable;
+            }
+
+            return null;
+        }
+
+        private static bool ContainsExactInstance(
+            CardZoneRuntime zone,
+            CardInstance card
+        )
+        {
+            if (
+                zone == null
+                || card == null
+            )
+            {
+                return false;
+            }
+
+            foreach (
+                CardInstance containedCard
+                in zone.Cards
+            )
+            {
+                if (ReferenceEquals(
+                        containedCard,
+                        card
+                    ))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
         #endregion
 

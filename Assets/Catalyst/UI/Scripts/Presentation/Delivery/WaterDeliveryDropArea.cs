@@ -10,6 +10,7 @@ using Catalyst.UI.Presentation.Hand;
 using Catalyst.UI.Presentation.Interaction;
 using Catalyst.UI.Presentation.Objectives;
 using Catalyst.UI.Presentation.Session;
+using Catalyst.UI.Presentation.ReactionTable;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -37,6 +38,9 @@ namespace Catalyst.UI.Presentation.Delivery
         [Header("Visual Refresh")]
         [SerializeField]
         private InitialHandPresenter handPresenter;
+
+        [SerializeField]
+        private ReactionTablePresenter reactionTablePresenter;
 
         [SerializeField]
         private WaterTankPresenter waterTankPresenter;
@@ -111,8 +115,8 @@ namespace Catalyst.UI.Presentation.Delivery
             }
 
             if (!TryGetDeliverableCard(
-                    out CardInstance card
-                ))
+                out CardInstance card
+            ))
             {
                 return;
             }
@@ -150,8 +154,8 @@ namespace Catalyst.UI.Presentation.Delivery
         }
 
         private bool TryGetDeliverableCard(
-            out CardInstance card
-        )
+    out CardInstance card
+)
         {
             card = null;
 
@@ -180,16 +184,14 @@ namespace Catalyst.UI.Presentation.Delivery
                 return false;
             }
 
-            if (!dragPresenter.IsDraggingFrom(
-                    CardDragOrigin.Hand
+            if (!dragPresenter.TryGetDraggedCard(
+                    out card
                 ))
             {
                 return false;
             }
 
-            if (!dragPresenter.TryGetDraggedCard(
-                    out card
-                ))
+            if (!HasSupportedDragOrigin())
             {
                 return false;
             }
@@ -208,9 +210,20 @@ namespace Catalyst.UI.Presentation.Delivery
             );
         }
 
+        private bool HasSupportedDragOrigin()
+        {
+            return
+                dragPresenter.DragOrigin
+                    == CardDragOrigin.Hand
+                || dragPresenter.DragOrigin
+                    == CardDragOrigin.ReactionTable;
+        }
+
         private void RefreshAfterDelivery()
         {
             handPresenter.PresentInitialHand();
+
+            reactionTablePresenter.Refresh();
 
             waterTankPresenter.Refresh();
 
@@ -282,6 +295,15 @@ namespace Catalyst.UI.Presentation.Delivery
                     $"{nameof(GameSessionEndPresenter)} assigned."
                 );
             }
+            if (reactionTablePresenter == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(WaterDeliveryDropArea)} " +
+                    $"on '{name}' has no " +
+                    $"{nameof(ReactionTablePresenter)} assigned."
+                );
+            }
         }
+
     }
 }

@@ -2479,6 +2479,10 @@ PrefabInstance:
       propertyPath: sessionEndPresenter
       value: 
       objectReference: {fileID: 928447158}
+    - target: {fileID: 510419093034961075, guid: b8146385a59fd014ca9a4a0be75bfa4f, type: 3}
+      propertyPath: reactionTablePresenter
+      value: 
+      objectReference: {fileID: 1902360159}
     - target: {fileID: 7106553937164290811, guid: b8146385a59fd014ca9a4a0be75bfa4f, type: 3}
       propertyPath: bootstrap
       value: 
