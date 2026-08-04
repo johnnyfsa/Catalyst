@@ -141,6 +141,20 @@ namespace Catalyst.UI.Presentation.Objectives
             );
         }
 
+        public CardDeliveryZoneRuntime
+    GetDeliveryObjective()
+        {
+            ValidateReferences();
+
+            if (deliveryObjective == null)
+            {
+                deliveryObjective =
+                    FindDeliveryObjective();
+            }
+
+            return deliveryObjective;
+        }
+
         public void Refresh()
         {
             ValidateReferences();

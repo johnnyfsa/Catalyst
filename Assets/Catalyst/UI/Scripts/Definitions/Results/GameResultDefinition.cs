@@ -14,6 +14,11 @@ namespace Catalyst.UI.Definitions.Results
         [Header("Identity")]
         [SerializeField]
         private GameSessionEndReason endReason;
+        [SerializeField]
+        private Sprite background;
+
+        public Sprite Background =>
+            background;
 
         [SerializeField]
         private GameResultOutcome outcome;
@@ -28,6 +33,19 @@ namespace Catalyst.UI.Definitions.Results
         [SerializeField]
         [TextArea]
         private string message;
+
+        [Header("Summary")]
+        [SerializeField]
+        private string objectiveSummaryLabel;
+
+        [SerializeField]
+        private string sessionSummaryLabel;
+
+        public string ObjectiveSummaryLabel =>
+            objectiveSummaryLabel;
+
+        public string SessionSummaryLabel =>
+            sessionSummaryLabel;
 
         public GameSessionEndReason EndReason =>
             endReason;

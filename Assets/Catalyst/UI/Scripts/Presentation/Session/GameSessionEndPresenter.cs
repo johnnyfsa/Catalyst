@@ -5,6 +5,8 @@ using Catalyst.UI.Presentation.Hand;
 using Catalyst.UI.Presentation.Inspection;
 using Catalyst.UI.Presentation.ReactionTable;
 using Catalyst.UI.Presentation.Turn;
+using Catalyst.Cards.Runtime.Session;
+using Catalyst.UI.Presentation.GameResult;
 using UnityEngine;
 
 namespace Catalyst.UI.Presentation.Session
@@ -15,6 +17,12 @@ namespace Catalyst.UI.Presentation.Session
         [Header("Runtime Source")]
         [SerializeField]
         private GameSessionBootstrap bootstrap;
+
+        [Header("Result Presentation")]
+        [SerializeField]
+        private GameResultPresenter gameResultPresenter;
+
+        private GameSession appliedSession;
 
         [Header("Inspection")]
         [SerializeField]
@@ -70,10 +78,21 @@ namespace Catalyst.UI.Presentation.Session
         {
             ValidateReferences();
 
+            GameSession session =
+                bootstrap.Session;
+
             if (
-                bootstrap.Session == null
-                || !bootstrap.Session.HasEnded
+                session == null
+                || !session.HasEnded
             )
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(
+                appliedSession,
+                session
+            ))
             {
                 return false;
             }
@@ -101,20 +120,27 @@ namespace Catalyst.UI.Presentation.Session
             turnActionButtonPresenter
                 .SetInteractionLocked(true);
 
+            gameResultPresenter
+                .PresentEndedSession();
+
+            appliedSession =
+                session;
+
             HasAppliedSessionEnd = true;
 
             Debug.Log(
                 $"Session ended. " +
-                $"Reason: {bootstrap.Session.EndReason}. " +
-                $"Turn: {bootstrap.Session.Turn.TurnNumber}. " +
+                $"Reason: {session.EndReason}. " +
+                $"Turn: {session.Turn.TurnNumber}. " +
                 $"Maximum turns: " +
                 $"{FormatMaximumTurns()}. " +
                 $"Phase: " +
-                $"{bootstrap.Session.Turn.CurrentPhase}. " +
-                $"Hand: {bootstrap.Session.Hand.Count}/" +
-                $"{bootstrap.Session.Hand.Capacity}. " +
-                $"Deck: {bootstrap.Session.Deck.Count}. " +
-                "Interactions locked: true.",
+                $"{session.Turn.CurrentPhase}. " +
+                $"Hand: {session.Hand.Count}/" +
+                $"{session.Hand.Capacity}. " +
+                $"Deck: {session.Deck.Count}. " +
+                "Interactions locked: true. " +
+                "Result presented: true.",
                 this
             );
 
@@ -220,6 +246,15 @@ namespace Catalyst.UI.Presentation.Session
                     $"on '{name}' has no " +
                     $"{nameof(TurnActionButtonPresenter)} " +
                     "assigned."
+                );
+            }
+
+            if (gameResultPresenter == null)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(GameSessionEndPresenter)} " +
+                    $"on '{name}' has no " +
+                    $"{nameof(GameResultPresenter)} assigned."
                 );
             }
         }

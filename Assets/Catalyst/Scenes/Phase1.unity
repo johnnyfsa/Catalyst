@@ -870,7 +870,7 @@ MonoBehaviour:
   - acceptedDefinition: {fileID: 11400000, guid: 62de5a9c413b6d742bb3412a315930e5, type: 2}
     requiredAmount: 8
   useTurnLimit: 1
-  maximumTurns: 12
+  maximumTurns: 1
   randomSeed: 12345
 --- !u!4 &845730861
 Transform:
@@ -977,6 +977,7 @@ GameObject:
   m_Component:
   - component: {fileID: 928447157}
   - component: {fileID: 928447158}
+  - component: {fileID: 928447159}
   m_Layer: 5
   m_Name: SessionEndPresenter
   m_TagString: Untagged
@@ -1016,6 +1017,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bootstrap: {fileID: 845730860}
+  gameResultPresenter: {fileID: 928447159}
   inspectionPresenter: {fileID: 460561814}
   dragPresenter: {fileID: 1514875159}
   handPresenter: {fileID: 1845664308}
@@ -1025,6 +1027,22 @@ MonoBehaviour:
   discardDropArea: {fileID: 1465631010}
   reactionAvailabilityPresenter: {fileID: 8360304083609516396}
   turnActionButtonPresenter: {fileID: 1857564778}
+--- !u!114 &928447159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 928447156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d024865397defb4cbdb07eea8e59d27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bootstrap: {fileID: 845730860}
+  resultContext: {fileID: 1662488087}
+  objectivePresenter: {fileID: 1937225849}
+  overlayView: {fileID: 4996959980846034222}
 --- !u!1 &992162953
 GameObject:
   m_ObjectHideFlags: 0
@@ -2594,40 +2612,27 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3688415853306514652, guid: bf98eada1fb443249bd31557195dba99, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 5333457477853672185, guid: bf98eada1fb443249bd31557195dba99, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 5879174166963579743, guid: bf98eada1fb443249bd31557195dba99, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3806134644722429601, guid: bf98eada1fb443249bd31557195dba99, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 1641299177155624312, guid: bf98eada1fb443249bd31557195dba99, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 9028455651985808888, guid: bf98eada1fb443249bd31557195dba99, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 2713459801887494020, guid: bf98eada1fb443249bd31557195dba99, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bf98eada1fb443249bd31557195dba99, type: 3}
 --- !u!224 &4996959980846034221 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1711835584323462269, guid: bf98eada1fb443249bd31557195dba99, type: 3}
   m_PrefabInstance: {fileID: 4996959980846034220}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4996959980846034222 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5342547100585207671, guid: bf98eada1fb443249bd31557195dba99, type: 3}
+  m_PrefabInstance: {fileID: 4996959980846034220}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83a9156ee83097643ad16f55b60ba722, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &5945630717972095659
 PrefabInstance:
   m_ObjectHideFlags: 0
