@@ -860,7 +860,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c19ffbd41e5abeb4086f6c747568f8a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deckDefinition: {fileID: 11400000, guid: 00bca9ffd39275f4ab80d5659bea4aad, type: 2}
+  deckDefinition: {fileID: 11400000, guid: 6bb02524766cc0e42a5efddd8de8f49e, type: 2}
   reactionLibrary: {fileID: 11400000, guid: de830f52bc0ce114c8a059f35c70c0c4, type: 2}
   initialHandSize: 8
   maxHandSize: 8
@@ -870,7 +870,7 @@ MonoBehaviour:
   - acceptedDefinition: {fileID: 11400000, guid: 62de5a9c413b6d742bb3412a315930e5, type: 2}
     requiredAmount: 8
   useTurnLimit: 1
-  maximumTurns: 1
+  maximumTurns: 12
   randomSeed: 12345
 --- !u!4 &845730861
 Transform:
@@ -2611,6 +2611,18 @@ PrefabInstance:
     - target: {fileID: 1711835584323462269, guid: bf98eada1fb443249bd31557195dba99, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5342547100585207671, guid: bf98eada1fb443249bd31557195dba99, type: 3}
+      propertyPath: defeatAccentColor.b
+      value: 0.068841234
+      objectReference: {fileID: 0}
+    - target: {fileID: 5342547100585207671, guid: bf98eada1fb443249bd31557195dba99, type: 3}
+      propertyPath: defeatAccentColor.g
+      value: 0.15182647
+      objectReference: {fileID: 0}
+    - target: {fileID: 5342547100585207671, guid: bf98eada1fb443249bd31557195dba99, type: 3}
+      propertyPath: defeatAccentColor.r
+      value: 0.8584906
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
