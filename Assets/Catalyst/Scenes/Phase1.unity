@@ -903,6 +903,7 @@ MonoBehaviour:
   useTurnLimit: 1
   maximumTurns: 12
   randomSeed: 12345
+  fallbackEntryMode: 0
 --- !u!4 &845730861
 Transform:
   m_ObjectHideFlags: 0
@@ -2165,6 +2166,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1753171913 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1730775172106765771, guid: bf98eada1fb443249bd31557195dba99, type: 3}
+  m_PrefabInstance: {fileID: 4996959980846034220}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b1b5218812ea9642b199aa314c7bf1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1753171914 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4315246734771554145, guid: bf98eada1fb443249bd31557195dba99, type: 3}
+  m_PrefabInstance: {fileID: 4996959980846034220}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1845664308 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5544053490037123626, guid: e87a7d0089f682a42ad08041bd1fad88, type: 3}
@@ -2320,6 +2343,33 @@ MonoBehaviour:
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4367155616236481561, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
   m_PrefabInstance: {fileID: 2132337065}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2073505025 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6608150633632876131, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
+  m_PrefabInstance: {fileID: 2132337065}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b1b5218812ea9642b199aa314c7bf1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2073505026 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8670266212844930249, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
+  m_PrefabInstance: {fileID: 2132337065}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &2119218560 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 942456796646146695, guid: bf98eada1fb443249bd31557195dba99, type: 3}
+  m_PrefabInstance: {fileID: 4996959980846034220}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2132337065
 PrefabInstance:
@@ -3034,7 +3084,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 510466172817455500, guid: bf98eada1fb443249bd31557195dba99, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2073505024}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 942456796646146695, guid: bf98eada1fb443249bd31557195dba99, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4996959980846034223}
   m_SourcePrefab: {fileID: 100100000, guid: bf98eada1fb443249bd31557195dba99, type: 3}
 --- !u!224 &4996959980846034221 stripped
 RectTransform:
@@ -3046,12 +3099,30 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5342547100585207671, guid: bf98eada1fb443249bd31557195dba99, type: 3}
   m_PrefabInstance: {fileID: 4996959980846034220}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 2119218560}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 83a9156ee83097643ad16f55b60ba722, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4996959980846034223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2119218560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbc50c385d1774940bd1943ddcb85554, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bootstrap: {fileID: 845730860}
+  retryButton: {fileID: 1753171914}
+  retryButtonVisual: {fileID: 1753171913}
+  returnToTitleButton: {fileID: 2073505026}
+  returnToTitleButtonVisual: {fileID: 2073505025}
+  titleSceneName: MainMenu
 --- !u!1001 &5945630717972095659
 PrefabInstance:
   m_ObjectHideFlags: 0
