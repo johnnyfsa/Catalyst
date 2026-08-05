@@ -7,6 +7,7 @@ using Catalyst.Cards.Runtime.Randomness;
 using Catalyst.Cards.Runtime.Session;
 using Catalyst.Game.Bootstrap;
 using Catalyst.Reactions.Definitions;
+using Catalyst.Game.Launch;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -31,9 +32,17 @@ namespace Catalyst.Tests.EditMode.Game.Bootstrap
         private readonly List<UnityEngine.Object> createdObjects =
             new List<UnityEngine.Object>();
 
+        private const string RandomSeedFieldName =
+            "randomSeed";
+
+        private const string FallbackEntryModeFieldName =
+            "fallbackEntryMode";
+
         [SetUp]
         public void SetUp()
         {
+            GameLaunchContext.Clear();
+
             bootstrapObject =
                 new GameObject(
                     nameof(GameSessionBootstrapTests)
@@ -61,6 +70,7 @@ namespace Catalyst.Tests.EditMode.Game.Bootstrap
             }
 
             createdObjects.Clear();
+            GameLaunchContext.Clear();
 
             if (bootstrapObject != null)
             {
@@ -68,6 +78,104 @@ namespace Catalyst.Tests.EditMode.Game.Bootstrap
                     bootstrapObject
                 );
             }
+        }
+
+        [Test]
+        public void Awake_WithPendingLaunchRequest_UsesRequest()
+        {
+            ConfigureValidBootstrap();
+
+            SetPrivateField(
+                bootstrap,
+                RandomSeedFieldName,
+                111
+            );
+
+            SetPrivateField(
+                bootstrap,
+                FallbackEntryModeFieldName,
+                StageEntryMode.ShowBriefing
+            );
+
+            GameLaunchContext.Prepare(
+                new GameLaunchRequest(
+                    seed: 222,
+                    entryMode:
+                        StageEntryMode.SkipBriefing
+                )
+            );
+
+            InvokeAwake();
+
+            Assert.That(
+                bootstrap.SessionSeed,
+                Is.EqualTo(222)
+            );
+
+            Assert.That(
+                bootstrap.EntryMode,
+                Is.EqualTo(
+                    StageEntryMode.SkipBriefing
+                )
+            );
+        }
+
+        [Test]
+        public void Awake_WithPendingLaunchRequest_ConsumesRequest()
+        {
+            ConfigureValidBootstrap();
+
+            GameLaunchContext.Prepare(
+                new GameLaunchRequest(
+                    seed: 222,
+                    entryMode:
+                        StageEntryMode.SkipBriefing
+                )
+            );
+
+            InvokeAwake();
+
+            bool remainsPending =
+                GameLaunchContext.TryConsume(
+                    out _
+                );
+
+            Assert.That(
+                remainsPending,
+                Is.False
+            );
+        }
+
+        [Test]
+        public void Awake_WithoutLaunchRequest_UsesDevelopmentFallback()
+        {
+            ConfigureValidBootstrap();
+
+            SetPrivateField(
+                bootstrap,
+                RandomSeedFieldName,
+                333
+            );
+
+            SetPrivateField(
+                bootstrap,
+                FallbackEntryModeFieldName,
+                StageEntryMode.ShowBriefing
+            );
+
+            InvokeAwake();
+
+            Assert.That(
+                bootstrap.SessionSeed,
+                Is.EqualTo(333)
+            );
+
+            Assert.That(
+                bootstrap.EntryMode,
+                Is.EqualTo(
+                    StageEntryMode.ShowBriefing
+                )
+            );
         }
 
         [Test]
@@ -550,6 +658,53 @@ namespace Catalyst.Tests.EditMode.Game.Bootstrap
             method.Invoke(
                 bootstrap,
                 Array.Empty<object>()
+            );
+        }
+
+        private void ConfigureValidBootstrap()
+        {
+            CardDefinition card =
+                CreateCardDefinition();
+
+            DeckDefinition deckDefinition =
+                CreateDeckDefinition(
+                    new DeckEntry(
+                        card,
+                        quantity: 2
+                    )
+                );
+
+            ReactionLibraryDefinition library =
+                CreateReactionLibrary();
+
+            SetPrivateField(
+                bootstrap,
+                DeckDefinitionFieldName,
+                deckDefinition
+            );
+
+            SetPrivateField(
+                bootstrap,
+                ReactionLibraryFieldName,
+                library
+            );
+
+            SetPrivateField(
+                bootstrap,
+                "initialHandSize",
+                1
+            );
+
+            SetPrivateField(
+                bootstrap,
+                "maxHandSize",
+                1
+            );
+
+            SetPrivateField(
+                bootstrap,
+                "useTurnLimit",
+                false
             );
         }
     }

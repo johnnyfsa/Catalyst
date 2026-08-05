@@ -13,6 +13,7 @@ using Catalyst.Cards.Runtime.Session;
 using Catalyst.Cards.Runtime.Turn;
 using Catalyst.Reactions.Runtime;
 using Catalyst.Reactions.Runtime.Resolution;
+using Catalyst.Game.Launch;
 using UnityEngine;
 
 namespace Catalyst.Game.Bootstrap
@@ -84,9 +85,25 @@ namespace Catalyst.Game.Bootstrap
         [Min(1)]
         private int maximumTurns = 10;
 
-        [Header("Randomness")]
+        [Header("Development Launch Fallback")]
         [SerializeField]
         private int randomSeed = 12345;
+
+        [SerializeField]
+        private StageEntryMode fallbackEntryMode =
+            StageEntryMode.ShowBriefing;
+
+        public int SessionSeed
+        {
+            get;
+            private set;
+        }
+
+        public StageEntryMode EntryMode
+        {
+            get;
+            private set;
+        }
 
         public GameSession Session { get; private set; }
 
@@ -110,6 +127,7 @@ namespace Catalyst.Game.Bootstrap
 
         private void Awake()
         {
+            ResolveLaunch();
             if (deckDefinition == null)
             {
                 throw new InvalidOperationException(
@@ -172,22 +190,25 @@ namespace Catalyst.Game.Bootstrap
                         configuredMaximumTurns
                 ),
                 new SeededRandomSource(
-                    randomSeed
+                    SessionSeed
                 )
             );
 
             SessionFlow.Start(Session);
 
             Debug.Log(
-                $"Session initialized. " +
-                $"Cards: {Session.SessionCards.Count}, " +
-                $"Deck: {Session.Deck.Count}, " +
-                $"Hand: {Session.Hand.Count}, " +
-                $"Delivery zones: {Session.DeliveryZones.Count}, " +
-                $"Reactions: {ReactionFlow.AvailableReactions.Count}, " +
-                $"Heat: {Session.Heat.Amount}, " +
-                $"Electricity: {Session.Electricity.Amount}, " +
-                $"Turn limit: {FormatTurnLimit(Session)}"
+               $"Session initialized. " +
+               $"Seed: {SessionSeed}. " +
+               $"Entry mode: {EntryMode}. " +
+               $"Cards: {Session.SessionCards.Count}, " +
+               $"Deck: {Session.Deck.Count}, " +
+               $"Hand: {Session.Hand.Count}, " +
+               $"Delivery zones: {Session.DeliveryZones.Count}, " +
+               $"Reactions: {ReactionFlow.AvailableReactions.Count}, " +
+               $"Heat: {Session.Heat.Amount}, " +
+               $"Electricity: {Session.Electricity.Amount}, " +
+               $"Turn limit: {FormatTurnLimit(Session)}",
+               this
             );
             DrawPhaseResult initialDrawResult =
     SessionFlow.ResolveDrawPhase(
@@ -198,6 +219,39 @@ namespace Catalyst.Game.Bootstrap
                 $"Initial draw resolved. " +
                 $"Outcome: {initialDrawResult.Outcome}. " +
                 $"Phase: {Session.Turn.CurrentPhase}."
+            );
+        }
+
+        private void ResolveLaunch()
+        {
+            if (
+                GameLaunchContext.TryConsume(
+                    out GameLaunchRequest request
+                )
+            )
+            {
+                SessionSeed = request.Seed;
+                EntryMode = request.EntryMode;
+
+                Debug.Log(
+                    $"Game launch request consumed. " +
+                    $"Seed: {SessionSeed}. " +
+                    $"Entry mode: {EntryMode}.",
+                    this
+                );
+
+                return;
+            }
+
+            SessionSeed = randomSeed;
+            EntryMode = fallbackEntryMode;
+
+            Debug.Log(
+                $"No game launch request found. " +
+                $"Using development fallback. " +
+                $"Seed: {SessionSeed}. " +
+                $"Entry mode: {EntryMode}.",
+                this
             );
         }
 
