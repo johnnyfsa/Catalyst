@@ -16,7 +16,7 @@ MonoBehaviour:
   background: {fileID: 21300000, guid: 2a4032bf44b82cd4aa47af2c4a787399, type: 3}
   outcome: 1
   icon: {fileID: 21300000, guid: 35cca8e5b5e9f734db5a54de0914d1ca, type: 3}
-  title: No more resources
-  message: There are no more resources to react
-  objectiveSummaryLabel: Water
-  sessionSummaryLabel: Turns
+  title: Sem recursos
+  message: "N\xE3o h\xE1 mais recursos para reagir"
+  objectiveSummaryLabel: "\xC0gua"
+  sessionSummaryLabel: Turnos

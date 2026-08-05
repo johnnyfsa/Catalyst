@@ -134,6 +134,10 @@ PrefabInstance:
       propertyPath: bootstrap
       value: 
       objectReference: {fileID: 845730860}
+    - target: {fileID: 2524354688279033693, guid: c08f24c59220d19419ff95b2abd04a5e, type: 3}
+      propertyPath: m_text
+      value: 'Turno:'
+      objectReference: {fileID: 0}
     - target: {fileID: 2594069864163444365, guid: c08f24c59220d19419ff95b2abd04a5e, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 257
@@ -266,6 +270,14 @@ PrefabInstance:
     - target: {fileID: 2063741472181353934, guid: e87a7d0089f682a42ad08041bd1fad88, type: 3}
       propertyPath: m_Name
       value: PlayerBoard
+      objectReference: {fileID: 0}
+    - target: {fileID: 4086779511312328258, guid: e87a7d0089f682a42ad08041bd1fad88, type: 3}
+      propertyPath: m_text
+      value: 'Cartas Restantes:'
+      objectReference: {fileID: 0}
+    - target: {fileID: 4086779511312328258, guid: e87a7d0089f682a42ad08041bd1fad88, type: 3}
+      propertyPath: m_fontSize
+      value: 7.75
       objectReference: {fileID: 0}
     - target: {fileID: 4891017769755226582, guid: e87a7d0089f682a42ad08041bd1fad88, type: 3}
       propertyPath: m_FillAmount
@@ -1473,7 +1485,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2740415638819322064, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
       propertyPath: m_text
-      value: NextTurn
+      value: Passar Turno
+      objectReference: {fileID: 0}
+    - target: {fileID: 2740415638819322064, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
+      propertyPath: m_fontSize
+      value: 24.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2740415638819322064, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
+      propertyPath: m_margin.x
+      value: 21.52861
+      objectReference: {fileID: 0}
+    - target: {fileID: 2740415638819322064, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
+      propertyPath: m_margin.z
+      value: 29.661697
       objectReference: {fileID: 0}
     - target: {fileID: 2740415638819322064, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
       propertyPath: m_fontColor.b
@@ -1980,7 +2004,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2740415638819322064, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
       propertyPath: m_text
-      value: React
+      value: Reagir
       objectReference: {fileID: 0}
     - target: {fileID: 2740415638819322064, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
       propertyPath: m_fontColor.b
@@ -2312,8 +2336,8 @@ MonoBehaviour:
   bootstrap: {fileID: 845730860}
   acceptedDefinition: {fileID: 11400000, guid: 62de5a9c413b6d742bb3412a315930e5, type: 2}
   objectiveEntryView: {fileID: 207400997}
-  objectiveTitle: PRODUCE WATER
-  objectiveDescription: Deliver water to the reservoir.
+  objectiveTitle: "PRODUZIR \xC1GUA"
+  objectiveDescription: "Entregue \xE1gua para o reservat\xF3rio"
   objectiveIcon: {fileID: 21300000, guid: 33bc8eb9406b74f43a325ac9b87b0ad5, type: 3}
 --- !u!114 &1997688600 stripped
 MonoBehaviour:
@@ -2575,6 +2599,14 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 300
       objectReference: {fileID: 0}
+    - target: {fileID: 3947534089901817602, guid: 401366a84816a8d48ba9986e4739c852, type: 3}
+      propertyPath: m_text
+      value: Objetivos
+      objectReference: {fileID: 0}
+    - target: {fileID: 3947534089901817602, guid: 401366a84816a8d48ba9986e4739c852, type: 3}
+      propertyPath: m_fontSize
+      value: 47.45
+      objectReference: {fileID: 0}
     - target: {fileID: 4641329295114118059, guid: 401366a84816a8d48ba9986e4739c852, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -2686,6 +2718,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 509137029}
     m_Modifications:
+    - target: {fileID: 1172413185159702370, guid: d5b900a70cc79d940b4ae63ca35354c3, type: 3}
+      propertyPath: m_text
+      value: 'Turnos Restantes:'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1172413185159702370, guid: d5b900a70cc79d940b4ae63ca35354c3, type: 3}
+      propertyPath: m_fontSize
+      value: 7.55
+      objectReference: {fileID: 0}
     - target: {fileID: 1671128848557410719, guid: d5b900a70cc79d940b4ae63ca35354c3, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -3290,6 +3330,14 @@ PrefabInstance:
       propertyPath: reactionTablePresenter
       value: 
       objectReference: {fileID: 1902360159}
+    - target: {fileID: 5206632040260536314, guid: b8146385a59fd014ca9a4a0be75bfa4f, type: 3}
+      propertyPath: m_text
+      value: "CAIXA D'\xC1GUA"
+      objectReference: {fileID: 0}
+    - target: {fileID: 5206632040260536314, guid: b8146385a59fd014ca9a4a0be75bfa4f, type: 3}
+      propertyPath: m_fontSize
+      value: 19.3
+      objectReference: {fileID: 0}
     - target: {fileID: 7106553937164290811, guid: b8146385a59fd014ca9a4a0be75bfa4f, type: 3}
       propertyPath: bootstrap
       value: 

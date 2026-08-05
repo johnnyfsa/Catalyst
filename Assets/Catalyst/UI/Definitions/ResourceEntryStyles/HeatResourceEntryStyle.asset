@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21203587b9f82b0448dd437d05372275, type: 3}
   m_Name: HeatResourceEntryStyle
   m_EditorClassIdentifier: 
-  displayName: Heat
+  displayName: Calor
   icon: {fileID: 21300000, guid: 949982dbb4fc15448af7787963c4995e, type: 3}
   outlineColor: {r: 0.8862745, g: 0.3529412, b: 0, a: 0.7058824}
   nameTextColor: {r: 0.8862745, g: 0.3529412, b: 0, a: 1}

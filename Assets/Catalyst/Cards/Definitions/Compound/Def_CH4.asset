@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Def_CH4
   m_EditorClassIdentifier: 
   id: ch4
-  displayName: Methane
+  displayName: Metano
   cardType: 1
   formula: CH<sub>4</sub>
   artwork: {fileID: 21300000, guid: e08a2c87f5486dc40bc207a4a22fb905, type: 3}

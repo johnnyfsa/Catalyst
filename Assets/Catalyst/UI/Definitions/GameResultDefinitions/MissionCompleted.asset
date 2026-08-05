@@ -16,7 +16,7 @@ MonoBehaviour:
   background: {fileID: 21300000, guid: d130750307749494f9421b57d9a397e9, type: 3}
   outcome: 0
   icon: {fileID: 21300000, guid: 832fc0c44953ae54db7dabd6a61b3f69, type: 3}
-  title: Community Saved!
-  message: You managed to create enough water to supply the people.
-  objectiveSummaryLabel: Water
-  sessionSummaryLabel: Turns
+  title: Comunidade Salva!
+  message: "Voc\xEA conseguiu criar \xE1gua suficiente para a comunidade!"
+  objectiveSummaryLabel: "\xC1gua"
+  sessionSummaryLabel: Turnos

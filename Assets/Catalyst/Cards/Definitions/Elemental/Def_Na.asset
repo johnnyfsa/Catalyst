@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Def_Na
   m_EditorClassIdentifier: 
   id: na
-  displayName: Sodium
+  displayName: "S\xF3dio"
   cardType: 0
   formula: Na
   artwork: {fileID: 21300000, guid: 1a8a42023c1e08048ab14216ac18f85f, type: 3}

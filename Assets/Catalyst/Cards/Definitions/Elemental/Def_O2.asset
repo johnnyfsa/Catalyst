@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Def_O2
   m_EditorClassIdentifier: 
   id: o2
-  displayName: Oxigen
+  displayName: "Oxig\xEAnio"
   cardType: 0
   formula: O<sub>2</sub>
   artwork: {fileID: 21300000, guid: eac1a684c71e8b64d9143c6da5935764, type: 3}

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Def_Cl2
   m_EditorClassIdentifier: 
   id: cl2
-  displayName: Chlorine
+  displayName: Cloro
   cardType: 0
   formula: Cl<sub>2</sub>
   artwork: {fileID: 21300000, guid: 0e7c4b2f625339e4497608772219ffd3, type: 3}

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Def_H2O
   m_EditorClassIdentifier: 
   id: h2o
-  displayName: Water
+  displayName: "\xC1gua"
   cardType: 1
   formula: H<sub>2</sub>O
   artwork: {fileID: 21300000, guid: 21a01716de7bc214eadf19cf1a20d2e9, type: 3}

@@ -16,7 +16,8 @@ MonoBehaviour:
   background: {fileID: 21300000, guid: cf804d8ec82873b4c972956d179163e0, type: 3}
   outcome: 1
   icon: {fileID: 21300000, guid: 9153d2b52a261c841a7622dceb244e14, type: 3}
-  title: Fail
-  message: You couldn't produce enough water to supply the people.
-  objectiveSummaryLabel: Water
-  sessionSummaryLabel: Turns
+  title: "N\xE3o conseguiu \xE0 tempo"
+  message: "Voc\xEA n\xE3o conseguiu cumprir o objetivo, a comunidade esperou tempo
+    demais por essa \xE1gua. E n\xE3o resistiu."
+  objectiveSummaryLabel: "\xC1gua"
+  sessionSummaryLabel: Turnos

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Def_H2
   m_EditorClassIdentifier: 
   id: h2
-  displayName: Hydrogen
+  displayName: "Hidrog\xEAnio"
   cardType: 0
   formula: H<sub>2</sub>
   artwork: {fileID: 21300000, guid: d995c2f25db369a4896e6c65e2bb6720, type: 3}

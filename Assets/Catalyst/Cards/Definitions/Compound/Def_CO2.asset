@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Def_CO2
   m_EditorClassIdentifier: 
   id: co2
-  displayName: Carbon Dioxide
+  displayName: "Di\xF3xido de Carbono"
   cardType: 1
   formula: CO<sub>2</sub>
   artwork: {fileID: 21300000, guid: 7f140eda359981e4abeaedbe0f375d51, type: 3}

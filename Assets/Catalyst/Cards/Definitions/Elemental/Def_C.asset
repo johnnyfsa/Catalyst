@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Def_C
   m_EditorClassIdentifier: 
   id: c
-  displayName: Carbon
+  displayName: Carbono
   cardType: 0
   formula: C
   artwork: {fileID: 21300000, guid: ab313019dc457ab4585d4e133e092355, type: 3}

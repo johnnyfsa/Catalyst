@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Def_NaCl
   m_EditorClassIdentifier: 
   id: nacl
-  displayName: Sodium Chloride
+  displayName: "Cloreto de S\xF3dio"
   cardType: 1
   formula: NaCl
   artwork: {fileID: 21300000, guid: dbee772d687577b4d97135b7e2923f87, type: 3}
