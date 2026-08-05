@@ -193,33 +193,83 @@ namespace Catalyst.Game.Bootstrap
                     SessionSeed
                 )
             );
+            Debug.Log(
+    $"Session constructed. " +
+    $"Seed: {SessionSeed}. " +
+    $"Entry mode: {EntryMode}. " +
+    $"State: {Session.State}. " +
+    $"Cards: {Session.SessionCards.Count}. " +
+    $"Deck: {Session.Deck.Count}. " +
+    $"Hand: {Session.Hand.Count}. " +
+    $"Delivery zones: {Session.DeliveryZones.Count}. " +
+    $"Reactions: {ReactionFlow.AvailableReactions.Count}. " +
+    $"Heat: {Session.Heat.Amount}. " +
+    $"Electricity: {Session.Electricity.Amount}. " +
+    $"Turn limit: {FormatTurnLimit(Session)}.",
+    this
+);
+
+            if (EntryMode == StageEntryMode.SkipBriefing)
+            {
+                StartSession();
+            }
+            else
+            {
+                Debug.Log(
+                    $"Session awaiting briefing confirmation. " +
+                    $"Seed: {SessionSeed}. " +
+                    $"Entry mode: {EntryMode}. " +
+                    $"State: {Session.State}.",
+                    this
+                );
+            }
+
+        }
+
+        public bool StartSession()
+        {
+            if (Session == null)
+            {
+                throw new InvalidOperationException(
+                    "The game session must be constructed before it can be started."
+                );
+            }
+
+            if (SessionFlow == null)
+            {
+                throw new InvalidOperationException(
+                    "The game session flow must be created before the session can be started."
+                );
+            }
+
+            if (
+                Session.State
+                != GameSessionState.NotStarted
+            )
+            {
+                return false;
+            }
 
             SessionFlow.Start(Session);
 
-            Debug.Log(
-               $"Session initialized. " +
-               $"Seed: {SessionSeed}. " +
-               $"Entry mode: {EntryMode}. " +
-               $"Cards: {Session.SessionCards.Count}, " +
-               $"Deck: {Session.Deck.Count}, " +
-               $"Hand: {Session.Hand.Count}, " +
-               $"Delivery zones: {Session.DeliveryZones.Count}, " +
-               $"Reactions: {ReactionFlow.AvailableReactions.Count}, " +
-               $"Heat: {Session.Heat.Amount}, " +
-               $"Electricity: {Session.Electricity.Amount}, " +
-               $"Turn limit: {FormatTurnLimit(Session)}",
-               this
-            );
             DrawPhaseResult initialDrawResult =
-    SessionFlow.ResolveDrawPhase(
-        Session
-    );
+                SessionFlow.ResolveDrawPhase(
+                    Session
+                );
 
             Debug.Log(
-                $"Initial draw resolved. " +
-                $"Outcome: {initialDrawResult.Outcome}. " +
-                $"Phase: {Session.Turn.CurrentPhase}."
+                $"Session started. " +
+                $"Seed: {SessionSeed}. " +
+                $"Entry mode: {EntryMode}. " +
+                $"Initial draw outcome: " +
+                $"{initialDrawResult.Outcome}. " +
+                $"State: {Session.State}. " +
+                $"Turn: {Session.Turn.TurnNumber}. " +
+                $"Phase: {Session.Turn.CurrentPhase}.",
+                this
             );
+
+            return true;
         }
 
         private void ResolveLaunch()

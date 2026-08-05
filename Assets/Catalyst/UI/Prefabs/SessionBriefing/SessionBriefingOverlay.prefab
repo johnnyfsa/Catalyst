@@ -200,6 +200,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 625456841334001882}
+  - component: {fileID: 9041591969617176155}
+  - component: {fileID: 9073371183792240351}
   m_Layer: 5
   m_Name: SessionBriefingOverlay
   m_TagString: Untagged
@@ -228,6 +230,38 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &9041591969617176155
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1469505505330169620}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &9073371183792240351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1469505505330169620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0c7b13cf93aca14c8ddc6536804e9c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bootstrap: {fileID: 0}
+  definition: {fileID: 0}
+  canvasGroup: {fileID: 0}
+  stageTitleText: {fileID: 0}
+  briefingText: {fileID: 0}
+  stageBackgroundImage: {fileID: 0}
+  startMissionButton: {fileID: 0}
+  startMissionButtonVisual: {fileID: 0}
 --- !u!1 &3061091856470291860
 GameObject:
   m_ObjectHideFlags: 0

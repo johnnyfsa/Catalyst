@@ -10,6 +10,7 @@ using Catalyst.Reactions.Definitions;
 using Catalyst.Game.Launch;
 using NUnit.Framework;
 using UnityEngine;
+using Catalyst.Cards.Runtime.Turn;
 
 namespace Catalyst.Tests.EditMode.Game.Bootstrap
 {
@@ -117,6 +118,189 @@ namespace Catalyst.Tests.EditMode.Game.Bootstrap
                 Is.EqualTo(
                     StageEntryMode.SkipBriefing
                 )
+            );
+        }
+
+        [Test]
+        public void Awake_WithShowBriefing_LeavesSessionNotStarted()
+        {
+            ConfigureValidBootstrap();
+
+            SetPrivateField(
+                bootstrap,
+                "fallbackEntryMode",
+                StageEntryMode.ShowBriefing
+            );
+
+            InvokeAwake();
+
+            Assert.That(
+                bootstrap.Session.State,
+                Is.EqualTo(
+                    GameSessionState.NotStarted
+                )
+            );
+
+            Assert.That(
+                bootstrap.Session.Turn.HasStarted,
+                Is.False
+            );
+
+            Assert.That(
+                bootstrap.Session.Turn.TurnNumber,
+                Is.Zero
+            );
+
+            Assert.That(
+                bootstrap.Session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.NotStarted)
+            );
+        }
+
+        [Test]
+        public void Awake_WithSkipBriefing_StartsSessionAndResolvesInitialDraw()
+        {
+            ConfigureValidBootstrap();
+
+            SetPrivateField(
+                bootstrap,
+                "fallbackEntryMode",
+                StageEntryMode.SkipBriefing
+            );
+
+            InvokeAwake();
+
+            Assert.That(
+                bootstrap.Session.State,
+                Is.EqualTo(
+                    GameSessionState.Running
+                )
+            );
+
+            Assert.That(
+                bootstrap.Session.Turn.TurnNumber,
+                Is.EqualTo(1)
+            );
+
+            Assert.That(
+                bootstrap.Session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Main)
+            );
+        }
+
+        [Test]
+        public void StartSession_AfterShowBriefing_StartsAndResolvesInitialDraw()
+        {
+            ConfigureValidBootstrap();
+
+            SetPrivateField(
+                bootstrap,
+                "fallbackEntryMode",
+                StageEntryMode.ShowBriefing
+            );
+
+            InvokeAwake();
+
+            bool started =
+                bootstrap.StartSession();
+
+            Assert.That(started, Is.True);
+
+            Assert.That(
+                bootstrap.Session.State,
+                Is.EqualTo(
+                    GameSessionState.Running
+                )
+            );
+
+            Assert.That(
+                bootstrap.Session.Turn.TurnNumber,
+                Is.EqualTo(1)
+            );
+
+            Assert.That(
+                bootstrap.Session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Main)
+            );
+        }
+
+        [Test]
+        public void StartSession_WhenAlreadyStarted_ReturnsFalseWithoutRestarting()
+        {
+            ConfigureValidBootstrap();
+
+            SetPrivateField(
+                bootstrap,
+                "fallbackEntryMode",
+                StageEntryMode.ShowBriefing
+            );
+
+            InvokeAwake();
+
+            bool firstResult =
+                bootstrap.StartSession();
+
+            int turnAfterFirstStart =
+                bootstrap.Session.Turn.TurnNumber;
+
+            GamePhase phaseAfterFirstStart =
+                bootstrap.Session.Turn.CurrentPhase;
+
+            bool secondResult =
+                bootstrap.StartSession();
+
+            Assert.That(firstResult, Is.True);
+            Assert.That(secondResult, Is.False);
+
+            Assert.That(
+                bootstrap.Session.Turn.TurnNumber,
+                Is.EqualTo(turnAfterFirstStart)
+            );
+
+            Assert.That(
+                bootstrap.Session.Turn.CurrentPhase,
+                Is.EqualTo(phaseAfterFirstStart)
+            );
+        }
+
+        [Test]
+        public void Awake_WithSkipBriefingRequest_StartsDespiteShowBriefingFallback()
+        {
+            ConfigureValidBootstrap();
+
+            SetPrivateField(
+                bootstrap,
+                "fallbackEntryMode",
+                StageEntryMode.ShowBriefing
+            );
+
+            GameLaunchContext.Prepare(
+                new GameLaunchRequest(
+                    seed: 987654,
+                    entryMode:
+                        StageEntryMode.SkipBriefing
+                )
+            );
+
+            InvokeAwake();
+
+            Assert.That(
+                bootstrap.EntryMode,
+                Is.EqualTo(
+                    StageEntryMode.SkipBriefing
+                )
+            );
+
+            Assert.That(
+                bootstrap.Session.State,
+                Is.EqualTo(
+                    GameSessionState.Running
+                )
+            );
+
+            Assert.That(
+                bootstrap.Session.Turn.CurrentPhase,
+                Is.EqualTo(GamePhase.Main)
             );
         }
 
