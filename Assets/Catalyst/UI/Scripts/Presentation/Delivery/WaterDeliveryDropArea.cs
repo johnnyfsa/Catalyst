@@ -5,6 +5,7 @@ using Catalyst.Cards.Runtime.Session;
 using Catalyst.Cards.Runtime.Turn;
 using Catalyst.Cards.Runtime.Zones;
 using Catalyst.Game.Bootstrap;
+using Catalyst.UI.Presentation.Audio;
 using Catalyst.Game.UI;
 using Catalyst.UI.Presentation.Hand;
 using Catalyst.UI.Presentation.Interaction;
@@ -48,6 +49,10 @@ namespace Catalyst.UI.Presentation.Delivery
         [SerializeField]
         private GameSessionEndPresenter
             sessionEndPresenter;
+
+        [Header("Audio")]
+        [SerializeField]
+        private BasicAudioPresenter audioPresenter;
 
         private bool interactionLocked;
 
@@ -147,6 +152,7 @@ namespace Catalyst.UI.Presentation.Delivery
                 return;
             }
 
+            audioPresenter?.PlayWaterDelivered();
             RefreshAfterDelivery();
 
             sessionEndPresenter

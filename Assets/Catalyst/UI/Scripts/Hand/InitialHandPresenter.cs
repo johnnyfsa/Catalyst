@@ -3,6 +3,7 @@ using Catalyst.Cards.Runtime;
 using Catalyst.Cards.Runtime.Session;
 using Catalyst.Game.Bootstrap;
 using Catalyst.UI.Presentation.Inspection;
+using Catalyst.UI.Presentation.Audio;
 using UnityEngine;
 
 namespace Catalyst.UI.Presentation.Hand
@@ -20,6 +21,10 @@ namespace Catalyst.UI.Presentation.Hand
         [Header("Drag")]
         [SerializeField]
         private HandCardDragPresenter dragPresenter;
+
+        [Header("Audio")]
+        [SerializeField]
+        private BasicAudioPresenter audioPresenter;
 
         [Header("Hand Views")]
         [Tooltip(
@@ -85,7 +90,8 @@ namespace Catalyst.UI.Presentation.Hand
 
                 interactionView.Initialize(
                     inspectionPresenter,
-                    dragPresenter
+                    dragPresenter,
+                    audioPresenter
                 );
                 interactionView.SetInteractionLocked(
                     interactionLocked

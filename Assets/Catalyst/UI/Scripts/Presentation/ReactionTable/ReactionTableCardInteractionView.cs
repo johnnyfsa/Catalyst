@@ -3,6 +3,7 @@ using Catalyst.Cards.Runtime;
 using Catalyst.UI.Presentation.Hand;
 using Catalyst.UI.Presentation.Inspection;
 using Catalyst.UI.Presentation.Interaction;
+using Catalyst.UI.Presentation.Audio;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -27,6 +28,9 @@ namespace Catalyst.UI.Presentation.ReactionTable
 
         private HandCardDragPresenter
             dragPresenter;
+
+        private BasicAudioPresenter
+            audioPresenter;
 
         private bool dragStarted;
 
@@ -63,9 +67,10 @@ namespace Catalyst.UI.Presentation.ReactionTable
             && dragPresenter != null;
 
         public void Initialize(
-            CardInspectionPresenter presenter,
-            HandCardDragPresenter cardDragPresenter
-        )
+    CardInspectionPresenter presenter,
+    HandCardDragPresenter cardDragPresenter,
+    BasicAudioPresenter basicAudioPresenter
+    )
         {
             inspectionPresenter = presenter
                 ?? throw new ArgumentNullException(
@@ -76,6 +81,8 @@ namespace Catalyst.UI.Presentation.ReactionTable
                 ?? throw new ArgumentNullException(
                     nameof(cardDragPresenter)
                 );
+
+            audioPresenter = basicAudioPresenter;
         }
 
         public void OnPointerClick(
@@ -106,6 +113,7 @@ namespace Catalyst.UI.Presentation.ReactionTable
                 card,
                 selectionOutline
             );
+            audioPresenter?.PlayCardClick();
         }
 
         public void OnBeginDrag(
@@ -132,6 +140,7 @@ namespace Catalyst.UI.Presentation.ReactionTable
                 eventData,
                 CardDragOrigin.ReactionTable
             );
+            audioPresenter?.PlayCardClick();
         }
 
         public void OnDrag(

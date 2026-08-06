@@ -4,6 +4,7 @@ using Catalyst.Cards.Runtime.Zones;
 using Catalyst.Game.Bootstrap;
 using Catalyst.UI.Definitions.Results;
 using Catalyst.UI.Presentation.Objectives;
+using Catalyst.UI.Presentation.Audio;
 using UnityEngine;
 
 namespace Catalyst.UI.Presentation.GameResult
@@ -26,6 +27,10 @@ namespace Catalyst.UI.Presentation.GameResult
         [Header("View")]
         [SerializeField]
         private GameResultOverlayView overlayView;
+
+        [Header("Audio")]
+        [SerializeField]
+        private BasicAudioPresenter audioPresenter;
 
         private GameSession presentedSession;
 
@@ -71,8 +76,21 @@ namespace Catalyst.UI.Presentation.GameResult
                 summary
             );
 
-            presentedSession =
-                session;
+            overlayView.Present(
+    definition,
+    summary
+);
+
+            presentedSession = session;
+
+            if (definition.Outcome == GameResultOutcome.Victory)
+            {
+                audioPresenter?.PlayVictory();
+            }
+            else if (definition.Outcome == GameResultOutcome.Defeat)
+            {
+                audioPresenter?.PlayDefeat();
+            }
 
             return true;
         }

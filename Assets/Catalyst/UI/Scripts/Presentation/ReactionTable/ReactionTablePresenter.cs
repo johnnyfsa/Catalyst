@@ -4,6 +4,7 @@ using Catalyst.Cards.Runtime.Session;
 using Catalyst.Game.Bootstrap;
 using Catalyst.UI.Presentation.Hand;
 using Catalyst.UI.Presentation.Inspection;
+using Catalyst.UI.Presentation.Audio;
 using UnityEngine;
 
 namespace Catalyst.UI.Presentation.ReactionTable
@@ -22,6 +23,9 @@ namespace Catalyst.UI.Presentation.ReactionTable
 
         [SerializeField]
         private HandCardDragPresenter dragPresenter;
+
+        [SerializeField]
+        private BasicAudioPresenter audioPresenter;
 
         [Header("Reaction Table Views")]
         [Tooltip(
@@ -138,7 +142,8 @@ namespace Catalyst.UI.Presentation.ReactionTable
             {
                 interactionViews[index].Initialize(
                     inspectionPresenter,
-                    dragPresenter
+                    dragPresenter,
+                    audioPresenter
                 );
                 interactionViews[index].SetInteractionLocked(
                     interactionLocked

@@ -1,6 +1,7 @@
 using System;
 using Catalyst.Cards.Runtime;
 using Catalyst.Cards.Runtime.Session;
+using Catalyst.UI.Presentation.Audio;
 using Catalyst.Cards.Runtime.Zones;
 using Catalyst.Game.Bootstrap;
 using Catalyst.UI.Presentation.Hand;
@@ -58,6 +59,10 @@ namespace Catalyst.UI.Presentation.Discard
         [SerializeField]
         private TurnActionButtonPresenter
         turnActionButtonPresenter;
+
+        [Header("Audio")]
+        [SerializeField]
+        private BasicAudioPresenter audioPresenter;
 
         private CardInstance trackedCard;
 
@@ -195,6 +200,8 @@ namespace Catalyst.UI.Presentation.Discard
                 CancelCharging();
                 return;
             }
+
+            audioPresenter?.PlayCardDiscarded();
 
             RefreshAfterDiscard(
                 origin

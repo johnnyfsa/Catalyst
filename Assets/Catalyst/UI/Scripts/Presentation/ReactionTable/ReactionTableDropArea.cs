@@ -4,6 +4,7 @@ using Catalyst.Cards.Runtime.Movement;
 using Catalyst.Cards.Runtime.Session;
 using Catalyst.Game.Bootstrap;
 using Catalyst.UI.Presentation.Hand;
+using Catalyst.UI.Presentation.Audio;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -34,6 +35,10 @@ namespace Catalyst.UI.Presentation.ReactionTable
         [SerializeField]
         private ReactionAvailabilityPresenter
             reactionAvailabilityPresenter;
+
+        [Header("Audio")]
+        [SerializeField]
+        private BasicAudioPresenter audioPresenter;
 
         private readonly CardMovementService
             movementService =
@@ -141,7 +146,7 @@ namespace Catalyst.UI.Presentation.ReactionTable
 
                 return;
             }
-
+            audioPresenter?.PlayCardPlaced();
             handPresenter.PresentInitialHand();
             reactionTablePresenter.Refresh();
             reactionAvailabilityPresenter.Refresh();

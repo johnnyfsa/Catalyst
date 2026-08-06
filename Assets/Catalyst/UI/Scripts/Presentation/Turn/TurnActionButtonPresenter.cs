@@ -5,6 +5,7 @@ using Catalyst.Game.Bootstrap;
 using Catalyst.UI.Presentation.Hand;
 using Catalyst.UI.Presentation.ReactionTable;
 using Catalyst.UI.Presentation.Session;
+using Catalyst.UI.Presentation.Audio;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -52,6 +53,10 @@ namespace Catalyst.UI.Presentation.Turn
         [SerializeField]
         private GameSessionEndPresenter
         sessionEndPresenter;
+
+        [Header("Audio")]
+        [SerializeField]
+        private BasicAudioPresenter audioPresenter;
 
         private bool interactionLocked;
 
@@ -153,6 +158,8 @@ namespace Catalyst.UI.Presentation.Turn
                 Refresh();
                 return;
             }
+
+            audioPresenter?.PlayTurnPassed();
 
             ResolveStartedDrawPhase(
                  session

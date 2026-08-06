@@ -6,8 +6,10 @@ using Catalyst.UI.Presentation.Hand;
 using Catalyst.UI.Presentation.Session;
 using Catalyst.UI.Presentation.Discard;
 using Catalyst.UI.Presentation.Turn;
+using Catalyst.UI.Presentation.Audio;
 using UnityEngine;
 using UnityEngine.UI;
+
 
 namespace Catalyst.UI.Presentation.ReactionTable
 {
@@ -60,6 +62,9 @@ namespace Catalyst.UI.Presentation.ReactionTable
         [SerializeField]
         private TurnActionButtonPresenter
     turnActionButtonPresenter;
+        [Header("Audio")]
+        [SerializeField]
+        private BasicAudioPresenter audioPresenter;
 
         private bool isExecuting;
 
@@ -163,6 +168,8 @@ namespace Catalyst.UI.Presentation.ReactionTable
 
             SetInteractionsLocked(true);
 
+            audioPresenter?.PlayReactionCharge();
+
             tableAnimationOverlay.PlayFadeIn();
         }
 
@@ -217,6 +224,10 @@ namespace Catalyst.UI.Presentation.ReactionTable
                         $"Failure: {result.Failure}.",
                         this
                     );
+                }
+                else
+                {
+                    audioPresenter?.PlayReactionExecuted();
                 }
 
                 RefreshAffectedPresenters();

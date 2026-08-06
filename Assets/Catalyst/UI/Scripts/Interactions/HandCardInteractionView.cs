@@ -2,6 +2,7 @@ using System;
 using Catalyst.Cards.Runtime;
 using Catalyst.UI.Presentation.Inspection;
 using Catalyst.UI.Presentation.Interaction;
+using Catalyst.UI.Presentation.Audio;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -20,6 +21,8 @@ namespace Catalyst.UI.Presentation.Hand
 
         [SerializeField]
         private GameObject selectionOutline;
+
+        private BasicAudioPresenter audioPresenter;
 
         private CardInspectionPresenter inspectionPresenter;
         private HandCardDragPresenter dragPresenter;
@@ -58,9 +61,10 @@ namespace Catalyst.UI.Presentation.Hand
             && dragPresenter != null;
 
         public void Initialize(
-            CardInspectionPresenter presenter,
-            HandCardDragPresenter cardDragPresenter
-        )
+    CardInspectionPresenter presenter,
+    HandCardDragPresenter cardDragPresenter,
+    BasicAudioPresenter basicAudioPresenter
+)
         {
             inspectionPresenter = presenter
                 ?? throw new ArgumentNullException(
@@ -71,6 +75,8 @@ namespace Catalyst.UI.Presentation.Hand
                 ?? throw new ArgumentNullException(
                     nameof(cardDragPresenter)
                 );
+
+            audioPresenter = basicAudioPresenter;
         }
 
         public void OnPointerClick(
@@ -102,6 +108,8 @@ namespace Catalyst.UI.Presentation.Hand
                 card,
                 selectionOutline
             );
+
+            audioPresenter?.PlayCardClick();
         }
 
         public void OnBeginDrag(
@@ -128,6 +136,7 @@ namespace Catalyst.UI.Presentation.Hand
                 eventData,
                 CardDragOrigin.Hand
             );
+            audioPresenter?.PlayCardClick();
         }
 
         public void OnDrag(
