@@ -2432,11 +2432,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2740415638819322064, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
       propertyPath: m_text
-      value: Return to Title
+      value: "Voltar para o In\xEDcio"
       objectReference: {fileID: 0}
     - target: {fileID: 2740415638819322064, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
       propertyPath: m_fontSize
-      value: 29.35
+      value: 22.9
       objectReference: {fileID: 0}
     - target: {fileID: 3144364456946814270, guid: 4b899e9f9f22aa147bb59f8d4339573c, type: 3}
       propertyPath: m_IsActive
@@ -3222,7 +3222,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7329545331149421432, guid: bf98eada1fb443249bd31557195dba99, type: 3}
       propertyPath: m_text
-      value: Retry
+      value: De Novo
+      objectReference: {fileID: 0}
+    - target: {fileID: 7329545331149421432, guid: bf98eada1fb443249bd31557195dba99, type: 3}
+      propertyPath: m_fontSize
+      value: 30.55
       objectReference: {fileID: 0}
     - target: {fileID: 7499383933795389078, guid: bf98eada1fb443249bd31557195dba99, type: 3}
       propertyPath: m_IsActive

@@ -4,12 +4,16 @@ namespace Catalyst.Game.Launch
 {
     public static class SessionSeedGenerator
     {
+        public static int Generate()
+        {
+            return Guid.NewGuid().GetHashCode();
+        }
+
         public static int GenerateDifferentFrom(
             int previousSeed
         )
         {
-            int generatedSeed =
-                Guid.NewGuid().GetHashCode();
+            int generatedSeed = Generate();
 
             if (generatedSeed == previousSeed)
             {
